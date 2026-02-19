@@ -1,0 +1,188 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>Reconstruction, Suffrage & Structural Amendments — CS 9–11</title>
+<link rel="stylesheet" href="../styles.css"/>
+<style>
+body{margin:0;background:#0b1220;color:#e7eefc;font-family:system-ui;}
+.wrap{width:min(1000px,92vw);margin:30px auto;}
+.panel{background:#111a2f;border:1px solid rgba(255,255,255,.1);padding:20px;border-radius:16px;}
+.choice{border:1px solid rgba(255,255,255,.1);padding:10px;border-radius:12px;margin:8px 0;cursor:pointer;}
+.choice:hover{border-color:#7aa2ff;}
+.msg{padding:10px;border-radius:12px;margin-top:10px;display:none;}
+.msg.good{background:rgba(43,213,118,.1);display:block;}
+.msg.bad{background:rgba(255,92,122,.1);display:block;}
+.msg.warn{background:rgba(255,209,102,.1);display:block;}
+button{padding:10px 14px;border-radius:12px;border:1px solid rgba(255,255,255,.1);background:#16223b;color:white;cursor:pointer;}
+button:hover{border-color:#7aa2ff;}
+</style>
+</head>
+
+<body>
+<div class="wrap">
+<div class="panel">
+<h2>Reconstruction, Suffrage & Structural Amendments — CS 9–11</h2>
+<p>Mastery = 100% accuracy. Function + societal cause + resistance + federal response.</p>
+
+<div id="question"></div>
+<div id="feedback" class="msg"></div>
+
+<button id="submit">Submit</button>
+<button id="hint" disabled>Hint</button>
+<button id="next" disabled>Next</button>
+</div>
+</div>
+
+<script>
+
+const QUESTIONS = [
+
+/* ===== RECONSTRUCTION AMENDMENTS ===== */
+
+{prompt:"What did the 13th Amendment accomplish?",choices:["Ended slavery","Gave women the vote","Created Electoral College","Lowered voting age"],correct:0,hint:"Civil War outcome."},
+
+{prompt:"Why was the 13th Amendment necessary?",choices:["To legally end slavery nationwide","To expand westward","To limit immigration","To establish income tax"],correct:0,hint:"Emancipation Proclamation only applied to rebelling states."},
+
+{prompt:"What did the 14th Amendment guarantee?",choices:["Birthright citizenship and equal protection","Right to bear arms","Income tax authority","Women’s suffrage"],correct:0,hint:"Equal protection clause."},
+
+{prompt:"Why was the 14th Amendment needed after the Civil War?",choices:["Southern states passed Black Codes","Women demanded voting rights","Immigration increased","New territories formed"],correct:0,hint:"Black Codes restricted freedmen."},
+
+{prompt:"What did the 15th Amendment protect?",choices:["Voting rights regardless of race","Freedom of speech","Right to counsel","Protection from cruel punishment"],correct:0,hint:"Race-based suffrage."},
+
+{prompt:"Why was the 15th Amendment necessary?",choices:["States were denying Black men the vote","Women demanded suffrage","Poll taxes existed nationwide","Courts overturned slavery"],correct:0,hint:"Resistance to Reconstruction."},
+
+/* ===== JIM CROW & RESISTANCE ===== */
+
+{prompt:"What were Black Codes designed to do?",choices:["Restrict freedoms of freedmen","Expand voting rights","Improve labor conditions","Increase land ownership"],correct:0,hint:"Post-Civil War South."},
+
+{prompt:"What was the purpose of Jim Crow laws?",choices:["Enforce racial segregation","Protect equal rights","Expand suffrage","Encourage migration"],correct:0,hint:"Plessy v. Ferguson era."},
+
+{prompt:"Which Supreme Court case upheld segregation under 'separate but equal'?",choices:["Plessy v. Ferguson","Brown v. Board","Marbury v. Madison","McCulloch v. Maryland"],correct:0,hint:"1896 decision."},
+
+{prompt:"Why did literacy tests and poll taxes exist?",choices:["To prevent African Americans from voting","To fund schools","To register immigrants","To verify citizenship"],correct:0,hint:"Voting suppression."},
+
+/* ===== CIVIL RIGHTS MOVEMENT ===== */
+
+{prompt:"What did the Civil Rights Act of 1964 accomplish?",choices:["Outlawed discrimination in public accommodations","Ended slavery","Lowered voting age","Created Electoral College"],correct:0,hint:"Public places discrimination."},
+
+{prompt:"What problem led to the Voting Rights Act of 1965?",choices:["Discriminatory voting practices in the South","Immigration increases","Women's suffrage demands","Foreign policy conflicts"],correct:0,hint:"Selma + voting suppression."},
+
+{prompt:"What authority allows Congress to enforce the Reconstruction Amendments?",choices:["Enforcement Clause","Commerce Clause","Necessary Clause","Supremacy Clause"],correct:0,hint:"Section 5 language."},
+
+{prompt:"Brown v. Board of Education overturned which doctrine?",choices:["Separate but equal","Popular sovereignty","Judicial review","Federalism"],correct:0,hint:"Education segregation."},
+
+/* ===== SUFFRAGE EXPANSIONS ===== */
+
+{prompt:"What did the 19th Amendment accomplish?",choices:["Gave women the right to vote","Ended slavery","Created income tax","Lowered voting age to 18"],correct:0,hint:"1920 ratification."},
+
+{prompt:"What social movement led to the 19th Amendment?",choices:["Women’s suffrage movement","Civil Rights Movement","Temperance movement","Labor unions"],correct:0,hint:"Susan B. Anthony era."},
+
+{prompt:"What did the 24th Amendment prohibit?",choices:["Poll taxes in federal elections","Literacy tests","Segregation","Income taxes"],correct:0,hint:"Financial barrier to voting."},
+
+{prompt:"What did the 26th Amendment accomplish?",choices:["Lowered voting age to 18","Granted citizenship","Ended segregation","Created electoral votes for DC"],correct:0,hint:"Vietnam War era slogan."},
+
+{prompt:"Why was the 26th Amendment passed?",choices:["18-year-olds were drafted but couldn’t vote","Women protested","Poll taxes existed","Slavery returned"],correct:0,hint:"Old enough to fight."},
+
+/* ===== STRUCTURAL AMENDMENTS ===== */
+
+{prompt:"Why was the 12th Amendment necessary?",choices:["To fix problems from the Election of 1800","To expand voting rights","To end slavery","To regulate commerce"],correct:0,hint:"Jefferson vs Burr tie."},
+
+{prompt:"What did the 23rd Amendment accomplish?",choices:["Gave DC electoral votes","Ended slavery","Gave women the vote","Lowered voting age"],correct:0,hint:"Washington DC representation."},
+
+{prompt:"What does the 25th Amendment address?",choices:["Presidential succession and disability","Voting age","Electoral College reform","Income tax"],correct:0,hint:"Vice President replacement."},
+
+{prompt:"Why was the 25th Amendment clarified after JFK’s assassination?",choices:["Uncertainty over presidential disability","Voting disputes","Civil Rights protests","Election fraud"],correct:0,hint:"1963 concerns."},
+
+/* ===== CAUSATION & ANALYSIS QUESTIONS ===== */
+
+{prompt:"How did Reconstruction Amendments attempt to change Southern society?",choices:["Extend citizenship and political rights to freedmen","Increase tariffs","Limit federal power","Reduce immigration"],correct:0,hint:"Equal protection + suffrage."},
+
+{prompt:"Why did federal intervention become necessary during Civil Rights era?",choices:["States failed to protect constitutional rights","Immigration increased","Wars required change","Economic depression"],correct:0,hint:"State resistance."},
+
+{prompt:"Which amendment most directly supports incorporation of rights to states?",choices:["14th","10th","7th","3rd"],correct:0,hint:"Due process clause."},
+
+{prompt:"Which development demonstrates resistance to Reconstruction reforms?",choices:["Rise of the Ku Klux Klan","Ratification of 15th Amendment","Passage of Civil Rights Act","Election of African Americans to Congress"],correct:0,hint:"White supremacist violence."},
+
+{prompt:"Which law directly targeted discriminatory voting practices?",choices:["Voting Rights Act of 1965","Civil Rights Act 1964","Social Security Act","Sherman Antitrust Act"],correct:0,hint:"Federal oversight of elections."},
+
+{prompt:"What was the long-term effect of Jim Crow laws?",choices:["Institutionalized racial segregation","Expanded suffrage","Strengthened equal protection","Ended discrimination"],correct:0,hint:"Late 19th to mid-20th century."},
+
+{prompt:"Which amendment addressed discrimination in voting based on race?",choices:["15th","19th","24th","26th"],correct:0,hint:"Post-Civil War."},
+
+{prompt:"Which amendment addressed discrimination in voting based on sex?",choices:["19th","15th","24th","26th"],correct:0,hint:"Women’s suffrage."},
+
+{prompt:"Which amendment addressed discrimination in voting based on age?",choices:["26th","19th","15th","24th"],correct:0,hint:"18 years old."},
+
+{prompt:"Which amendment addressed discrimination in voting based on failure to pay a poll tax?",choices:["24th","15th","19th","26th"],correct:0,hint:"Financial barrier removed."},
+
+{prompt:"Which amendment provided equal protection of the laws?",choices:["14th","13th","15th","12th"],correct:0,hint:"Equal protection clause."},
+
+{prompt:"Which event directly led to greater federal enforcement of civil rights protections?",choices:["Violence against civil rights activists","Election of 1800","Civil War battles","Formation of political parties"],correct:0,hint:"Televised brutality."}
+
+];
+
+let index=0, attempts=0, correct=0, selected=null;
+
+const qDiv=document.getElementById("question");
+const feedback=document.getElementById("feedback");
+const submit=document.getElementById("submit");
+const hint=document.getElementById("hint");
+const next=document.getElementById("next");
+
+function loadQ(){
+  feedback.className="msg";
+  feedback.textContent="";
+  hint.disabled=true;
+  next.disabled=true;
+  selected=null;
+  const q=QUESTIONS[index];
+  qDiv.innerHTML=`<p><b>Question ${index+1} of ${QUESTIONS.length}</b></p><p>${q.prompt}</p>`;
+  q.choices.forEach((c,i)=>{
+    const div=document.createElement("div");
+    div.className="choice";
+    div.textContent=c;
+    div.onclick=()=>selected=i;
+    qDiv.appendChild(div);
+  });
+}
+
+submit.onclick=()=>{
+  if(selected===null)return alert("Select an answer.");
+  attempts++;
+  if(selected===QUESTIONS[index].correct){
+    correct++;
+    feedback.className="msg good";
+    feedback.textContent="Correct.";
+    next.disabled=false;
+  } else {
+    feedback.className="msg bad";
+    feedback.textContent="Incorrect.";
+    hint.disabled=false;
+  }
+};
+
+hint.onclick=()=>{
+  feedback.className="msg warn";
+  feedback.textContent="Hint: "+QUESTIONS[index].hint;
+  hint.disabled=true;
+};
+
+next.onclick=()=>{
+  index++;
+  if(index>=QUESTIONS.length){
+    if(correct===attempts){
+      alert("Mastery achieved!");
+    } else {
+      alert("Replay for 100% mastery.");
+    }
+    location.reload();
+  } else loadQ();
+};
+
+loadQ();
+
+</script>
+</body>
+</html>
