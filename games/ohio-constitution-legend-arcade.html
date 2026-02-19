@@ -1,0 +1,255 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>Ohio Constitution — Legend Arcade Edition</title>
+
+<style>
+:root{
+  --bg1:#0f172a;
+  --bg2:#1e293b;
+  --accent:#38bdf8;
+  --good:#22c55e;
+  --bad:#ef4444;
+  --gold:#facc15;
+  --card:#0f172a;
+  --text:#f1f5f9;
+}
+body{
+  margin:0;
+  font-family:system-ui,Segoe UI,Roboto;
+  color:var(--text);
+  background:linear-gradient(135deg,var(--bg1),var(--bg2));
+  overflow-x:hidden;
+}
+.container{
+  max-width:900px;
+  margin:40px auto;
+  padding:20px;
+}
+.card{
+  background:rgba(15,23,42,.85);
+  border:1px solid rgba(255,255,255,.1);
+  border-radius:20px;
+  padding:25px;
+  box-shadow:0 25px 60px rgba(0,0,0,.6);
+  backdrop-filter:blur(8px);
+  transition:.4s;
+}
+h1{
+  margin:0 0 10px;
+  font-size:26px;
+  letter-spacing:1px;
+}
+.subtitle{
+  color:#94a3b8;
+  margin-bottom:20px;
+}
+.progressbar{
+  height:8px;
+  background:#1e293b;
+  border-radius:20px;
+  overflow:hidden;
+  margin-bottom:20px;
+}
+.progress{
+  height:100%;
+  width:0%;
+  background:linear-gradient(90deg,#38bdf8,#22d3ee);
+  transition:.4s;
+}
+.choice{
+  margin:12px 0;
+  padding:12px 14px;
+  border-radius:14px;
+  border:1px solid rgba(255,255,255,.1);
+  cursor:pointer;
+  transition:.3s;
+}
+.choice:hover{
+  border-color:var(--accent);
+  background:rgba(56,189,248,.15);
+}
+.choice.correct{
+  background:rgba(34,197,94,.2);
+  border-color:var(--good);
+}
+.choice.wrong{
+  background:rgba(239,68,68,.2);
+  border-color:var(--bad);
+}
+.stats{
+  display:flex;
+  justify-content:space-between;
+  margin-bottom:15px;
+  font-weight:600;
+}
+.badge{
+  padding:6px 12px;
+  border-radius:20px;
+  font-size:12px;
+  background:rgba(250,204,21,.2);
+  border:1px solid var(--gold);
+}
+button{
+  margin-top:15px;
+  padding:10px 16px;
+  border-radius:14px;
+  border:none;
+  background:linear-gradient(90deg,#38bdf8,#22d3ee);
+  color:white;
+  font-weight:bold;
+  cursor:pointer;
+}
+button:hover{opacity:.85}
+.ticket{
+  margin-top:20px;
+  padding:15px;
+  border-radius:16px;
+  background:rgba(34,197,94,.15);
+  border:1px solid var(--good);
+}
+.confetti{
+  position:fixed;
+  top:0;left:0;
+  width:100%;height:100%;
+  pointer-events:none;
+}
+</style>
+</head>
+
+<body>
+
+<div class="container">
+<div class="card">
+<h1>🏛 Ohio Constitution — Legend Arcade</h1>
+<div class="subtitle">CS 16–17 | Reform • Structure • Civic Power</div>
+
+<div class="stats">
+<div>XP: <span id="xp">0</span></div>
+<div>Level: <span id="level">1</span></div>
+<div>Streak: <span id="streak">0</span></div>
+<div class="badge" id="badge">Reform Rookie</div>
+</div>
+
+<div class="progressbar"><div class="progress" id="progress"></div></div>
+
+<div id="question"></div>
+<div id="choices"></div>
+<button onclick="next()">Next</button>
+
+<div id="ticket"></div>
+
+</div>
+</div>
+
+<canvas class="confetti" id="confetti"></canvas>
+
+<script>
+// SOUND EFFECTS
+const correctSound=new Audio("https://assets.mixkit.co/sfx/preview/mixkit-correct-answer-tone-2870.mp3");
+const wrongSound=new Audio("https://assets.mixkit.co/sfx/preview/mixkit-wrong-answer-fail-notification-946.mp3");
+const levelSound=new Audio("https://assets.mixkit.co/sfx/preview/mixkit-game-level-completed-2059.mp3");
+
+// QUESTIONS
+const questions=[
+{q:"Why was the 1851 Ohio Constitution adopted?",a:["To limit legislative power and state debt","To expand slavery","To eliminate courts"],c:0},
+{q:"What reform made judges more accountable in 1851?",a:["Election of judges","Lifetime appointment","Executive selection only"],c:0},
+{q:"Which feature exists in Ohio but not U.S. Constitution?",a:["Initiative and referendum","Bill of Rights","Three branches"],c:0},
+{q:"Initiative allows citizens to…",a:["Propose laws by petition","Appoint judges","Impeach governor"],c:0},
+{q:"Referendum allows citizens to…",a:["Vote on laws passed by legislature","Rewrite federal laws","Control Supreme Court"],c:0},
+{q:"One problem under the 1803 Constitution was…",a:["Legislative dominance","Too many judges","No governor"],c:0},
+{q:"Both Ohio and U.S. Constitutions include…",a:["Separation of powers","Monarchy","Direct democracy only"],c:0},
+{q:"Debt limits were added in 1851 to…",a:["Protect taxpayers","Increase federal control","Expand war spending"],c:0},
+{q:"Attending a school board meeting demonstrates…",a:["Civic responsibility","Judicial review","Military authority"],c:0}
+];
+
+let index=0;
+let xp=0;
+let level=1;
+let streak=0;
+let name="";
+let startTime=new Date();
+
+const qDiv=document.getElementById("question");
+const cDiv=document.getElementById("choices");
+
+function render(){
+const q=questions[index];
+qDiv.innerHTML=`<h3>${q.q}</h3>`;
+cDiv.innerHTML="";
+q.a.forEach((choice,i)=>{
+const div=document.createElement("div");
+div.className="choice";
+div.textContent=choice;
+div.onclick=()=>check(i,div);
+cDiv.appendChild(div);
+});
+document.getElementById("progress").style.width=((index)/questions.length*100)+"%";
+}
+
+function check(i,div){
+if(i===questions[index].c){
+div.classList.add("correct");
+correctSound.play();
+xp+=10+(streak*2);
+streak++;
+if(streak%3===0){
+level++;
+levelSound.play();
+document.getElementById("badge").textContent="Civic Champion";
+}
+}else{
+div.classList.add("wrong");
+wrongSound.play();
+streak=0;
+}
+updateStats();
+}
+
+function updateStats(){
+document.getElementById("xp").textContent=xp;
+document.getElementById("level").textContent=level;
+document.getElementById("streak").textContent=streak;
+}
+
+function next(){
+index++;
+if(index>=questions.length){
+celebrate();
+return;
+}
+render();
+}
+
+function celebrate(){
+document.getElementById("progress").style.width="100%";
+launchConfetti();
+document.getElementById("ticket").innerHTML=`
+<div class="ticket">
+<h2>🏆 Mastery Complete!</h2>
+XP Earned: ${xp}<br>
+Level: ${level}<br>
+Started: ${startTime}<br>
+Completed: ${new Date()}
+</div>`;
+}
+
+// CONFETTI
+function launchConfetti(){
+const canvas=document.getElementById("confetti");
+const ctx=canvas.getContext("2d");
+canvas.width=window.innerWidth;
+canvas.height=window.innerHeight;
+for(let i=0;i<150;i++){
+ctx.fillStyle=`hsl(${Math.random()*360},100%,50%)`;
+ctx.fillRect(Math.random()*canvas.width,Math.random()*canvas.height,5,5);
+}
+}
+
+render();
+</script>
+
+</body>
+</html>
