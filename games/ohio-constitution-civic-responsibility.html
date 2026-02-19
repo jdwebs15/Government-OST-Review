@@ -1,0 +1,202 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>Ohio Constitution & Civic Responsibility — CS 16–17</title>
+<link rel="stylesheet" href="../styles.css"/>
+<style>
+body{margin:0;background:#0b1220;color:#e7eefc;font-family:system-ui}
+.app{width:min(1000px,92vw);margin:30px auto}
+.panel{background:#111a2f;border:1px solid rgba(255,255,255,.1);padding:20px;border-radius:16px}
+.choice{border:1px solid rgba(255,255,255,.1);padding:10px;border-radius:12px;margin:8px 0;cursor:pointer}
+.choice:hover{border-color:#7aa2ff}
+.choice.sel{outline:2px solid #7aa2ff}
+.msg{padding:10px;border-radius:12px;margin-top:10px;display:none}
+.msg.good{background:rgba(43,213,118,.1);display:block}
+.msg.bad{background:rgba(255,92,122,.1);display:block}
+.msg.warn{background:rgba(255,209,102,.1);display:block}
+button{padding:10px 14px;border-radius:12px;border:1px solid rgba(255,255,255,.1);background:#16223b;color:white;cursor:pointer}
+button:hover{border-color:#7aa2ff}
+.ticket{background:rgba(43,213,118,.08);border:1px solid rgba(43,213,118,.45);padding:15px;border-radius:14px}
+pre{background:#000;padding:10px;border-radius:10px;font-family:monospace}
+</style>
+</head>
+
+<body>
+<div class="app">
+<div class="panel" id="panel"></div>
+</div>
+
+<script>
+const QUESTIONS = [
+
+/* ===== STRUCTURE & PURPOSE ===== */
+
+{stem:"What is the primary purpose of the Ohio Constitution?",choices:["To establish the framework and powers of state government","To regulate foreign policy","To control federal taxation","To create national laws"],correct:0,hint:"State-level governing framework."},
+
+{stem:"Which principle is shared by both the Ohio and U.S. Constitutions?",choices:["Separation of powers","Unitary government","Monarchy","Direct democracy only"],correct:0,hint:"Three branches."},
+
+{stem:"Both constitutions reflect which idea?",choices:["Popular sovereignty","Absolute executive authority","Judicial supremacy only","Single-branch control"],correct:0,hint:"Power comes from the people."},
+
+/* ===== 1803 → 1851 CHANGES ===== */
+
+{stem:"Why was the Ohio Constitution of 1851 adopted?",choices:["To limit legislative power and state debt","To expand slavery","To eliminate courts","To reduce voter participation"],correct:0,hint:"Legislative abuse & debt problems."},
+
+{stem:"One problem under the 1803 Constitution was that the legislature had too much ___?",choices:["Power","Military authority","Judicial review","Executive independence"],correct:0,hint:"General Assembly dominance."},
+
+{stem:"The 1851 Constitution limited the state’s ability to incur large ___?",choices:["Debt","Taxes","Population","Votes"],correct:0,hint:"Financial restrictions."},
+
+{stem:"Under the 1851 Constitution, many judges became…",choices:["Elected by voters","Appointed for life","Chosen by Congress","Selected by governors only"],correct:0,hint:"Increased accountability."},
+
+{stem:"Why were judges made elected positions in 1851?",choices:["To increase public accountability","To weaken the judiciary","To eliminate courts","To centralize power"],correct:0,hint:"More democratic control."},
+
+/* ===== OHIO VS U.S. DIFFERENCES ===== */
+
+{stem:"Which feature exists in the Ohio Constitution but not the U.S. Constitution?",choices:["Initiative and referendum","Bill of Rights","Separation of powers","Supremacy Clause"],correct:0,hint:"Direct citizen lawmaking."},
+
+{stem:"What is the initiative process?",choices:["Citizens propose laws by petition","Governor appoints legislators","Courts rewrite laws","Congress overrides states"],correct:0,hint:"Citizen-driven proposal."},
+
+{stem:"What is referendum?",choices:["Citizens vote on laws passed by legislature","Judges strike laws","Governor vetoes bills","Congress reviews state laws"],correct:0,hint:"Direct approval/rejection vote."},
+
+{stem:"Which constitution grants electoral votes to Washington D.C.?",choices:["U.S. Constitution (23rd Amendment)","Ohio Constitution","Both","Neither"],correct:0,hint:"Federal amendment."},
+
+/* ===== CIVIC RESPONSIBILITY ===== */
+
+{stem:"Attending a city council meeting is an example of…",choices:["Civic participation","Judicial review","Executive action","Federal enforcement"],correct:0,hint:"Citizen involvement."},
+
+{stem:"Contacting a state legislator about a proposed bill is an example of…",choices:["Influencing public policy","Judicial review","Executive privilege","Tax policy"],correct:0,hint:"Citizen action."},
+
+{stem:"Serving on a local school board demonstrates…",choices:["Active civic responsibility","Federalism","Judicial supremacy","Military authority"],correct:0,hint:"Local governance participation."},
+
+{stem:"Volunteering in a community organization supports which democratic principle?",choices:["Civic engagement","Autocracy","Centralization","Judicial review"],correct:0,hint:"Participation strengthens democracy."},
+
+/* ===== COMPARISON REASONING ===== */
+
+{stem:"Which statement best explains a similarity between the Ohio and U.S. Constitutions?",choices:["Both limit government power through checks and balances","Both allow unlimited legislative power","Both eliminate courts","Both grant executive life tenure"],correct:0,hint:"Power limited by structure."},
+
+{stem:"Which statement best explains why the 1851 Constitution reduced legislative dominance?",choices:["To prevent abuse of power and financial mismanagement","To weaken democracy","To remove voters","To centralize authority"],correct:0,hint:"Response to problems under 1803."},
+
+{stem:"Why are initiative and referendum considered more direct forms of democracy?",choices:["Citizens vote directly on laws","Courts decide policy","Governors appoint legislators","Congress reviews state bills"],correct:0,hint:"Direct vote by people."},
+
+{stem:"Which situation demonstrates federalism in action?",choices:["Ohio passing state laws under its constitution","Congress declaring war","President issuing executive order","Supreme Court hearing a federal case"],correct:0,hint:"State authority."},
+
+{stem:"Which feature reflects popular sovereignty?",choices:["Citizens voting in elections","Executive issuing decrees","Judges appointed for life","Military rule"],correct:0,hint:"Power from people."},
+
+/* ===== STRUCTURAL APPLICATION ===== */
+
+{stem:"If Ohio citizens collect signatures to propose a new state law, they are using the…",choices:["Initiative process","Electoral College","Judicial review","Executive order"],correct:0,hint:"Petition-based proposal."},
+
+{stem:"If Ohio voters reject a law passed by the legislature, they are using the…",choices:["Referendum","Veto","Impeachment","Judicial review"],correct:0,hint:"Direct vote."},
+
+{stem:"The 1851 Constitution’s limits on debt were designed to protect…",choices:["Taxpayers and financial stability","Foreign trade","Federal supremacy","Military expansion"],correct:0,hint:"State fiscal responsibility."},
+
+{stem:"Which is a key difference between the Ohio and U.S. Constitutions regarding judges?",choices:["Ohio judges are elected; federal judges are appointed","Both appoint judges for life","Both elect judges","Federal judges are elected"],correct:0,hint:"State vs federal selection."},
+
+/* ===== RELEASED-STYLE SUPPLEMENTAL QUESTIONS ===== */
+
+{stem:"Which problem under the 1803 Constitution led to reform in 1851?",choices:["Legislative control over courts and high debt","Expansion of suffrage","Federal interference","Judicial activism"],correct:0,hint:"Legislative dominance."},
+
+{stem:"Why does civic responsibility matter in a state government?",choices:["It ensures government reflects the will of the people","It eliminates elections","It removes legislative authority","It centralizes executive control"],correct:0,hint:"Participation matters."},
+
+{stem:"Which scenario reflects a citizen exercising civic responsibility?",choices:["Writing to a representative about public policy","Ignoring elections","Refusing jury duty","Avoiding public meetings"],correct:0,hint:"Active engagement."},
+
+{stem:"How does the Ohio Constitution reflect limited government?",choices:["It divides power among branches and limits debt","It grants unlimited legislative authority","It eliminates checks","It removes judicial oversight"],correct:0,hint:"Checks + fiscal limits."},
+
+{stem:"Which constitutional feature increases accountability of state officials?",choices:["Election of judges","Lifetime appointments","Executive supremacy","Legislative immunity"],correct:0,hint:"Voters choose."},
+
+{stem:"Which is a structural similarity between the two constitutions?",choices:["Both have three branches","Both allow initiative","Both elect federal judges","Both limit executive to one term only"],correct:0,hint:"Legislative, Executive, Judicial."},
+
+{stem:"Why are initiative and referendum considered tools of reform?",choices:["They allow citizens to bypass legislature","They increase federal control","They eliminate courts","They reduce elections"],correct:0,hint:"Direct democracy tools."},
+
+{stem:"Which best describes the relationship between state and federal constitutions?",choices:["State constitutions cannot conflict with the U.S. Constitution","State constitutions override federal law","They are unrelated","Federal law is optional"],correct:0,hint:"Supremacy Clause."},
+
+{stem:"Which principle ensures that government power is divided to prevent abuse?",choices:["Separation of powers","Direct democracy","Federal supremacy","Judicial activism"],correct:0,hint:"Three branches."}
+
+];
+
+let idx=0, attempts=0, correct=0, selected=null, started=new Date(), name="";
+const panel=document.getElementById("panel");
+
+function renderStart(){
+panel.innerHTML=`
+<h2>Enter Name</h2>
+<input id="n" style="width:100%;padding:8px"/>
+<button onclick="start()">Start</button>
+`;
+}
+window.start=function(){
+name=document.getElementById("n").value.trim();
+if(!name)return alert("Enter name");
+renderGame();
+};
+
+function renderGame(){
+const q=QUESTIONS[idx];
+panel.innerHTML=`
+<p><b>Question ${idx+1}/${QUESTIONS.length}</b></p>
+<p>${q.stem}</p>
+<div id="choices"></div>
+<div id="msg" class="msg"></div>
+<button onclick="submit()">Submit</button>
+<button onclick="hint()">Hint</button>
+<button onclick="next()">Next</button>
+<button onclick="restart()">Restart</button>
+`;
+const cdiv=document.getElementById("choices");
+q.choices.forEach((c,i)=>{
+const d=document.createElement("div");
+d.className="choice";
+d.textContent=c;
+d.onclick=()=>{selected=i;document.querySelectorAll('.choice').forEach(x=>x.classList.remove('sel'));d.classList.add('sel');};
+cdiv.appendChild(d);
+});
+}
+
+window.submit=function(){
+if(selected==null)return alert("Select answer");
+attempts++;
+if(selected===QUESTIONS[idx].correct){
+correct++;
+document.getElementById("msg").className="msg good";
+document.getElementById("msg").textContent="Correct.";
+}else{
+document.getElementById("msg").className="msg bad";
+document.getElementById("msg").textContent="Incorrect.";
+}
+};
+
+window.hint=function(){
+document.getElementById("msg").className="msg warn";
+document.getElementById("msg").textContent="Hint: "+QUESTIONS[idx].hint;
+};
+
+window.next=function(){
+idx++;
+selected=null;
+if(idx>=QUESTIONS.length){
+if(correct===attempts){
+const end=new Date();
+panel.innerHTML=`
+<div class="ticket">
+<h2>Mastery Achieved</h2>
+<pre>
+STUDENT: ${name}
+START: ${started}
+END: ${end}
+SCORE: ${correct}/${attempts}
+</pre>
+</div>`;
+}else{
+alert("Must replay for 100%");
+location.reload();
+}
+}else renderGame();
+};
+
+window.restart=function(){location.reload();};
+
+renderStart();
+</script>
+</body>
+</html>
