@@ -309,6 +309,65 @@
   </div>
 
 <script>
+  // ============================================
+// FORCE FRESH ATTEMPT (no resume, always restart)
+// ============================================
+
+const FORCE_FRESH_ATTEMPT = true;
+
+// Removes common game-state keys AND anything tied to this pathname
+function purgeGameState(){
+  const path = location.pathname;
+
+  const killIfMatch = (k) => {
+    if(!k) return false;
+    return (
+      k.includes(path) ||
+      k.startsWith("LEGEND_") ||
+      k.startsWith("LEGEND_STATE") ||
+      k.startsWith("GAME_STATE") ||
+      k.startsWith("STATE:") ||
+      k.includes("submission") ||
+      k.includes("attempt") ||
+      k.includes("progress")
+    );
+  };
+
+  try{
+    // sessionStorage
+    for(let i = sessionStorage.length - 1; i >= 0; i--){
+      const k = sessionStorage.key(i);
+      if(killIfMatch(k)) sessionStorage.removeItem(k);
+    }
+  }catch(e){}
+
+  try{
+    // localStorage
+    for(let i = localStorage.length - 1; i >= 0; i--){
+      const k = localStorage.key(i);
+      if(killIfMatch(k)) localStorage.removeItem(k);
+    }
+  }catch(e){}
+
+  // Remove URL hash/query that might store question index
+  try{
+    history.replaceState(null, "", location.pathname);
+  }catch(e){}
+}
+
+// If the page is restored from the back/forward cache, reload clean
+window.addEventListener("pageshow", (e) => {
+  if (e.persisted) {
+    purgeGameState();
+    // hard reload, no-cache feel
+    location.replace(location.pathname + "?r=" + Date.now());
+  }
+});
+
+if(FORCE_FRESH_ATTEMPT){
+  purgeGameState();
+}
+
 (() => {
   // ---------- Hardened shell + on-page error box ----------
   const errbox = document.getElementById('errbox');
