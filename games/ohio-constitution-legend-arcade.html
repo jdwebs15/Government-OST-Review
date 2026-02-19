@@ -238,15 +238,65 @@ Completed: ${new Date()}
 
 // CONFETTI
 function launchConfetti(){
-const canvas=document.getElementById("confetti");
-const ctx=canvas.getContext("2d");
-canvas.width=window.innerWidth;
-canvas.height=window.innerHeight;
-for(let i=0;i<150;i++){
-ctx.fillStyle=`hsl(${Math.random()*360},100%,50%)`;
-ctx.fillRect(Math.random()*canvas.width,Math.random()*canvas.height,5,5);
+
+const canvas = document.getElementById("confetti");
+const ctx = canvas.getContext("2d");
+
+canvas.width = window.innerWidth;
+canvas.height = window.innerHeight;
+
+let pieces = [];
+let gravity = 0.6;
+let confettiCount = 180;
+
+for(let i=0;i<confettiCount;i++){
+  pieces.push({
+    x: Math.random()*canvas.width,
+    y: Math.random()*canvas.height - canvas.height,
+    size: Math.random()*8+4,
+    speedX: Math.random()*4-2,
+    speedY: Math.random()*3+2,
+    color: `hsl(${Math.random()*360}, 100%, 50%)`,
+    rotation: Math.random()*360,
+    rotationSpeed: Math.random()*10-5
+  });
 }
+
+function animate(){
+  ctx.clearRect(0,0,canvas.width,canvas.height);
+
+  pieces.forEach(p=>{
+    p.speedY += gravity;
+    p.x += p.speedX;
+    p.y += p.speedY;
+    p.rotation += p.rotationSpeed;
+
+    ctx.save();
+    ctx.translate(p.x,p.y);
+    ctx.rotate(p.rotation * Math.PI/180);
+    ctx.fillStyle = p.color;
+    ctx.fillRect(-p.size/2,-p.size/2,p.size,p.size);
+    ctx.restore();
+
+    if(p.y > canvas.height){
+      p.y = -20;
+      p.x = Math.random()*canvas.width;
+      p.speedY = Math.random()*3+2;
+    }
+  });
+
+  requestAnimationFrame(animate);
 }
+
+animate();
+
+// Stop after 8 seconds (optional)
+setTimeout(()=> {
+  ctx.clearRect(0,0,canvas.width,canvas.height);
+},8000);
+
+}
+
 
 render();
 </script>
