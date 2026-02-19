@@ -1,0 +1,550 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Government Vocabulary & Concepts — Bullet Match (OST Review)</title>
+  <link rel="stylesheet" href="../styles.css" />
+
+  <style>
+    :root{
+      --bg:#0b1220; --text:#e7eefc; --muted:#a8b4cf; --line:rgba(255,255,255,.12);
+      --shadow:0 18px 55px rgba(0,0,0,.40); --radius:18px;
+      --good:#2bd576; --bad:#ff5c7a; --warn:#ffd166; --accent:#7aa2ff;
+      --mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+    }
+    *{box-sizing:border-box}
+    body{margin:0;background:linear-gradient(180deg,#0b1220,#070b14);color:var(--text);font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial;min-height:100vh}
+    .wrap{width:min(980px,92vw);margin:22px auto 40px}
+    .topbar{
+      background:rgba(255,255,255,.03);border:1px solid var(--line);border-radius:var(--radius);
+      padding:18px 18px 14px;box-shadow:var(--shadow);display:flex;gap:14px;align-items:flex-start;justify-content:space-between
+    }
+    .kicker{letter-spacing:.14em;font-size:12px;color:var(--muted);font-weight:800}
+    h1{margin:6px 0 6px;font-size:24px}
+    .sub{margin:0;color:var(--muted);line-height:1.35}
+    .pillrow{display:flex;gap:8px;flex-wrap:wrap;justify-content:flex-end}
+    .pill{border:1px solid var(--line);background:rgba(255,255,255,.02);padding:6px 10px;border-radius:999px;font-size:12px;color:var(--muted);white-space:nowrap}
+
+    .grid{display:grid;grid-template-columns:1.15fr .85fr;gap:14px;margin-top:14px}
+    @media (max-width:900px){.grid{grid-template-columns:1fr}}
+    .panel{background:rgba(255,255,255,.03);border:1px solid var(--line);border-radius:var(--radius);box-shadow:var(--shadow);padding:16px}
+
+    .row{display:flex;gap:10px;align-items:center;justify-content:space-between;flex-wrap:wrap}
+    .label{color:var(--muted);font-size:12px;letter-spacing:.08em;font-weight:900}
+    .statline{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
+    .stat{background:rgba(255,255,255,.02);border:1px solid var(--line);border-radius:12px;padding:10px 12px;min-width:140px}
+    .stat .big{font-size:16px;font-weight:900}
+    .stat .small{font-size:12px;color:var(--muted);margin-top:2px}
+
+    .qtitle{margin:10px 0 6px;font-size:18px}
+    .qtext{margin:0 0 12px;color:var(--text);line-height:1.4;white-space:pre-wrap}
+
+    .field{display:grid;gap:6px;margin-top:10px}
+    input[type="text"]{
+      width:100%;padding:12px 12px;border-radius:14px;border:1px solid var(--line);
+      background:rgba(255,255,255,.02);color:var(--text);outline:none
+    }
+    input[type="text"]:focus{border-color:rgba(122,162,255,.55)}
+
+    .actions{display:flex;gap:10px;flex-wrap:wrap;margin-top:12px}
+    .btn{
+      border-radius:14px;border:1px solid var(--line);background:rgba(255,255,255,.02);
+      color:var(--text);padding:10px 12px;cursor:pointer;font-weight:900
+    }
+    .btn:hover{border-color:rgba(122,162,255,.45)}
+    .btn.primary{border-color:rgba(122,162,255,.45);background:rgba(122,162,255,.10)}
+    .btn[disabled]{opacity:.6;cursor:not-allowed}
+
+    .msg{border-radius:14px;border:1px solid var(--line);padding:12px;margin-top:12px;display:none}
+    .msg.good{display:block;border-color:rgba(43,213,118,.35);background:rgba(43,213,118,.08)}
+    .msg.bad{display:block;border-color:rgba(255,92,122,.35);background:rgba(255,92,122,.08)}
+    .msg.warn{display:block;border-color:rgba(255,209,102,.35);background:rgba(255,209,102,.08)}
+    .msg .t{font-weight:900;margin-bottom:4px}
+    .msg .b{color:var(--muted);line-height:1.35}
+
+    .errbox{display:none;margin-top:14px;border:1px solid rgba(255,92,122,.45);background:rgba(255,92,122,.10);border-radius:14px;padding:12px}
+    .errbox .t{font-weight:900}
+    .errbox pre{margin:8px 0 0;white-space:pre-wrap;color:var(--text);font-family:var(--mono);font-size:12px}
+
+    /* Match UI */
+    .matchWrap{display:grid;gap:12px;margin-top:10px}
+    .bullet{
+      border:1px solid var(--line);
+      background:rgba(255,255,255,.02);
+      border-radius:14px;
+      padding:12px;
+    }
+    .bullet .btxt{white-space:pre-wrap; line-height:1.35}
+    .selectRow{display:grid;grid-template-columns:1fr;gap:8px;margin-top:10px}
+    select{
+      width:100%;
+      padding:12px 10px;
+      border-radius:14px;
+      border:1px solid var(--line);
+      background:rgba(255,255,255,.02);
+      color:var(--text);
+      outline:none;
+    }
+    select:focus{border-color:rgba(122,162,255,.55)}
+    .hintLine{font-size:12px;color:var(--muted)}
+
+    .ticket{
+      margin-top:12px;border:1px solid rgba(43,213,118,.35);background:rgba(43,213,118,.07);border-radius:14px;padding:12px
+    }
+    .ticket .code{
+      font-family:var(--mono);font-weight:900;letter-spacing:.06em;padding:10px;border-radius:12px;border:1px solid var(--line);
+      background:rgba(255,255,255,.02);margin-top:8px;word-break:break-word
+    }
+    .muted{color:var(--muted)}
+  </style>
+</head>
+
+<body>
+  <div class="wrap">
+    <div class="topbar">
+      <div>
+        <div class="kicker">GOVERNMENT OST REVIEW</div>
+        <h1>Government Vocabulary &amp; Concepts — Bullet Match</h1>
+        <p class="sub">
+          Match each bullet (definition/example) to the correct term. Wrong matches trigger a hint and retry, but mastery requires <b>100% accuracy</b>.
+          Ticket includes name + start/end times + runtime.
+        </p>
+      </div>
+      <div class="pillrow">
+        <div class="pill">Mastery (100%) ✅</div>
+        <div class="pill">Hints + retry ✅</div>
+        <div class="pill">Name + timestamps ✅</div>
+        <div class="pill">Submission ticket ✅</div>
+      </div>
+    </div>
+
+    <div id="errbox" class="errbox" role="alert">
+      <div class="t">On-page error box</div>
+      <div class="muted">Copy the details below if anything “white screens.”</div>
+      <pre id="errtext"></pre>
+    </div>
+
+    <div class="grid">
+      <section class="panel">
+        <div class="row">
+          <div class="label">QUESTION</div>
+          <div class="statline">
+            <div class="stat"><div class="big" id="qpos">—</div><div class="small">Progress</div></div>
+            <div class="stat"><div class="big" id="acc">—</div><div class="small">Accuracy</div></div>
+            <div class="stat"><div class="big" id="runtime">—</div><div class="small">Runtime</div></div>
+          </div>
+        </div>
+
+        <h2 class="qtitle" id="qtitle">Enter your name to begin</h2>
+        <p class="qtext" id="qtext">Your teacher requires a submission ticket at the end (no cropping). Use your real name.</p>
+
+        <div id="nameBox" class="field">
+          <label class="muted" for="studentName"><b>Student Name</b></label>
+          <input id="studentName" type="text" placeholder="e.g., Jordan Smith" autocomplete="name" />
+          <div class="actions">
+            <button class="btn primary" id="btnStart">Start</button>
+            <button class="btn" id="btnResetAll" title="Clears saved progress for this game only">Reset Game</button>
+          </div>
+          <div class="muted" style="margin-top:6px;font-size:12px;">
+            Progress saves in this browser until you finish or reset.
+          </div>
+        </div>
+
+        <div id="playBox" style="display:none;">
+          <h2 class="qtitle" id="termTitle">—</h2>
+          <p class="qtext muted" style="margin-top:-2px">Select the correct term for the bullet. Then click “Submit Match.”</p>
+
+          <div class="matchWrap">
+            <div class="bullet">
+              <div class="btxt" id="bulletText">—</div>
+              <div class="selectRow">
+                <select id="selTerm"></select>
+                <div class="hintLine" id="hintLine"></div>
+                <div class="actions">
+                  <button class="btn primary" id="btnSubmit">Submit Match</button>
+                  <button class="btn" id="btnHint" disabled>Hint</button>
+                  <button class="btn" id="btnNext" disabled>Next</button>
+                </div>
+              </div>
+            </div>
+
+            <div id="feedback" class="msg" aria-live="polite">
+              <div class="t" id="fbTitle"></div>
+              <div class="b" id="fbBody"></div>
+            </div>
+          </div>
+        </div>
+
+        <div id="finishBox" style="display:none;">
+          <h2 class="qtitle">Finish</h2>
+          <p class="qtext">
+            If you have <b>100% accuracy</b>, you’ll receive a submission ticket. If not, you must reset and replay for mastery.
+          </p>
+
+          <div id="finishMsg" class="msg warn" style="display:block;">
+            <div class="t" id="finishTitle">Checking mastery…</div>
+            <div class="b" id="finishBody">—</div>
+          </div>
+
+          <div id="ticket" class="ticket" style="display:none;">
+            <div><b>Submission Ticket</b> (screenshot this)</div>
+            <div class="muted" style="margin-top:6px;line-height:1.35">
+              Name: <span id="tName"></span><br/>
+              Date: <span id="tDate"></span><br/>
+              Start: <span id="tStart"></span><br/>
+              End: <span id="tEnd"></span><br/>
+              Runtime: <span id="tRun"></span><br/>
+              Accuracy: <span id="tAcc"></span>
+            </div>
+            <div class="code" id="tCode">—</div>
+            <div class="actions" style="margin-top:10px;">
+              <button class="btn primary" id="btnCopy">Copy Ticket Code</button>
+              <button class="btn" id="btnReset">Play Again</button>
+            </div>
+          </div>
+
+          <div class="actions" style="margin-top:10px;">
+            <button class="btn" onclick="location.href='../index.html'">Back to Hub</button>
+          </div>
+        </div>
+      </section>
+
+      <aside class="panel">
+        <div class="label">RULES</div>
+        <ul class="muted" style="margin:10px 0 0; line-height:1.45;">
+          <li><b>Mastery</b> = finish all items with <b>0 misses</b> (100% accuracy).</li>
+          <li>Wrong match → hint appears → retry until correct, but accuracy keeps the miss.</li>
+          <li>Ticket at end includes name + timestamps + runtime.</li>
+        </ul>
+
+        <hr style="border:none;border-top:1px solid var(--line); margin:14px 0;">
+
+        <div class="label">WHAT THIS TARGETS</div>
+        <p class="muted" style="margin:10px 0 0; line-height:1.45;">
+          Core government vocabulary (rights, branches, checks &amp; balances, federalism, civic participation, policy process).
+        </p>
+      </aside>
+    </div>
+  </div>
+
+<script>
+(() => {
+  // ---------------- Hardened shell ----------------
+  const errbox = document.getElementById('errbox');
+  const errtext = document.getElementById('errtext');
+  window.addEventListener('error', (e) => {
+    errbox.style.display = 'block';
+    errtext.textContent = `Error: ${e.message}\nSource: ${e.filename}:${e.lineno}:${e.colno}`;
+  });
+  window.addEventListener('unhandledrejection', (e) => {
+    errbox.style.display = 'block';
+    errtext.textContent = `Unhandled Promise Rejection:\n${(e.reason && e.reason.stack) ? e.reason.stack : e.reason}`;
+  });
+
+  // ---------------- Utilities ----------------
+  const pad2 = n => String(n).padStart(2,'0');
+  const fmtTime = (d) => {
+    const hr = d.getHours();
+    const ampm = hr >= 12 ? 'PM' : 'AM';
+    const h12 = hr % 12 || 12;
+    return `${h12}:${pad2(d.getMinutes())}:${pad2(d.getSeconds())} ${ampm}`;
+  };
+  const fmtDate = (d) => `${d.getMonth()+1}/${d.getDate()}/${d.getFullYear()}`;
+  const msToHMS = (ms) => {
+    const s = Math.max(0, Math.floor(ms/1000));
+    const hh = Math.floor(s/3600);
+    const mm = Math.floor((s%3600)/60);
+    const ss = s%60;
+    return `${hh}:${pad2(mm)}:${pad2(ss)}`;
+  };
+  const hash32 = (str) => {
+    let h = 2166136261 >>> 0;
+    for (let i=0;i<str.length;i++){
+      h ^= str.charCodeAt(i);
+      h = Math.imul(h, 16777619);
+    }
+    return h >>> 0;
+  };
+  const base36 = (n) => n.toString(36).toUpperCase();
+  function shuffle(arr){
+    const a = arr.slice();
+    for(let i=a.length-1;i>0;i--){
+      const j = Math.floor(Math.random()*(i+1));
+      [a[i],a[j]]=[a[j],a[i]];
+    }
+    return a;
+  }
+
+  // ---------------- BANK (25) ----------------
+  // Standards-supplemented term bank.
+  // If you want, you can later swap some bullets to verbatim released stems as you locate them.
+  const ITEMS = [
+    { id:"BM01", term:"Checks and balances", bullet:"• One branch limits another branch’s power (e.g., veto/override).", hint:"Look for “one branch limiting another.”" },
+    { id:"BM02", term:"Separation of powers", bullet:"• Legislative makes laws, executive enforces, judicial interprets.", hint:"This is about dividing power among three branches." },
+    { id:"BM03", term:"Federalism", bullet:"• Power is shared between the national government and state governments.", hint:"Shared power across levels of government." },
+    { id:"BM04", term:"Popular sovereignty", bullet:"• Government authority comes from the consent of the governed.", hint:"Who is the source of government power?" },
+    { id:"BM05", term:"Rule of law", bullet:"• No one is above the law; leaders must follow the law.", hint:"Think: laws apply to everyone." },
+    { id:"BM06", term:"Bill of Rights", bullet:"• First 10 amendments protecting individual liberties and limiting government.", hint:"First ten amendments." },
+    { id:"BM07", term:"Due process", bullet:"• Government must follow fair procedures before taking life, liberty, or property.", hint:"Fair procedures." },
+    { id:"BM08", term:"Equal protection", bullet:"• Government must treat people equally under the law.", hint:"Equality under the law." },
+    { id:"BM09", term:"First Amendment", bullet:"• Protects speech, press, religion, assembly, and petition.", hint:"Five freedoms." },
+    { id:"BM10", term:"Fourth Amendment", bullet:"• Protects against unreasonable searches; warrants require probable cause.", hint:"Searches/warrants." },
+    { id:"BM11", term:"Fifth Amendment", bullet:"• Protects against self-incrimination and double jeopardy; includes due process.", hint:"“I plead the Fifth.”" },
+    { id:"BM12", term:"Sixth Amendment", bullet:"• Rights of the accused: speedy/public trial, jury, counsel, confront witnesses.", hint:"Criminal trial rights." },
+    { id:"BM13", term:"Eighth Amendment", bullet:"• Protects against cruel and unusual punishment.", hint:"Punishment limits." },
+    { id:"BM14", term:"Electoral College", bullet:"• System used to elect the President through state electors.", hint:"President election system." },
+    { id:"BM15", term:"Veto", bullet:"• President rejects a bill passed by Congress.", hint:"Executive check on Congress." },
+    { id:"BM16", term:"Judicial review", bullet:"• Courts can declare a law unconstitutional.", hint:"Power of courts to strike laws." },
+    { id:"BM17", term:"Interest group", bullet:"• Organization that seeks to influence policy without running candidates.", hint:"Influence policy; not a political party." },
+    { id:"BM18", term:"Political party", bullet:"• Organization that seeks to win elections and hold office to shape policy.", hint:"Runs candidates to win office." },
+    { id:"BM19", term:"Lobbying", bullet:"• Directly meeting with officials to influence decisions.", hint:"Direct contact with lawmakers." },
+    { id:"BM20", term:"Public policy", bullet:"• Decisions and actions taken by government to address public issues.", hint:"Government solutions to public problems." },
+    { id:"BM21", term:"Ratification", bullet:"• Formal approval process (e.g., Senate approval for treaties; states for amendments).", hint:"Official approval." },
+    { id:"BM22", term:"Treaty", bullet:"• Formal agreement between the U.S. and another country negotiated by the President.", hint:"International agreement." },
+    { id:"BM23", term:"Compromise", bullet:"• Each side gives up something to reach agreement.", hint:"Mutual concession." },
+    { id:"BM24", term:"Consensus building", bullet:"• Working to get a group to agree on a decision before a vote.", hint:"Building agreement within a group." },
+    { id:"BM25", term:"Civic participation", bullet:"• Actions citizens take to influence government (vote, petition, attend meetings).", hint:"How citizens engage." }
+  ];
+
+  // build term choices list
+  const TERMS = Array.from(new Set(ITEMS.map(i => i.term))).sort();
+
+  // ---------------- State / DOM ----------------
+  const STORAGE_KEY = 'GOV_OST_GAME5_BULLET_MATCH_V1';
+  let state = { name:'', startedAtISO:'', startedAtMS:0, idx:0, attempts:0, correct:0, order:[] };
+
+  const elQpos = document.getElementById('qpos');
+  const elAcc = document.getElementById('acc');
+  const elRuntime = document.getElementById('runtime');
+
+  const elNameBox = document.getElementById('nameBox');
+  const elStudentName = document.getElementById('studentName');
+  const btnStart = document.getElementById('btnStart');
+  const btnResetAll = document.getElementById('btnResetAll');
+
+  const elPlayBox = document.getElementById('playBox');
+  const elTermTitle = document.getElementById('termTitle');
+  const elBulletText = document.getElementById('bulletText');
+  const elSel = document.getElementById('selTerm');
+  const elHintLine = document.getElementById('hintLine');
+
+  const btnSubmit = document.getElementById('btnSubmit');
+  const btnHint = document.getElementById('btnHint');
+  const btnNext = document.getElementById('btnNext');
+
+  const elFeedback = document.getElementById('feedback');
+  const elFbTitle = document.getElementById('fbTitle');
+  const elFbBody = document.getElementById('fbBody');
+
+  const elFinishBox = document.getElementById('finishBox');
+  const elFinishTitle = document.getElementById('finishTitle');
+  const elFinishBody = document.getElementById('finishBody');
+  const elTicket = document.getElementById('ticket');
+
+  const elTName = document.getElementById('tName');
+  const elTDate = document.getElementById('tDate');
+  const elTStart = document.getElementById('tStart');
+  const elTEnd = document.getElementById('tEnd');
+  const elTRun = document.getElementById('tRun');
+  const elTAcc = document.getElementById('tAcc');
+  const elTCode = document.getElementById('tCode');
+  const btnCopy = document.getElementById('btnCopy');
+  const btnReset = document.getElementById('btnReset');
+
+  function save(){ localStorage.setItem(STORAGE_KEY, JSON.stringify(state)); }
+  function load(){
+    try{
+      const raw = localStorage.getItem(STORAGE_KEY);
+      if(!raw) return false;
+      const parsed = JSON.parse(raw);
+      if(!parsed || !parsed.startedAtISO || !parsed.name) return false;
+      state = parsed;
+      return true;
+    }catch{ return false; }
+  }
+  function clearSave(){ localStorage.removeItem(STORAGE_KEY); }
+
+  function updateStats(){
+    const total = ITEMS.length;
+    const pos = Math.min(state.idx+1, total);
+    elQpos.textContent = `${pos} / ${total}`;
+    const acc = state.attempts ? Math.round((state.correct/state.attempts)*100) : 0;
+    elAcc.textContent = `${acc}%`;
+    const rt = state.startedAtMS ? (Date.now() - state.startedAtMS) : 0;
+    elRuntime.textContent = msToHMS(rt);
+  }
+  setInterval(updateStats, 500);
+
+  function setFeedback(kind, title, body){
+    elFeedback.className = `msg ${kind}`;
+    elFbTitle.textContent = title;
+    elFbBody.textContent = body;
+  }
+  function clearFeedback(){
+    elFeedback.className = 'msg';
+    elFbTitle.textContent = '';
+    elFbBody.textContent = '';
+  }
+
+  function buildSelect(){
+    elSel.innerHTML = '';
+    const opt0 = document.createElement('option');
+    opt0.value = '';
+    opt0.textContent = 'Select a term…';
+    elSel.appendChild(opt0);
+
+    TERMS.forEach(t => {
+      const o = document.createElement('option');
+      o.value = t;
+      o.textContent = t;
+      elSel.appendChild(o);
+    });
+  }
+
+  function showItem(){
+    clearFeedback();
+    btnNext.disabled = true;
+    btnHint.disabled = true;
+    btnSubmit.disabled = false;
+    elHintLine.textContent = '';
+
+    const item = ITEMS[state.order[state.idx]];
+    elTermTitle.textContent = `Bullet Match ${state.idx+1}`;
+    elBulletText.textContent = item.bullet;
+    elSel.value = '';
+
+    updateStats();
+    save();
+  }
+
+  btnSubmit.addEventListener('click', () => {
+    const item = ITEMS[state.order[state.idx]];
+    const picked = (elSel.value || '').trim();
+    if(!picked){
+      setFeedback('bad', 'Pick a term first', 'Select a term from the dropdown, then submit.');
+      return;
+    }
+
+    state.attempts += 1;
+    const ok = picked === item.term;
+
+    if(ok){
+      state.correct += 1;
+      setFeedback('good', 'Correct ✅', `Matched: ${item.term}`);
+      btnNext.disabled = false;
+      btnHint.disabled = true;
+      btnSubmit.disabled = true;
+      save();
+    }else{
+      setFeedback('bad', 'Not yet ❌', 'Try again. Click “Hint” if you need help.');
+      btnHint.disabled = false;
+      btnNext.disabled = true;
+      btnSubmit.disabled = false;
+      save();
+    }
+    updateStats();
+  });
+
+  btnHint.addEventListener('click', () => {
+    const item = ITEMS[state.order[state.idx]];
+    elHintLine.textContent = `Hint: ${item.hint}`;
+    setFeedback('warn', 'Hint 💡', item.hint);
+    btnHint.disabled = true;
+  });
+
+  btnNext.addEventListener('click', () => {
+    state.idx += 1;
+    if(state.idx >= ITEMS.length){
+      showFinish();
+      return;
+    }
+    showItem();
+  });
+
+  function showFinish(){
+    elNameBox.style.display = 'none';
+    elPlayBox.style.display = 'none';
+    elFinishBox.style.display = '';
+
+    const acc = state.attempts ? Math.round((state.correct/state.attempts)*100) : 0;
+    const ended = new Date();
+
+    if(acc === 100 && state.attempts >= ITEMS.length){
+      elFinishTitle.textContent = 'Mastery achieved ✅';
+      elFinishBody.textContent = 'You finished with 100% accuracy. Screenshot the ticket (no cropping).';
+
+      const start = new Date(state.startedAtISO);
+      const runMS = Date.now() - state.startedAtMS;
+
+      elTName.textContent = state.name;
+      elTDate.textContent = fmtDate(ended);
+      elTStart.textContent = fmtTime(start);
+      elTEnd.textContent = fmtTime(ended);
+      elTRun.textContent = msToHMS(runMS);
+      elTAcc.textContent = `${acc}%`;
+
+      const raw = `${state.name}|${state.startedAtISO}|${ended.toISOString()}|${state.correct}|${state.attempts}|${ITEMS.length}`;
+      const code = `GOV-BM-${base36(hash32(raw))}-${base36(hash32(raw+'BM')).slice(0,4)}`;
+      elTCode.textContent = code;
+
+      elTicket.style.display = '';
+      clearSave();
+    }else{
+      elFinishTitle.textContent = 'Mastery NOT achieved ❌';
+      elFinishBody.textContent = `Accuracy: ${acc}%. You must replay for 100% (0 misses). Click “Play Again.”`;
+      elTicket.style.display = 'none';
+    }
+
+    updateStats();
+  }
+
+  btnCopy.addEventListener('click', async () => {
+    try{
+      await navigator.clipboard.writeText(elTCode.textContent.trim());
+      btnCopy.textContent = 'Copied ✅';
+      setTimeout(()=>btnCopy.textContent='Copy Ticket Code', 1100);
+    }catch{
+      btnCopy.textContent = 'Copy failed';
+      setTimeout(()=>btnCopy.textContent='Copy Ticket Code', 1100);
+    }
+  });
+
+  btnReset.addEventListener('click', () => { clearSave(); location.reload(); });
+  btnResetAll.addEventListener('click', () => { clearSave(); location.reload(); });
+
+  btnStart.addEventListener('click', () => {
+    const name = (elStudentName.value || '').trim();
+    if(name.length < 2){
+      setFeedback('bad', 'Name required', 'Enter your name to begin.');
+      elFeedback.style.display = 'block';
+      return;
+    }
+    state.name = name;
+    const start = new Date();
+    state.startedAtISO = start.toISOString();
+    state.startedAtMS = Date.now();
+    state.idx = 0;
+    state.attempts = 0;
+    state.correct = 0;
+    state.order = shuffle([...Array(ITEMS.length).keys()]);
+    save();
+
+    buildSelect();
+    elNameBox.style.display = 'none';
+    elPlayBox.style.display = '';
+    showItem();
+  });
+
+  // Resume saved
+  if(load()){
+    buildSelect();
+    elStudentName.value = state.name || '';
+    elNameBox.style.display = 'none';
+    elPlayBox.style.display = '';
+    showItem();
+  }
+})();
+</script>
+</body>
+</html>
