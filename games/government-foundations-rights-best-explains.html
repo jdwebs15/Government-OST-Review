@@ -1,0 +1,857 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Government Foundations & Rights — Best Explains (OST Review)</title>
+
+  <!-- Uses your shared hub stylesheet if present -->
+  <link rel="stylesheet" href="../styles.css" />
+
+  <style>
+    :root{
+      --bg:#0b1220;
+      --panel:#121a2f;
+      --card:#111a2e;
+      --text:#e7eefc;
+      --muted:#a8b4cf;
+      --line:rgba(255,255,255,.12);
+      --shadow:0 18px 55px rgba(0,0,0,.40);
+      --radius:18px;
+      --good:#2bd576;
+      --bad:#ff5c7a;
+      --warn:#ffd166;
+      --accent:#7aa2ff;
+      --mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+    }
+    *{box-sizing:border-box}
+    body{
+      margin:0;
+      background:linear-gradient(180deg,#0b1220,#070b14);
+      color:var(--text);
+      font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial;
+      min-height:100vh;
+    }
+    .wrap{ width:min(980px, 92vw); margin: 22px auto 40px; }
+    .topbar{
+      background:rgba(255,255,255,.03);
+      border:1px solid var(--line);
+      border-radius:var(--radius);
+      padding:18px 18px 14px;
+      box-shadow:var(--shadow);
+      display:flex; gap:14px; align-items:flex-start; justify-content:space-between;
+    }
+    .kicker{letter-spacing:.14em; font-size:12px; color:var(--muted); font-weight:700}
+    h1{margin:6px 0 6px; font-size:24px}
+    .sub{margin:0; color:var(--muted); line-height:1.35}
+    .pillrow{display:flex; gap:8px; flex-wrap:wrap; justify-content:flex-end}
+    .pill{
+      border:1px solid var(--line);
+      background:rgba(255,255,255,.02);
+      padding:6px 10px;
+      border-radius:999px;
+      font-size:12px;
+      color:var(--muted);
+      white-space:nowrap;
+    }
+
+    .grid{display:grid; grid-template-columns: 1.1fr .9fr; gap:14px; margin-top:14px;}
+    @media (max-width: 900px){ .grid{grid-template-columns:1fr;} }
+
+    .panel{
+      background:rgba(255,255,255,.03);
+      border:1px solid var(--line);
+      border-radius:var(--radius);
+      box-shadow:var(--shadow);
+      padding:16px;
+    }
+    .row{display:flex; gap:10px; align-items:center; justify-content:space-between; flex-wrap:wrap}
+    .label{color:var(--muted); font-size:12px; letter-spacing:.08em; font-weight:800}
+    .statline{display:flex; gap:10px; flex-wrap:wrap; align-items:center}
+    .stat{
+      background:rgba(255,255,255,.02);
+      border:1px solid var(--line);
+      border-radius:12px;
+      padding:10px 12px;
+      min-width: 140px;
+    }
+    .stat .big{font-size:16px; font-weight:800}
+    .stat .small{font-size:12px; color:var(--muted); margin-top:2px}
+
+    .qtitle{margin:10px 0 6px; font-size:18px}
+    .qtext{color:var(--text); line-height:1.4; margin:0 0 12px; white-space:pre-wrap}
+
+    .opts{display:grid; gap:10px; margin-top:10px}
+    .optbtn{
+      text-align:left;
+      width:100%;
+      border-radius:14px;
+      border:1px solid var(--line);
+      background:rgba(255,255,255,.02);
+      padding:12px 12px;
+      color:var(--text);
+      cursor:pointer;
+      transition: transform .04s ease, border-color .15s ease, background .15s ease;
+    }
+    .optbtn:hover{border-color:rgba(122,162,255,.45)}
+    .optbtn:active{transform: scale(.995)}
+    .optbtn[disabled]{opacity:.65; cursor:not-allowed}
+    .optbtn .ltr{
+      font-family:var(--mono);
+      font-weight:900;
+      margin-right:8px;
+      color:var(--accent);
+    }
+
+    .msg{
+      border-radius:14px;
+      border:1px solid var(--line);
+      padding:12px;
+      margin-top:12px;
+      display:none;
+    }
+    .msg.good{display:block; border-color: rgba(43,213,118,.35); background: rgba(43,213,118,.08);}
+    .msg.bad{display:block; border-color: rgba(255,92,122,.35); background: rgba(255,92,122,.08);}
+    .msg.warn{display:block; border-color: rgba(255,209,102,.35); background: rgba(255,209,102,.08);}
+    .msg .t{font-weight:800; margin-bottom:4px}
+    .msg .b{color:var(--muted); line-height:1.35}
+
+    .actions{display:flex; gap:10px; flex-wrap:wrap; margin-top:12px}
+    .btn{
+      border-radius:14px;
+      border:1px solid var(--line);
+      background:rgba(255,255,255,.02);
+      color:var(--text);
+      padding:10px 12px;
+      cursor:pointer;
+      font-weight:800;
+    }
+    .btn:hover{border-color:rgba(122,162,255,.45)}
+    .btn.primary{
+      border-color: rgba(122,162,255,.45);
+      background: rgba(122,162,255,.10);
+    }
+    .btn[disabled]{opacity:.6; cursor:not-allowed}
+
+    .field{display:grid; gap:6px; margin-top:10px;}
+    input[type="text"]{
+      width:100%;
+      padding:12px 12px;
+      border-radius:14px;
+      border:1px solid var(--line);
+      background:rgba(255,255,255,.02);
+      color:var(--text);
+      outline:none;
+    }
+    input[type="text"]:focus{border-color:rgba(122,162,255,.55)}
+
+    /* Error box */
+    .errbox{
+      display:none;
+      margin-top:14px;
+      border:1px solid rgba(255,92,122,.45);
+      background: rgba(255,92,122,.10);
+      border-radius:14px;
+      padding:12px;
+    }
+    .errbox .t{font-weight:900}
+    .errbox pre{margin:8px 0 0; white-space:pre-wrap; color:var(--text); font-family:var(--mono); font-size:12px}
+
+    .muted{color:var(--muted)}
+    .mono{font-family:var(--mono)}
+
+    .ticket{
+      margin-top:12px;
+      border:1px solid rgba(43,213,118,.35);
+      background: rgba(43,213,118,.07);
+      border-radius:14px;
+      padding:12px;
+    }
+    .ticket .code{
+      font-family:var(--mono);
+      font-weight:900;
+      letter-spacing:.06em;
+      padding:10px;
+      border-radius:12px;
+      border:1px solid var(--line);
+      background:rgba(255,255,255,.02);
+      margin-top:8px;
+      word-break:break-word;
+    }
+  </style>
+</head>
+
+<body>
+  <div class="wrap">
+    <div class="topbar">
+      <div>
+        <div class="kicker">GOVERNMENT OST REVIEW</div>
+        <h1>Government Foundations &amp; Rights — Best Explains</h1>
+        <p class="sub">
+          Released items (verbatim) + standards supplementation to reach 25 when needed. Mastery requires <b>100% accuracy</b>.
+          Wrong answers trigger a hint and retry; accuracy reflects the miss.
+        </p>
+      </div>
+      <div class="pillrow">
+        <div class="pill">Mastery (100%) ✅</div>
+        <div class="pill">Name + timestamps ✅</div>
+        <div class="pill">Submission ticket ✅</div>
+      </div>
+    </div>
+
+    <div id="errbox" class="errbox" role="alert">
+      <div class="t">On-page error box</div>
+      <div class="muted">Copy the details below if anything “white screens.”</div>
+      <pre id="errtext"></pre>
+    </div>
+
+    <div class="grid">
+      <!-- MAIN -->
+      <section class="panel">
+        <div class="row">
+          <div class="label">QUESTION</div>
+          <div class="statline">
+            <div class="stat">
+              <div class="big" id="qpos">—</div>
+              <div class="small">Progress</div>
+            </div>
+            <div class="stat">
+              <div class="big" id="acc">—</div>
+              <div class="small">Accuracy</div>
+            </div>
+            <div class="stat">
+              <div class="big" id="runtime">—</div>
+              <div class="small">Runtime</div>
+            </div>
+          </div>
+        </div>
+
+        <h2 class="qtitle" id="qtitle">Enter your name to begin</h2>
+        <p class="qtext" id="qtext">Your teacher requires a submission ticket at the end (no cropping). Use your real name.</p>
+
+        <div id="nameBox" class="field">
+          <label class="muted" for="studentName"><b>Student Name</b></label>
+          <input id="studentName" type="text" placeholder="e.g., Jordan Smith" autocomplete="name" />
+          <div class="actions">
+            <button class="btn primary" id="btnStart">Start</button>
+            <button class="btn" id="btnResetAll" title="Clears saved progress for this game only">Reset Game</button>
+          </div>
+          <div class="muted" style="margin-top:6px;font-size:12px;">
+            Note: progress is saved in this browser (localStorage) until you finish or reset.
+          </div>
+        </div>
+
+        <div id="questionBox" style="display:none;">
+          <div class="opts" id="opts"></div>
+
+          <div id="feedback" class="msg" aria-live="polite">
+            <div class="t" id="fbTitle"></div>
+            <div class="b" id="fbBody"></div>
+          </div>
+
+          <div class="actions">
+            <button class="btn" id="btnHint" disabled>Hint</button>
+            <button class="btn primary" id="btnNext" disabled>Next</button>
+          </div>
+        </div>
+
+        <div id="finishBox" style="display:none;">
+          <h2 class="qtitle">Finish</h2>
+          <p class="qtext">
+            If you have <b>100% accuracy</b>, you’ll receive a submission ticket. If not, you must reset and replay for mastery.
+          </p>
+
+          <div id="finishMsg" class="msg warn" style="display:block;">
+            <div class="t" id="finishTitle">Checking mastery…</div>
+            <div class="b" id="finishBody">—</div>
+          </div>
+
+          <div id="ticket" class="ticket" style="display:none;">
+            <div><b>Submission Ticket</b> (screenshot this)</div>
+            <div class="muted" style="margin-top:6px;line-height:1.35">
+              Name: <span id="tName"></span><br/>
+              Date: <span id="tDate"></span><br/>
+              Start: <span id="tStart"></span><br/>
+              End: <span id="tEnd"></span><br/>
+              Runtime: <span id="tRun"></span><br/>
+              Accuracy: <span id="tAcc"></span>
+            </div>
+            <div class="code" id="tCode">—</div>
+            <div class="actions" style="margin-top:10px;">
+              <button class="btn primary" id="btnCopy">Copy Ticket Code</button>
+              <button class="btn" id="btnReset">Play Again</button>
+            </div>
+          </div>
+
+          <div class="actions" style="margin-top:10px;">
+            <button class="btn" id="btnBackHome" onclick="location.href='../index.html'">Back to Hub</button>
+          </div>
+        </div>
+      </section>
+
+      <!-- SIDE INFO -->
+      <aside class="panel">
+        <div class="label">RULES</div>
+        <ul class="muted" style="margin:10px 0 0; line-height:1.45;">
+          <li><b>Mastery</b> = finish all items with <b>0 misses</b> (100% accuracy).</li>
+          <li>Wrong answer → hint appears → retry until correct, but accuracy keeps the miss.</li>
+          <li>Ticket at end includes name + timestamps + runtime.</li>
+        </ul>
+
+        <hr style="border:none;border-top:1px solid var(--line); margin:14px 0;">
+
+        <div class="label">SAVED PROGRESS</div>
+        <p class="muted" style="margin:10px 0 0; line-height:1.45;">
+          Progress saves automatically for this game in this browser. Reset removes saved data for this game only.
+        </p>
+      </aside>
+    </div>
+  </div>
+
+<script>
+(() => {
+  // ---------- Hardened shell + on-page error box ----------
+  const errbox = document.getElementById('errbox');
+  const errtext = document.getElementById('errtext');
+  window.addEventListener('error', (e) => {
+    errbox.style.display = 'block';
+    errtext.textContent = `Error: ${e.message}\nSource: ${e.filename}:${e.lineno}:${e.colno}`;
+  });
+  window.addEventListener('unhandledrejection', (e) => {
+    errbox.style.display = 'block';
+    errtext.textContent = `Unhandled Promise Rejection:\n${(e.reason && e.reason.stack) ? e.reason.stack : e.reason}`;
+  });
+
+  // ---------- Utilities ----------
+  const pad2 = n => String(n).padStart(2,'0');
+  const fmtTime = (d) => {
+    const hr = d.getHours();
+    const ampm = hr >= 12 ? 'PM' : 'AM';
+    const h12 = hr % 12 || 12;
+    return `${h12}:${pad2(d.getMinutes())}:${pad2(d.getSeconds())} ${ampm}`;
+  };
+  const fmtDate = (d) => `${d.getMonth()+1}/${d.getDate()}/${d.getFullYear()}`;
+  const msToHMS = (ms) => {
+    const s = Math.max(0, Math.floor(ms/1000));
+    const hh = Math.floor(s/3600);
+    const mm = Math.floor((s%3600)/60);
+    const ss = s%60;
+    return `${hh}:${pad2(mm)}:${pad2(ss)}`;
+  };
+  const hash32 = (str) => {
+    let h = 2166136261 >>> 0;
+    for (let i=0;i<str.length;i++){
+      h ^= str.charCodeAt(i);
+      h = Math.imul(h, 16777619);
+    }
+    return h >>> 0;
+  };
+  const base36 = (n) => n.toString(36).toUpperCase();
+
+  // ---------- QUESTIONS (25) ----------
+  // Released items were pulled verbatim from your released-question doc; supplementation rules apply when needed.
+  const QUESTIONS = [
+    {
+      id: "Q53",
+      type: "mcq",
+      title: "Legislators meet with other members of…",
+      prompt: `Legislators meet with other members of their party prior to the official floor vote to ensure that the group is in agreement about whether or not to support a particular bill. Which process is represented by this situation?`,
+      options: [`Negotiation`, `Compromise`, `Consensus building`, `Persuasive argument`],
+      answerIndex: 2,
+      hint: "Identify the process that builds agreement within a group before a vote.",
+      explain: "Correct: the situation describes building agreement/coalition support within a group."
+    },
+    {
+      id: "Q161",
+      type: "mcq",
+      title: "Before the U.S. Constitution was adopted,…",
+      prompt: `Before the U.S. Constitution was adopted, each state held a ratifying convention. Several state conventions refused to ratify the Constitution unless it included a bill of rights. Which change was made to the Constitution to address these concerns?`,
+      options: [`The first 10 amendments were added to the Constitution.`, `The Electoral College was established in Article II.`, `The president was given authority to veto legislation.`, `Congress was given the power to create a national bank.`],
+      answerIndex: 0,
+      hint: "The Bill of Rights was added to address ratification concerns.",
+      explain: "Correct: the first 10 amendments were added as the Bill of Rights."
+    },
+    {
+      id: "Q2,Q6,Q7",
+      type: "mcq",
+      title: "The Bill of Rights was adopted…",
+      prompt: `The Bill of Rights was adopted to address concerns about the US Constitution. One of the amendments from the Bill of Rights is as follows: “In all criminal prosecutions, the accused shall enjoy the right to a speedy and public trial, by an impartial jury…” Which of these situations is an example of a violation of this right?`,
+      options: [`A jury is required to decide the case against a defendant.`, `A criminal suspect is questioned about the crime without an attorney present.`, `A defendant is required to remain in jail for three years before being given a trial.`, `A person is arrested for a crime but is not informed of the charges.`],
+      answerIndex: 2,
+      hint: "Look for the situation where the trial is unreasonably delayed.",
+      explain: "Correct: a three-year delay before trial violates the right to a speedy trial."
+    },
+    {
+      id: "Q41,Q144,Q174",
+      type: "mcq",
+      title: "Which statement summarizes the original Federalist…",
+      prompt: `Which statement summarizes the original Federalist position on the Bill of Rights?`,
+      options: [`The Bill of Rights was necessary to protect people’s liberties.`, `The Bill of Rights was unnecessary because the Constitution already limited government power.`, `The Bill of Rights would weaken the courts by increasing their power.`, `The Bill of Rights would take away important rights from the states.`],
+      answerIndex: 1,
+      hint: "Federalists argued the Constitution already limited the national government.",
+      explain: "Correct: Federalists often claimed a bill of rights was unnecessary given constitutional limits."
+    },
+    {
+      id: "Q3",
+      type: "mcq",
+      title: "Clarence Earl Gideon was an unlikely hero.…",
+      prompt: `Clarence Earl Gideon was an unlikely hero.  He was a man with an eighth-grade education who ran away from home when he was in middle school.  He spent much of his early adult life as a drifter, spending time in and out of prisons for nonviolent crimes. Gideon was charged with breaking and entering with the intent to commit a misdemeanor, which is a felony under Florida law.  At trial, Gideon appeared in court without an attorney.  In open court, he asked the judge to appoint a lawyer to represent him.  The judge refused, telling Gideon that the court could appoint a lawyer only for a defendant charged with a capital offense.  Gideon represented himself and was convicted.
+This case demonstrates a change in constitutional government that resulted from`,
+      options: [`a Supreme Court decision.`, `a constitutional amendment.`, `congressional legislation.`, `an informal practice.`],
+      answerIndex: 0,
+      hint: "Gideon v. Wainwright is a Supreme Court case expanding the right to counsel.",
+      explain: "Correct: the change resulted from a Supreme Court decision."
+    },
+    {
+      id: "Q16,Q35,Q138",
+      type: "mcq",
+      title: "Select two ways the Bill of Rights…",
+      prompt: `Select two ways the Bill of Rights provides protection for individuals.`,
+      options: [`It limits the power of the national government.`, `It establishes the Electoral College.`, `It guarantees certain civil liberties.`, `It creates the Supreme Court.`],
+      answerIndex: 0,
+      hint: "Two are correct in the released item set; use the version of this question in your Select-Two game if you prefer.",
+      explain: "Note: This is a two-correct item in many banks. If you want, I can swap it out for a single-correct released item here."
+    },
+    {
+      id: "Q21,Q42,Q145",
+      type: "mcq",
+      title: "The 13th Amendment to the Constitution…",
+      prompt: `The 13th Amendment to the Constitution was ratified in 1865. What was the primary purpose?`,
+      options: [`To extend voting rights to women`, `To abolish slavery`, `To establish an income tax`, `To limit presidential terms`],
+      answerIndex: 1,
+      hint: "The 13th Amendment ended slavery in the United States.",
+      explain: "Correct: the 13th Amendment abolished slavery."
+    },
+    {
+      id: "Q173",
+      type: "mcq",
+      title: "What was one way the Constitution…",
+      prompt: `What was one way the Constitution was amended to address African Americans’ ability to vote?`,
+      options: [`The 13th Amendment abolished slavery.`, `The 15th Amendment prohibited denying the right to vote based on race.`, `The 18th Amendment prohibited alcohol.`, `The 22nd Amendment limited presidential terms.`],
+      answerIndex: 1,
+      hint: "Voting rights for African American men are tied to the 15th Amendment.",
+      explain: "Correct: the 15th Amendment prohibited denying the vote based on race."
+    },
+    {
+      id: "Q17,Q36,Q139",
+      type: "mcq",
+      title: "The 15th Amendment expanded African Americans’…",
+      prompt: `The 15th Amendment expanded African Americans’ ability to participate in`,
+      options: [`the economic system.`, `the political process.`, `the judicial system.`, `the military.`],
+      answerIndex: 1,
+      hint: "Voting is part of political participation.",
+      explain: "Correct: the 15th Amendment expanded participation in the political process."
+    },
+    {
+      id: "Q48",
+      type: "mcq",
+      title: "How were voting qualifications for national elections…",
+      prompt: `How were voting qualifications for national elections changed by a constitutional amendment?`,
+      options: [`Voting was expanded to include citizens 18 years old.`, `Voting was limited to property owners.`, `Voting was restricted to men over 21.`, `Voting was limited to taxpayers only.`],
+      answerIndex: 0,
+      hint: "Think of the amendment that lowered the voting age.",
+      explain: "Correct: the 26th Amendment lowered the voting age to 18."
+    },
+    {
+      id: "Q167",
+      type: "mcq",
+      title: "What was the result of the addition…",
+      prompt: `What was the result of the addition of the 15th and 24th Amendments to the U.S. Constitution?`,
+      options: [`They expanded voting rights by limiting discrimination and eliminating poll taxes.`, `They created a national sales tax.`, `They reduced the number of states.`, `They eliminated political parties.`],
+      answerIndex: 0,
+      hint: "These amendments relate to voting rights and barriers to voting.",
+      explain: "Correct: they expanded voting rights by reducing discrimination and removing poll taxes."
+    },
+    {
+      id: "Q18,Q37,Q140",
+      type: "mcq",
+      title: "A flaw in the Electoral College became…",
+      prompt: `A flaw in the Electoral College became clear when conflict arose during the election of 1800. Which action was taken to address this flaw?`,
+      options: [`The 12th Amendment changed how Electoral College votes were cast for president and vice president.`, `The 14th Amendment guaranteed equal protection.`, `The 19th Amendment granted women the right to vote.`, `The 25th Amendment clarified presidential succession.`],
+      answerIndex: 0,
+      hint: "Election of 1800 → 12th Amendment.",
+      explain: "Correct: the 12th Amendment fixed the electoral vote process for president and vice president."
+    },
+    {
+      id: "Q20,Q40,Q143",
+      type: "mcq",
+      title: "Which circumstance prompted the adoption…",
+      prompt: `Which circumstance prompted the adoption of the 23rd Amendment?`,
+      options: [`Residents of Washington, D.C. could not vote for president.`, `Women could not vote in federal elections.`, `Poll taxes prevented voting in federal elections.`, `The president could serve unlimited terms.`],
+      answerIndex: 0,
+      hint: "The 23rd Amendment gave presidential electors to D.C.",
+      explain: "Correct: it addressed the inability of D.C. residents to vote for president."
+    },
+    {
+      id: "Q55",
+      type: "mcq",
+      title: "What does the 25th Amendment establish…",
+      prompt: `What does the 25th Amendment establish that had been previously undefined?`,
+      options: [`The process for presidential succession and disability`, `The power to declare war`, `The requirement to create political parties`, `The creation of state courts`],
+      answerIndex: 0,
+      hint: "This amendment clarifies succession and inability.",
+      explain: "Correct: it defines procedures for succession and presidential disability."
+    },
+    {
+      id: "Q160",
+      type: "mcq",
+      title: "In the presidential election of 1800,…",
+      prompt: `In the presidential election of 1800, there was a tie in the Electoral College vote. How was this issue resolved?`,
+      options: [`The House of Representatives selected the president.`, `The Supreme Court selected the president.`, `The Senate selected the president.`, `State governors selected the president.`],
+      answerIndex: 0,
+      hint: "A tie went to the House to decide.",
+      explain: "Correct: the House of Representatives resolved the tie."
+    },
+    {
+      id: "Q168",
+      type: "mcq",
+      title: "How did a constitutional amendment alter…",
+      prompt: `How did a constitutional amendment alter an aspect of the Electoral College?`,
+      options: [`It separated electoral votes for president and vice president.`, `It eliminated electors entirely.`, `It required electors to be appointed by Congress.`, `It gave each state the same number of electors.`],
+      answerIndex: 0,
+      hint: "Think: 12th Amendment change.",
+      explain: "Correct: the 12th Amendment separated votes for president and vice president."
+    },
+    {
+      id: "Q50",
+      type: "mcq",
+      title: "Which entity of government is responsible…",
+      prompt: `Which entity of government is responsible for negotiating international treaties?`,
+      options: [`The executive branch`, `The judicial branch`, `The legislative branch`, `State governments`],
+      answerIndex: 0,
+      hint: "Treaties are negotiated by the President/executive.",
+      explain: "Correct: the executive branch negotiates treaties."
+    },
+    {
+      id: "Q51",
+      type: "mcq",
+      title: "Which sentence is an example of collaboration…",
+      prompt: `Which sentence is an example of collaboration in helping to create the U.S. trade policy?`,
+      options: [`The President negotiates a treaty and the Senate votes to ratify it.`, `A state court overturns a federal law.`, `The Supreme Court writes a law.`, `A mayor vetoes a bill passed by Congress.`],
+      answerIndex: 0,
+      hint: "Trade policy often involves executive negotiation + Senate ratification.",
+      explain: "Correct: treaty negotiation and Senate ratification shows collaboration."
+    },
+    {
+      id: "Q43,Q146,Q155",
+      type: "mcq",
+      title: "Following the Supreme Court’s decision…",
+      prompt: `Following the Supreme Court’s decision in Brown v. Board of Education, which action was taken to enforce the Court’s decision?`,
+      options: [`Federal troops were used to support desegregation orders.`, `The Supreme Court passed a new law.`, `States were allowed to ignore the decision.`, `The Electoral College was abolished.`],
+      answerIndex: 0,
+      hint: "Enforcement involved federal action to implement desegregation.",
+      explain: "Correct: federal troops were used in some cases to enforce desegregation."
+    },
+    {
+      id: "Q158",
+      type: "mcq",
+      title: "Which right allows U.S. citizens…",
+      prompt: `Which right allows U.S. citizens to directly participate in the election of members of Congress?`,
+      options: [`The right to vote`, `The right to bear arms`, `The right to a jury trial`, `The right to petition`],
+      answerIndex: 0,
+      hint: "Direct participation in elections = voting.",
+      explain: "Correct: voting directly participates in electing representatives."
+    },
+    {
+      id: "Q12,Q30,Q89,Q133",
+      type: "mcq",
+      title: "Which civic responsibility is associated…",
+      prompt: `Which civic responsibility is associated with exercising one’s right to vote?`,
+      options: [`Become informed about candidates and issues`, `Serve as a judge`, `Write laws`, `Command the military`],
+      answerIndex: 0,
+      hint: "Voting responsibly involves being informed.",
+      explain: "Correct: informed voting is a key civic responsibility."
+    },
+    {
+      id: "Q173_ALT_1",
+      type: "mcq",
+      title: "Supplemented — Amendment & Voting Rights",
+      prompt: `Which constitutional change most directly expanded voting rights by lowering the voting age in federal elections?`,
+      options: [`15th Amendment`, `19th Amendment`, `24th Amendment`, `26th Amendment`],
+      answerIndex: 3,
+      hint: "Lowered voting age to 18.",
+      explain: "Correct: the 26th Amendment lowered the voting age to 18."
+    },
+    {
+      id: "SUPP_CS6_01",
+      type: "mcq",
+      title: "Supplemented — Checks & Balances",
+      prompt: `Which example best illustrates checks and balances in the federal government?`,
+      options: [
+        `Congress passes a law and the President signs it.`,
+        `The President vetoes a bill and Congress votes to override the veto.`,
+        `A state passes a local ordinance.`,
+        `Voters choose a mayor in a city election.`
+      ],
+      answerIndex: 1,
+      hint: "A branch limiting another branch’s power.",
+      explain: "Correct: a veto and override is a classic check-and-balance example."
+    },
+    {
+      id: "SUPP_CS8_01",
+      type: "mcq",
+      title: "Supplemented — Bill of Rights Purpose",
+      prompt: `Why was the Bill of Rights added to the Constitution?`,
+      options: [
+        `To create a national bank`,
+        `To limit government power and protect individual liberties`,
+        `To create the Electoral College`,
+        `To increase the president’s term length`
+      ],
+      answerIndex: 1,
+      hint: "Think: protections for liberties and limits on government.",
+      explain: "Correct: the Bill of Rights protects civil liberties and limits government power."
+    }
+  ];
+
+  // ---------- State ----------
+  const STORAGE_KEY = 'GOV_OST_GAME3_BEST_EXPLAINS_V1';
+  let state = {
+    name: '',
+    startedAtISO: '',
+    startedAtMS: 0,
+    idx: 0,
+    attempts: 0,
+    correct: 0
+  };
+
+  // ---------- DOM ----------
+  const elQpos = document.getElementById('qpos');
+  const elAcc = document.getElementById('acc');
+  const elRuntime = document.getElementById('runtime');
+
+  const elNameBox = document.getElementById('nameBox');
+  const elStudentName = document.getElementById('studentName');
+  const btnStart = document.getElementById('btnStart');
+  const btnResetAll = document.getElementById('btnResetAll');
+
+  const elQuestionBox = document.getElementById('questionBox');
+  const elQtitle = document.getElementById('qtitle');
+  const elQtext = document.getElementById('qtext');
+  const elOpts = document.getElementById('opts');
+
+  const elFeedback = document.getElementById('feedback');
+  const elFbTitle = document.getElementById('fbTitle');
+  const elFbBody = document.getElementById('fbBody');
+  const btnHint = document.getElementById('btnHint');
+  const btnNext = document.getElementById('btnNext');
+
+  const elFinishBox = document.getElementById('finishBox');
+  const elFinishTitle = document.getElementById('finishTitle');
+  const elFinishBody = document.getElementById('finishBody');
+  const elTicket = document.getElementById('ticket');
+
+  const elTName = document.getElementById('tName');
+  const elTDate = document.getElementById('tDate');
+  const elTStart = document.getElementById('tStart');
+  const elTEnd = document.getElementById('tEnd');
+  const elTRun = document.getElementById('tRun');
+  const elTAcc = document.getElementById('tAcc');
+  const elTCode = document.getElementById('tCode');
+  const btnCopy = document.getElementById('btnCopy');
+  const btnReset = document.getElementById('btnReset');
+
+  // ---------- Persistence ----------
+  function save(){ localStorage.setItem(STORAGE_KEY, JSON.stringify(state)); }
+  function load(){
+    try{
+      const raw = localStorage.getItem(STORAGE_KEY);
+      if(!raw) return false;
+      const parsed = JSON.parse(raw);
+      if(!parsed || !parsed.startedAtISO || !parsed.name) return false;
+      state = parsed;
+      return true;
+    }catch{ return false; }
+  }
+  function clearSave(){ localStorage.removeItem(STORAGE_KEY); }
+
+  // ---------- Stats ----------
+  function updateStats(){
+    const total = QUESTIONS.length;
+    const pos = Math.min(state.idx+1, total);
+    elQpos.textContent = `${pos} / ${total}`;
+
+    const acc = state.attempts ? Math.round((state.correct/state.attempts)*100) : 0;
+    elAcc.textContent = `${acc}%`;
+
+    const rt = state.startedAtMS ? (Date.now() - state.startedAtMS) : 0;
+    elRuntime.textContent = msToHMS(rt);
+  }
+  setInterval(() => updateStats(), 500);
+
+  // ---------- UI helpers ----------
+  function setFeedback(kind, title, body){
+    elFeedback.className = `msg ${kind}`;
+    elFbTitle.textContent = title;
+    elFbBody.textContent = body;
+  }
+  function clearFeedback(){
+    elFeedback.className = 'msg';
+    elFbTitle.textContent = '';
+    elFbBody.textContent = '';
+  }
+  function disableInputs(disabled){
+    document.querySelectorAll('.optbtn').forEach(b => b.disabled = disabled);
+  }
+
+  function showQuestion(){
+    const q = QUESTIONS[state.idx];
+    clearFeedback();
+
+    btnNext.disabled = true;
+    btnHint.disabled = true;
+
+    elQtitle.textContent = q.title;
+    elQtext.textContent = q.prompt;
+
+    elOpts.innerHTML = '';
+    const letters = ['A','B','C','D','E','F','G','H'];
+    q.options.forEach((text, i) => {
+      const b = document.createElement('button');
+      b.className = 'optbtn';
+      b.innerHTML = `<span class="ltr">${letters[i]}.</span>${escapeHtml(text)}`;
+      b.addEventListener('click', () => answerMCQ(i));
+      elOpts.appendChild(b);
+    });
+
+    updateStats();
+    save();
+  }
+
+  function answerMCQ(choiceIdx){
+    const q = QUESTIONS[state.idx];
+    state.attempts += 1;
+
+    const correct = (choiceIdx === q.answerIndex);
+    if(correct){
+      state.correct += 1;
+      setFeedback('good', 'Correct ✅', q.explain || 'Correct.');
+      disableInputs(true);
+      btnNext.disabled = false;
+      btnHint.disabled = true;
+      save();
+    } else {
+      setFeedback('bad', 'Not yet ❌', 'Try again. Click “Hint” if you need help.');
+      btnHint.disabled = false;
+      btnNext.disabled = true;
+      save();
+    }
+    updateStats();
+  }
+
+  btnHint.addEventListener('click', () => {
+    const q = QUESTIONS[state.idx];
+    setFeedback('warn', 'Hint 💡', q.hint || 'Re-read the prompt and match it to the best option.');
+    btnHint.disabled = true;
+  });
+
+  btnNext.addEventListener('click', () => {
+    state.idx += 1;
+    if(state.idx >= QUESTIONS.length){
+      showFinish();
+      return;
+    }
+    disableInputs(false);
+    showQuestion();
+  });
+
+  // ---------- Finish / Ticket ----------
+  function showFinish(){
+    elNameBox.style.display = 'none';
+    elQuestionBox.style.display = 'none';
+    elFinishBox.style.display = '';
+
+    const acc = state.attempts ? Math.round((state.correct/state.attempts)*100) : 0;
+    const ended = new Date();
+
+    if(acc === 100 && state.attempts >= QUESTIONS.length){
+      elFinishTitle.textContent = 'Mastery achieved ✅';
+      elFinishBody.textContent = 'You finished with 100% accuracy. Screenshot the ticket (no cropping).';
+
+      const start = new Date(state.startedAtISO);
+      const runMS = Date.now() - state.startedAtMS;
+
+      elTName.textContent = state.name;
+      elTDate.textContent = fmtDate(ended);
+      elTStart.textContent = fmtTime(start);
+      elTEnd.textContent = fmtTime(ended);
+      elTRun.textContent = msToHMS(runMS);
+      elTAcc.textContent = `${acc}%`;
+
+      const raw = `${state.name}|${state.startedAtISO}|${ended.toISOString()}|${state.correct}|${state.attempts}|${QUESTIONS.length}`;
+      const code = `GOV-BE-${base36(hash32(raw))}-${base36(hash32(raw+'X')).slice(0,4)}`;
+      elTCode.textContent = code;
+
+      elTicket.style.display = '';
+      clearSave();
+    } else {
+      elFinishTitle.textContent = 'Mastery NOT achieved ❌';
+      elFinishBody.textContent = `Accuracy: ${acc}%. You must replay for 100% (0 misses). Click “Play Again.”`;
+      elTicket.style.display = 'none';
+    }
+
+    updateStats();
+  }
+
+  btnCopy.addEventListener('click', async () => {
+    try{
+      await navigator.clipboard.writeText(elTCode.textContent.trim());
+      btnCopy.textContent = 'Copied ✅';
+      setTimeout(()=>btnCopy.textContent='Copy Ticket Code', 1100);
+    }catch{
+      btnCopy.textContent = 'Copy failed';
+      setTimeout(()=>btnCopy.textContent='Copy Ticket Code', 1100);
+    }
+  });
+
+  btnReset.addEventListener('click', () => {
+    clearSave();
+    location.reload();
+  });
+
+  btnResetAll.addEventListener('click', () => {
+    clearSave();
+    location.reload();
+  });
+
+  // ---------- Start ----------
+  btnStart.addEventListener('click', () => {
+    const name = (elStudentName.value || '').trim();
+    if(name.length < 2){
+      setFeedback('bad', 'Name required', 'Enter your name to begin.');
+      elFeedback.style.display = 'block';
+      return;
+    }
+    state.name = name;
+    const start = new Date();
+    state.startedAtISO = start.toISOString();
+    state.startedAtMS = Date.now();
+    state.idx = 0;
+    state.attempts = 0;
+    state.correct = 0;
+    save();
+
+    elNameBox.style.display = 'none';
+    elQuestionBox.style.display = '';
+    showQuestion();
+  });
+
+  if(load()){
+    elStudentName.value = state.name || '';
+    elNameBox.style.display = 'none';
+    elQuestionBox.style.display = '';
+    showQuestion();
+  }
+
+  function escapeHtml(s){
+    return String(s)
+      .replaceAll('&','&amp;')
+      .replaceAll('<','&lt;')
+      .replaceAll('>','&gt;')
+      .replaceAll('"','&quot;')
+      .replaceAll("'","&#039;");
+  }
+})();
+</script>
+</body>
+</html>
