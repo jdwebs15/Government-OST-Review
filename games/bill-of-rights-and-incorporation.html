@@ -1,0 +1,374 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>Bill of Rights & Incorporation — CS 8 (OST Review)</title>
+<link rel="stylesheet" href="../styles.css"/>
+
+<style>
+:root{
+  --bg:#0b1220;
+  --text:#e7eefc;
+  --muted:#a8b4cf;
+  --line:rgba(255,255,255,.12);
+  --good:#2bd576;
+  --bad:#ff5c7a;
+  --warn:#ffd166;
+  --accent:#7aa2ff;
+}
+body{
+  margin:0;
+  background:linear-gradient(180deg,#0b1220,#070b14);
+  color:var(--text);
+  font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial;
+}
+.wrap{width:min(1000px,92vw);margin:30px auto;}
+.panel{
+  background:rgba(255,255,255,.03);
+  border:1px solid var(--line);
+  border-radius:16px;
+  padding:20px;
+}
+.choice{
+  display:block;
+  border:1px solid var(--line);
+  padding:10px;
+  border-radius:12px;
+  margin-bottom:8px;
+  cursor:pointer;
+  background:rgba(255,255,255,.02);
+}
+.choice:hover{border-color:var(--accent);}
+.msg{margin-top:10px;padding:10px;border-radius:12px;display:none;}
+.msg.good{background:rgba(43,213,118,.08);border:1px solid rgba(43,213,118,.4);display:block;}
+.msg.bad{background:rgba(255,92,122,.08);border:1px solid rgba(255,92,122,.4);display:block;}
+.msg.warn{background:rgba(255,209,102,.08);border:1px solid rgba(255,209,102,.4);display:block;}
+button{
+  padding:10px 14px;
+  border-radius:12px;
+  border:1px solid var(--line);
+  background:rgba(255,255,255,.03);
+  color:var(--text);
+  cursor:pointer;
+  font-weight:700;
+}
+button:hover{border-color:var(--accent);}
+</style>
+</head>
+
+<body>
+<div class="wrap">
+<div class="panel">
+
+<h2>Bill of Rights & Incorporation — CS 8</h2>
+<p>Mastery = 100% accuracy (0 misses). Released items first, supplemented to 25+.</p>
+
+<div id="game"></div>
+<div id="feedback" class="msg"></div>
+
+<button id="submitBtn">Submit</button>
+<button id="hintBtn" disabled>Hint</button>
+<button id="nextBtn" disabled>Next</button>
+
+</div>
+</div>
+
+<script>
+
+// ===============================
+// QUESTION BANK (25 total)
+// Released items marked released:true
+// ===============================
+
+const QUESTIONS = [
+
+/* ===== RELEASED ITEMS (verbatim from CS 8 bank) ===== */
+
+{
+released:true,
+prompt:`Which Supreme Court case required states to provide legal counsel to defendants who could not afford an attorney?`,
+choices:[
+"Gideon v. Wainwright",
+"Marbury v. Madison",
+"McCulloch v. Maryland",
+"Brown v. Board of Education"
+],
+correct:0,
+hint:"This case incorporated the Sixth Amendment right to counsel."
+},
+
+{
+released:true,
+prompt:`Which amendment protects citizens from unreasonable searches and seizures?`,
+choices:[
+"First Amendment",
+"Fourth Amendment",
+"Eighth Amendment",
+"Tenth Amendment"
+],
+correct:1,
+hint:"Think: warrants and probable cause."
+},
+
+{
+released:true,
+prompt:`Which amendment protects the right to freedom of speech and peaceful assembly?`,
+choices:[
+"First Amendment",
+"Second Amendment",
+"Fifth Amendment",
+"Ninth Amendment"
+],
+correct:0,
+hint:"This amendment lists five freedoms."
+},
+
+/* ===== SUPPLEMENTAL (aligned to CS 8 expectations) ===== */
+
+{
+prompt:`Which amendment protects individuals from self-incrimination?`,
+choices:["Fourth","Fifth","Sixth","Eighth"],
+correct:1,
+hint:"'I plead the Fifth.'"
+},
+
+{
+prompt:`Which amendment guarantees a speedy and public trial?`,
+choices:["Fourth","Sixth","Seventh","Tenth"],
+correct:1,
+hint:"Rights of the accused."
+},
+
+{
+prompt:`Which amendment prohibits cruel and unusual punishment?`,
+choices:["First","Eighth","Ninth","Tenth"],
+correct:1,
+hint:"Think prison conditions and excessive punishment."
+},
+
+{
+prompt:`The incorporation doctrine applied most Bill of Rights protections to states through which amendment?`,
+choices:["10th","14th","2nd","7th"],
+correct:0,
+hint:"Due process clause."
+},
+
+{
+prompt:`Which scenario is protected by the First Amendment?`,
+choices:[
+"Peaceful protest in a public park",
+"Stealing private property",
+"Driving without a license",
+"Breaking into a home"
+],
+correct:0,
+hint:"Speech + assembly."
+},
+
+{
+prompt:`Which amendment protects freedom of religion?`,
+choices:["1st","3rd","6th","9th"],
+correct:0,
+hint:"Establishment + Free Exercise."
+},
+
+{
+prompt:`Which protection requires police to have probable cause before issuing a warrant?`,
+choices:["4th Amendment","6th Amendment","8th Amendment","9th Amendment"],
+correct:0,
+hint:"Search and seizure."
+},
+
+{
+prompt:`Which amendment protects against double jeopardy?`,
+choices:["4th","5th","6th","8th"],
+correct:1,
+hint:"You can't be tried twice for the same crime."
+},
+
+{
+prompt:`Which amendment protects the right to bear arms?`,
+choices:["1st","2nd","4th","9th"],
+correct:1,
+hint:"Militia clause."
+},
+
+{
+prompt:`Which amendment protects the right to petition the government?`,
+choices:["1st","3rd","7th","10th"],
+correct:0,
+hint:"One of the five freedoms."
+},
+
+{
+prompt:`Which amendment reserves powers not delegated to the federal government to the states?`,
+choices:["8th","9th","10th","14th"],
+correct:2,
+hint:"Federalism protection."
+},
+
+{
+prompt:`Which amendment requires due process of law?`,
+choices:["5th","7th","8th","10th"],
+correct:0,
+hint:"Also incorporated via 14th."
+},
+
+{
+prompt:`Which amendment protects the right to an impartial jury?`,
+choices:["6th","7th","8th","9th"],
+correct:0,
+hint:"Criminal trials."
+},
+
+{
+prompt:`Which amendment protects against excessive bail?`,
+choices:["4th","6th","8th","10th"],
+correct:2,
+hint:"Cruel and unusual punishment section."
+},
+
+{
+prompt:`Which scenario would violate the First Amendment?`,
+choices:[
+"Government banning peaceful protest",
+"Charging someone for theft",
+"Arresting someone for assault",
+"Requiring driver’s license"
+],
+correct:0,
+hint:"Peaceful expression."
+},
+
+{
+prompt:`Which clause in the 14th Amendment made incorporation possible?`,
+choices:["Equal Protection","Due Process","Privileges and Immunities","Commerce Clause"],
+correct:1,
+hint:"Key phrase: no state shall deprive..."
+},
+
+{
+prompt:`Which amendment protects freedom of the press?`,
+choices:["1st","2nd","4th","6th"],
+correct:0,
+hint:"Five freedoms."
+},
+
+{
+prompt:`Which amendment protects citizens from quartering soldiers in their homes?`,
+choices:["2nd","3rd","5th","8th"],
+correct:1,
+hint:"Rarely tested but important."
+},
+
+{
+prompt:`Which amendment ensures that rights not specifically listed are still retained by the people?`,
+choices:["7th","8th","9th","10th"],
+correct:2,
+hint:"Unenumerated rights."
+},
+
+{
+prompt:`Which amendment protects the right to confront witnesses?`,
+choices:["5th","6th","8th","10th"],
+correct:1,
+hint:"Rights of the accused."
+},
+
+{
+prompt:`Which scenario demonstrates incorporation?`,
+choices:[
+"A state must provide a jury trial",
+"A city passes a parking ordinance",
+"A governor vetoes a bill",
+"A senator filibusters"
+],
+correct:0,
+hint:"States required to follow BOR protections."
+},
+
+{
+prompt:`Which right is protected by the Sixth Amendment?`,
+choices:[
+"Right to counsel",
+"Freedom of speech",
+"Protection from self-incrimination",
+"Protection from unreasonable searches"
+],
+correct:0,
+hint:"Gideon case."
+}
+
+];
+
+// ===== GAME LOGIC =====
+
+let index = 0;
+let attempts = 0;
+let correct = 0;
+let selected = null;
+
+const game = document.getElementById("game");
+const feedback = document.getElementById("feedback");
+const submitBtn = document.getElementById("submitBtn");
+const hintBtn = document.getElementById("hintBtn");
+const nextBtn = document.getElementById("nextBtn");
+
+function loadQuestion(){
+  feedback.className="msg";
+  feedback.textContent="";
+  hintBtn.disabled=true;
+  nextBtn.disabled=true;
+  selected=null;
+  const q = QUESTIONS[index];
+  game.innerHTML = `<p>${q.prompt}</p>`;
+  q.choices.forEach((c,i)=>{
+    const div = document.createElement("div");
+    div.className="choice";
+    div.textContent=c;
+    div.onclick=()=>selected=i;
+    game.appendChild(div);
+  });
+}
+
+submitBtn.onclick = ()=>{
+  if(selected===null){alert("Select an answer.");return;}
+  attempts++;
+  if(selected===QUESTIONS[index].correct){
+    correct++;
+    feedback.className="msg good";
+    feedback.textContent="Correct.";
+    nextBtn.disabled=false;
+  } else {
+    feedback.className="msg bad";
+    feedback.textContent="Incorrect.";
+    hintBtn.disabled=false;
+  }
+};
+
+hintBtn.onclick=()=>{
+  feedback.className="msg warn";
+  feedback.textContent="Hint: "+QUESTIONS[index].hint;
+  hintBtn.disabled=true;
+};
+
+nextBtn.onclick=()=>{
+  index++;
+  if(index>=QUESTIONS.length){
+    if(correct===attempts){
+      alert("Mastery achieved!");
+    } else {
+      alert("Replay for 100%.");
+    }
+    location.reload();
+  } else {
+    loadQuestion();
+  }
+};
+
+loadQuestion();
+
+</script>
+</body>
+</html>
