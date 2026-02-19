@@ -1,305 +1,351 @@
-<!doctype html>
-<html lang="en">
-<head>
-<meta charset="utf-8"/>
-<meta name="viewport" content="width=device-width,initial-scale=1"/>
-<title>Ohio Constitution — Legend Arcade Edition</title>
-
-<style>
-:root{
-  --bg1:#0f172a;
-  --bg2:#1e293b;
-  --accent:#38bdf8;
-  --good:#22c55e;
-  --bad:#ef4444;
-  --gold:#facc15;
-  --card:#0f172a;
-  --text:#f1f5f9;
-}
-body{
-  margin:0;
-  font-family:system-ui,Segoe UI,Roboto;
-  color:var(--text);
-  background:linear-gradient(135deg,var(--bg1),var(--bg2));
-  overflow-x:hidden;
-}
-.container{
-  max-width:900px;
-  margin:40px auto;
-  padding:20px;
-}
-.card{
-  background:rgba(15,23,42,.85);
-  border:1px solid rgba(255,255,255,.1);
-  border-radius:20px;
-  padding:25px;
-  box-shadow:0 25px 60px rgba(0,0,0,.6);
-  backdrop-filter:blur(8px);
-  transition:.4s;
-}
-h1{
-  margin:0 0 10px;
-  font-size:26px;
-  letter-spacing:1px;
-}
-.subtitle{
-  color:#94a3b8;
-  margin-bottom:20px;
-}
-.progressbar{
-  height:8px;
-  background:#1e293b;
-  border-radius:20px;
-  overflow:hidden;
-  margin-bottom:20px;
-}
-.progress{
-  height:100%;
-  width:0%;
-  background:linear-gradient(90deg,#38bdf8,#22d3ee);
-  transition:.4s;
-}
-.choice{
-  margin:12px 0;
-  padding:12px 14px;
-  border-radius:14px;
-  border:1px solid rgba(255,255,255,.1);
-  cursor:pointer;
-  transition:.3s;
-}
-.choice:hover{
-  border-color:var(--accent);
-  background:rgba(56,189,248,.15);
-}
-.choice.correct{
-  background:rgba(34,197,94,.2);
-  border-color:var(--good);
-}
-.choice.wrong{
-  background:rgba(239,68,68,.2);
-  border-color:var(--bad);
-}
-.stats{
-  display:flex;
-  justify-content:space-between;
-  margin-bottom:15px;
-  font-weight:600;
-}
-.badge{
-  padding:6px 12px;
-  border-radius:20px;
-  font-size:12px;
-  background:rgba(250,204,21,.2);
-  border:1px solid var(--gold);
-}
-button{
-  margin-top:15px;
-  padding:10px 16px;
-  border-radius:14px;
-  border:none;
-  background:linear-gradient(90deg,#38bdf8,#22d3ee);
-  color:white;
-  font-weight:bold;
-  cursor:pointer;
-}
-button:hover{opacity:.85}
-.ticket{
-  margin-top:20px;
-  padding:15px;
-  border-radius:16px;
-  background:rgba(34,197,94,.15);
-  border:1px solid var(--good);
-}
-.confetti{
-  position:fixed;
-  top:0;left:0;
-  width:100%;height:100%;
-  pointer-events:none;
-}
-</style>
-</head>
-
-<body>
-
-<div class="container">
-<div class="card">
-<h1>🏛 Ohio Constitution — Legend Arcade</h1>
-<div class="subtitle">CS 16–17 | Reform • Structure • Civic Power</div>
-
-<div class="stats">
-<div>XP: <span id="xp">0</span></div>
-<div>Level: <span id="level">1</span></div>
-<div>Streak: <span id="streak">0</span></div>
-<div class="badge" id="badge">Reform Rookie</div>
-</div>
-
-<div class="progressbar"><div class="progress" id="progress"></div></div>
-
-<div id="question"></div>
-<div id="choices"></div>
-<button onclick="next()">Next</button>
-
-<div id="ticket"></div>
-
-</div>
-</div>
-
-<canvas class="confetti" id="confetti"></canvas>
-
 <script>
-// SOUND EFFECTS
-const correctSound=new Audio("https://assets.mixkit.co/sfx/preview/mixkit-correct-answer-tone-2870.mp3");
-const wrongSound=new Audio("https://assets.mixkit.co/sfx/preview/mixkit-wrong-answer-fail-notification-946.mp3");
-const levelSound=new Audio("https://assets.mixkit.co/sfx/preview/mixkit-game-level-completed-2059.mp3");
+// =========================
+// SOUND EFFECTS (synced)
+// =========================
+const SFX = {
+  correct: new Audio("https://assets.mixkit.co/sfx/preview/mixkit-correct-answer-tone-2870.mp3"),
+  wrong: new Audio("https://assets.mixkit.co/sfx/preview/mixkit-wrong-answer-fail-notification-946.mp3"),
+  level: new Audio("https://assets.mixkit.co/sfx/preview/mixkit-game-level-completed-2059.mp3"),
+  boom: new Audio("https://assets.mixkit.co/sfx/preview/mixkit-arcade-game-explosion-2759.mp3"),
+  sparkle: new Audio("https://assets.mixkit.co/sfx/preview/mixkit-magical-coin-win-1936.mp3")
+};
+Object.values(SFX).forEach(a => { a.preload = "auto"; a.volume = 0.65; });
+SFX.boom.volume = 0.55;
+SFX.sparkle.volume = 0.60;
 
-// QUESTIONS
+// clone-play helper (so bursts can overlap)
+function playSfx(audio){
+  try{
+    const a = audio.cloneNode();
+    a.volume = audio.volume;
+    a.play().catch(()=>{});
+  }catch(e){}
+}
+
+// =========================
+// QUESTIONS (same as before)
+// =========================
 const questions=[
-{q:"Why was the 1851 Ohio Constitution adopted?",a:["To limit legislative power and state debt","To expand slavery","To eliminate courts"],c:0},
-{q:"What reform made judges more accountable in 1851?",a:["Election of judges","Lifetime appointment","Executive selection only"],c:0},
-{q:"Which feature exists in Ohio but not U.S. Constitution?",a:["Initiative and referendum","Bill of Rights","Three branches"],c:0},
-{q:"Initiative allows citizens to…",a:["Propose laws by petition","Appoint judges","Impeach governor"],c:0},
-{q:"Referendum allows citizens to…",a:["Vote on laws passed by legislature","Rewrite federal laws","Control Supreme Court"],c:0},
-{q:"One problem under the 1803 Constitution was…",a:["Legislative dominance","Too many judges","No governor"],c:0},
-{q:"Both Ohio and U.S. Constitutions include…",a:["Separation of powers","Monarchy","Direct democracy only"],c:0},
-{q:"Debt limits were added in 1851 to…",a:["Protect taxpayers","Increase federal control","Expand war spending"],c:0},
-{q:"Attending a school board meeting demonstrates…",a:["Civic responsibility","Judicial review","Military authority"],c:0}
+  {q:"Why was the 1851 Ohio Constitution adopted?",a:["To limit legislative power and state debt","To expand slavery","To eliminate courts"],c:0},
+  {q:"What reform made judges more accountable in 1851?",a:["Election of judges","Lifetime appointment","Executive selection only"],c:0},
+  {q:"Which feature exists in Ohio but not U.S. Constitution?",a:["Initiative and referendum","Bill of Rights","Three branches"],c:0},
+  {q:"Initiative allows citizens to…",a:["Propose laws by petition","Appoint judges","Impeach governor"],c:0},
+  {q:"Referendum allows citizens to…",a:["Vote on laws passed by legislature","Rewrite federal laws","Control Supreme Court"],c:0},
+  {q:"One problem under the 1803 Constitution was…",a:["Legislative dominance","Too many judges","No governor"],c:0},
+  {q:"Both Ohio and U.S. Constitutions include…",a:["Separation of powers","Monarchy","Direct democracy only"],c:0},
+  {q:"Debt limits were added in 1851 to…",a:["Protect taxpayers","Increase federal control","Expand war spending"],c:0},
+  {q:"Attending a school board meeting demonstrates…",a:["Civic responsibility","Judicial review","Military authority"],c:0}
 ];
 
+// =========================
+// STATE
+// =========================
 let index=0;
 let xp=0;
 let level=1;
 let streak=0;
+let answered=false;
 let name="";
 let startTime=new Date();
 
+// =========================
+// DOM
+// =========================
 const qDiv=document.getElementById("question");
 const cDiv=document.getElementById("choices");
+const xpEl=document.getElementById("xp");
+const lvlEl=document.getElementById("level");
+const streakEl=document.getElementById("streak");
+const badgeEl=document.getElementById("badge");
+const cardEl=document.querySelector(".card");
+const popLayer=document.getElementById("popLayer");
 
+// =========================
+// FX: shake, glow, popups, badge unlock
+// =========================
+function triggerShake(){
+  cardEl.classList.remove("shake");
+  void cardEl.offsetWidth; // restart animation
+  cardEl.classList.add("shake");
+}
+
+function glowXP(){
+  xpEl.classList.remove("xpGlow");
+  void xpEl.offsetWidth;
+  xpEl.classList.add("xpGlow");
+}
+
+function popup(text, anchorEl){
+  const r = anchorEl.getBoundingClientRect();
+  const p = document.createElement("div");
+  p.className = "popup";
+  p.textContent = text;
+  p.style.left = (r.left + r.width/2) + "px";
+  p.style.top = (r.top - 6) + "px";
+  popLayer.appendChild(p);
+  setTimeout(()=> p.remove(), 1000);
+}
+
+function badgeUnlock(newText){
+  badgeEl.textContent = newText;
+  badgeEl.classList.remove("badgeUnlock");
+  void badgeEl.offsetWidth;
+  badgeEl.classList.add("badgeUnlock");
+  playSfx(SFX.sparkle);
+}
+
+// =========================
+// RENDER
+// =========================
 function render(){
-const q=questions[index];
-qDiv.innerHTML=`<h3>${q.q}</h3>`;
-cDiv.innerHTML="";
-q.a.forEach((choice,i)=>{
-const div=document.createElement("div");
-div.className="choice";
-div.textContent=choice;
-div.onclick=()=>check(i,div);
-cDiv.appendChild(div);
-});
-document.getElementById("progress").style.width=((index)/questions.length*100)+"%";
-}
+  const q=questions[index];
+  qDiv.innerHTML=`<h3>${q.q}</h3>`;
+  cDiv.innerHTML="";
+  answered=false;
 
-function check(i,div){
-if(i===questions[index].c){
-div.classList.add("correct");
-correctSound.play();
-xp+=10+(streak*2);
-streak++;
-if(streak%3===0){
-level++;
-levelSound.play();
-document.getElementById("badge").textContent="Civic Champion";
-}
-}else{
-div.classList.add("wrong");
-wrongSound.play();
-streak=0;
-}
-updateStats();
+  q.a.forEach((choice,i)=>{
+    const div=document.createElement("div");
+    div.className="choice";
+    div.textContent=choice;
+    div.onclick=()=>check(i,div);
+    cDiv.appendChild(div);
+  });
+
+  document.getElementById("progress").style.width=((index)/questions.length*100)+"%";
 }
 
 function updateStats(){
-document.getElementById("xp").textContent=xp;
-document.getElementById("level").textContent=level;
-document.getElementById("streak").textContent=streak;
+  xpEl.textContent=xp;
+  lvlEl.textContent=level;
+  streakEl.textContent=streak;
+}
+
+// =========================
+// GAME LOGIC (with FX)
+// =========================
+function check(i,div){
+  if(answered) return; // only first click counts
+
+  const correct = (i===questions[index].c);
+  if(correct){
+    answered=true;
+    div.classList.add("correct");
+    playSfx(SFX.correct);
+
+    // XP + streak multiplier
+    const gain = 10 + (streak*2);
+    xp += gain;
+    streak++;
+
+    glowXP();
+    popup(`+${gain} XP`, xpEl);
+
+    // Level up every 30 XP chunks (simple feel-good pacing)
+    const newLevel = 1 + Math.floor(xp / 30);
+    if(newLevel > level){
+      level = newLevel;
+      playSfx(SFX.level);
+      badgeUnlock(level >= 6 ? "Ohio Icon" : (level >= 4 ? "Civic Champion" : "Reform Ranger"));
+      // fireworks burst on level-up too
+      fireworkBurst(window.innerWidth/2, window.innerHeight/2, 2);
+    }
+
+    updateStats();
+  } else {
+    answered=true;
+    div.classList.add("wrong");
+    playSfx(SFX.wrong);
+    triggerShake();
+    streak=0;
+    updateStats();
+    popup("STREAK BROKEN!", streakEl);
+  }
 }
 
 function next(){
-index++;
-if(index>=questions.length){
-celebrate();
-return;
-}
-render();
-}
-
-function celebrate(){
-document.getElementById("progress").style.width="100%";
-launchConfetti();
-document.getElementById("ticket").innerHTML=`
-<div class="ticket">
-<h2>🏆 Mastery Complete!</h2>
-XP Earned: ${xp}<br>
-Level: ${level}<br>
-Started: ${startTime}<br>
-Completed: ${new Date()}
-</div>`;
+  index++;
+  if(index>=questions.length){
+    celebrate();
+    return;
+  }
+  render();
 }
 
-// CONFETTI
-function launchConfetti(){
-
+// =========================
+// CONFETTI + FIREWORKS (animated, continuous)
+// =========================
 const canvas = document.getElementById("confetti");
 const ctx = canvas.getContext("2d");
+let confetti = [];
+let fireworks = [];
+let animRunning = false;
+let animStopAt = 0;
 
-canvas.width = window.innerWidth;
-canvas.height = window.innerHeight;
+function resizeCanvas(){
+  canvas.width = window.innerWidth;
+  canvas.height = window.innerHeight;
+}
+window.addEventListener("resize", resizeCanvas);
 
-let pieces = [];
-let gravity = 0.6;
-let confettiCount = 180;
+function startCelebrationFX(durationMs=9000){
+  resizeCanvas();
+  animStopAt = performance.now() + durationMs;
 
-for(let i=0;i<confettiCount;i++){
-  pieces.push({
-    x: Math.random()*canvas.width,
-    y: Math.random()*canvas.height - canvas.height,
-    size: Math.random()*8+4,
-    speedX: Math.random()*4-2,
-    speedY: Math.random()*3+2,
-    color: `hsl(${Math.random()*360}, 100%, 50%)`,
-    rotation: Math.random()*360,
-    rotationSpeed: Math.random()*10-5
-  });
+  // build confetti field
+  confetti = [];
+  const count = 220;
+  for(let i=0;i<count;i++){
+    confetti.push({
+      x: Math.random()*canvas.width,
+      y: Math.random()*canvas.height - canvas.height,
+      size: Math.random()*7+4,
+      vx: Math.random()*3-1.5,
+      vy: Math.random()*2+2,
+      rot: Math.random()*Math.PI*2,
+      vr: Math.random()*0.18-0.09,
+      color: `hsl(${Math.random()*360}, 100%, 55%)`,
+      shape: Math.random()<0.5 ? "rect" : "ribbon"
+    });
+  }
+
+  // initial big burst
+  fireworkBurst(canvas.width/2, canvas.height*0.38, 4);
+
+  if(!animRunning){
+    animRunning = true;
+    playSfx(SFX.boom); // synced start
+    requestAnimationFrame(loopFX);
+  }
 }
 
-function animate(){
+function fireworkBurst(x,y,intensity=3){
+  // create a burst of particles from (x,y)
+  const burstCount = 45 + intensity*18;
+  for(let i=0;i<burstCount;i++){
+    const ang = Math.random()*Math.PI*2;
+    const spd = (Math.random()*3.0 + 2.2) * intensity;
+    fireworks.push({
+      x,y,
+      vx: Math.cos(ang)*spd,
+      vy: Math.sin(ang)*spd,
+      life: 70 + Math.random()*25,
+      age: 0,
+      size: 2 + Math.random()*2,
+      color: `hsl(${Math.random()*360}, 100%, 60%)`
+    });
+  }
+  playSfx(SFX.boom);
+}
+
+function loopFX(t){
   ctx.clearRect(0,0,canvas.width,canvas.height);
 
-  pieces.forEach(p=>{
-    p.speedY += gravity;
-    p.x += p.speedX;
-    p.y += p.speedY;
-    p.rotation += p.rotationSpeed;
+  // confetti
+  const g = 0.06;
+  confetti.forEach(p=>{
+    p.vy += g;
+    p.x += p.vx;
+    p.y += p.vy;
+    p.rot += p.vr;
+
+    // wrap
+    if(p.x < -20) p.x = canvas.width+20;
+    if(p.x > canvas.width+20) p.x = -20;
+
+    // respawn top
+    if(p.y > canvas.height+30){
+      p.y = -20;
+      p.x = Math.random()*canvas.width;
+      p.vy = Math.random()*2+2;
+    }
 
     ctx.save();
     ctx.translate(p.x,p.y);
-    ctx.rotate(p.rotation * Math.PI/180);
+    ctx.rotate(p.rot);
     ctx.fillStyle = p.color;
-    ctx.fillRect(-p.size/2,-p.size/2,p.size,p.size);
-    ctx.restore();
 
-    if(p.y > canvas.height){
-      p.y = -20;
-      p.x = Math.random()*canvas.width;
-      p.speedY = Math.random()*3+2;
+    if(p.shape === "rect"){
+      ctx.fillRect(-p.size/2,-p.size/2,p.size,p.size);
+    } else {
+      // ribbon-ish
+      ctx.beginPath();
+      ctx.moveTo(-p.size, 0);
+      ctx.quadraticCurveTo(0, -p.size, p.size, 0);
+      ctx.quadraticCurveTo(0, p.size, -p.size, 0);
+      ctx.fill();
     }
+    ctx.restore();
   });
 
-  requestAnimationFrame(animate);
+  // fireworks particles
+  fireworks = fireworks.filter(f => f.age < f.life);
+  fireworks.forEach(f=>{
+    f.age++;
+    // gravity + drag
+    f.vy += 0.04;
+    f.vx *= 0.99;
+    f.vy *= 0.99;
+    f.x += f.vx;
+    f.y += f.vy;
+
+    const alpha = Math.max(0, 1 - (f.age / f.life));
+    ctx.globalAlpha = alpha;
+    ctx.fillStyle = f.color;
+    ctx.beginPath();
+    ctx.arc(f.x, f.y, f.size, 0, Math.PI*2);
+    ctx.fill();
+    ctx.globalAlpha = 1;
+  });
+
+  // auto bursts for “show”
+  if(Math.random() < 0.05){
+    fireworkBurst(
+      canvas.width*(0.25 + Math.random()*0.5),
+      canvas.height*(0.18 + Math.random()*0.25),
+      2
+    );
+  }
+
+  if(t < animStopAt){
+    requestAnimationFrame(loopFX);
+  } else {
+    // stop and clear
+    ctx.clearRect(0,0,canvas.width,canvas.height);
+    fireworks = [];
+    confetti = [];
+    animRunning = false;
+  }
 }
 
-animate();
+// =========================
+// CELEBRATE
+// =========================
+function celebrate(){
+  document.getElementById("progress").style.width="100%";
+  startCelebrationFX(9500); // continuous falling confetti + fireworks
+  badgeUnlock("STATEHOUSE LEGEND");
 
-// Stop after 8 seconds (optional)
-setTimeout(()=> {
-  ctx.clearRect(0,0,canvas.width,canvas.height);
-},8000);
+  const endTime = new Date();
+  const runtimeSec = Math.max(0, Math.floor((endTime - startTime)/1000));
+  const mm = String(Math.floor(runtimeSec/60)).padStart(2,"0");
+  const ss = String(runtimeSec%60).padStart(2,"0");
 
+  document.getElementById("ticket").innerHTML=`
+    <div class="ticket">
+      <h2>🏆 Mastery Complete!</h2>
+      XP Earned: ${xp}<br>
+      Level: ${level}<br>
+      Streak Best: (watch the next build 😉)<br>
+      Started: ${startTime}<br>
+      Completed: ${endTime}<br>
+      Runtime: ${mm}:${ss}
+    </div>`;
 }
 
+// expose next() for your button
+window.next = next;
 
+// initial paint
 render();
+updateStats();
 </script>
-
-</body>
-</html>
