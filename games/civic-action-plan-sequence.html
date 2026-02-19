@@ -1,0 +1,988 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Civic Action Plan Sequence — From Issue to Policy (OST Review)</title>
+  <link rel="stylesheet" href="../styles.css" />
+
+  <style>
+    :root{
+      --bg:#0b1220; --text:#e7eefc; --muted:#a8b4cf; --line:rgba(255,255,255,.12);
+      --shadow:0 18px 55px rgba(0,0,0,.40); --radius:18px;
+      --good:#2bd576; --bad:#ff5c7a; --warn:#ffd166; --accent:#7aa2ff;
+      --mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+    }
+    *{box-sizing:border-box}
+    body{margin:0;background:linear-gradient(180deg,#0b1220,#070b14);color:var(--text);font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial;min-height:100vh}
+    .wrap{width:min(980px,92vw);margin:22px auto 40px}
+    .topbar{
+      background:rgba(255,255,255,.03);border:1px solid var(--line);border-radius:var(--radius);
+      padding:18px 18px 14px;box-shadow:var(--shadow);display:flex;gap:14px;align-items:flex-start;justify-content:space-between
+    }
+    .kicker{letter-spacing:.14em;font-size:12px;color:var(--muted);font-weight:800}
+    h1{margin:6px 0 6px;font-size:24px}
+    .sub{margin:0;color:var(--muted);line-height:1.35}
+    .pillrow{display:flex;gap:8px;flex-wrap:wrap;justify-content:flex-end}
+    .pill{border:1px solid var(--line);background:rgba(255,255,255,.02);padding:6px 10px;border-radius:999px;font-size:12px;color:var(--muted);white-space:nowrap}
+
+    .grid{display:grid;grid-template-columns:1.15fr .85fr;gap:14px;margin-top:14px}
+    @media (max-width:900px){.grid{grid-template-columns:1fr}}
+    .panel{background:rgba(255,255,255,.03);border:1px solid var(--line);border-radius:var(--radius);box-shadow:var(--shadow);padding:16px}
+
+    .row{display:flex;gap:10px;align-items:center;justify-content:space-between;flex-wrap:wrap}
+    .label{color:var(--muted);font-size:12px;letter-spacing:.08em;font-weight:900}
+    .statline{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
+    .stat{background:rgba(255,255,255,.02);border:1px solid var(--line);border-radius:12px;padding:10px 12px;min-width:140px}
+    .stat .big{font-size:16px;font-weight:900}
+    .stat .small{font-size:12px;color:var(--muted);margin-top:2px}
+
+    .qtitle{margin:10px 0 6px;font-size:18px}
+    .qtext{margin:0 0 12px;color:var(--text);line-height:1.4;white-space:pre-wrap}
+
+    .field{display:grid;gap:6px;margin-top:10px}
+    input[type="text"]{
+      width:100%;padding:12px 12px;border-radius:14px;border:1px solid var(--line);
+      background:rgba(255,255,255,.02);color:var(--text);outline:none
+    }
+    input[type="text"]:focus{border-color:rgba(122,162,255,.55)}
+
+    .actions{display:flex;gap:10px;flex-wrap:wrap;margin-top:12px}
+    .btn{
+      border-radius:14px;border:1px solid var(--line);background:rgba(255,255,255,.02);
+      color:var(--text);padding:10px 12px;cursor:pointer;font-weight:900
+    }
+    .btn:hover{border-color:rgba(122,162,255,.45)}
+    .btn.primary{border-color:rgba(122,162,255,.45);background:rgba(122,162,255,.10)}
+    .btn[disabled]{opacity:.6;cursor:not-allowed}
+
+    .msg{border-radius:14px;border:1px solid var(--line);padding:12px;margin-top:12px;display:none}
+    .msg.good{display:block;border-color:rgba(43,213,118,.35);background:rgba(43,213,118,.08)}
+    .msg.bad{display:block;border-color:rgba(255,92,122,.35);background:rgba(255,92,122,.08)}
+    .msg.warn{display:block;border-color:rgba(255,209,102,.35);background:rgba(255,209,102,.08)}
+    .msg .t{font-weight:900;margin-bottom:4px}
+    .msg .b{color:var(--muted);line-height:1.35}
+
+    .errbox{display:none;margin-top:14px;border:1px solid rgba(255,92,122,.45);background:rgba(255,92,122,.10);border-radius:14px;padding:12px}
+    .errbox .t{font-weight:900}
+    .errbox pre{margin:8px 0 0;white-space:pre-wrap;color:var(--text);font-family:var(--mono);font-size:12px}
+
+    /* Sequence UI */
+    .cols{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:10px}
+    @media (max-width:900px){.cols{grid-template-columns:1fr}}
+    .box{
+      border:1px solid var(--line);
+      background:rgba(255,255,255,.02);
+      border-radius:14px;
+      padding:12px;
+      min-height:120px;
+    }
+    .box h3{margin:0 0 10px;font-size:13px;letter-spacing:.08em;color:var(--muted)}
+    .step{
+      width:100%;
+      text-align:left;
+      border-radius:14px;
+      border:1px solid var(--line);
+      background:rgba(255,255,255,.02);
+      color:var(--text);
+      padding:10px 10px;
+      cursor:pointer;
+      margin-bottom:10px;
+    }
+    .step:hover{border-color:rgba(122,162,255,.45)}
+    .step .n{font-family:var(--mono);font-weight:900;color:var(--accent);margin-right:8px}
+    .step[disabled]{opacity:.65;cursor:not-allowed}
+    .chosen{
+      border-color:rgba(43,213,118,.35);
+      background:rgba(43,213,118,.06);
+    }
+
+    .turning{margin-top:12px;display:none}
+    .turning .opts{display:grid;gap:10px;margin-top:10px}
+    .optbtn{
+      width:100%;
+      text-align:left;
+      border-radius:14px;
+      border:1px solid var(--line);
+      background:rgba(255,255,255,.02);
+      color:var(--text);
+      padding:12px 12px;
+      cursor:pointer;
+    }
+    .optbtn:hover{border-color:rgba(122,162,255,.45)}
+    .optbtn[disabled]{opacity:.65;cursor:not-allowed}
+
+    .ticket{
+      margin-top:12px;border:1px solid rgba(43,213,118,.35);background:rgba(43,213,118,.07);border-radius:14px;padding:12px
+    }
+    .ticket .code{
+      font-family:var(--mono);font-weight:900;letter-spacing:.06em;padding:10px;border-radius:12px;border:1px solid var(--line);
+      background:rgba(255,255,255,.02);margin-top:8px;word-break:break-word
+    }
+    .muted{color:var(--muted)}
+  </style>
+</head>
+
+<body>
+  <div class="wrap">
+    <div class="topbar">
+      <div>
+        <div class="kicker">GOVERNMENT OST REVIEW</div>
+        <h1>Civic Action Plan Sequence — From Issue to Policy</h1>
+        <p class="sub">
+          Put steps in order, then pick the turning point. Wrong answers trigger a hint and retry, but mastery requires <b>100% accuracy</b>.
+          Ticket includes name + start/end times + runtime.
+        </p>
+      </div>
+      <div class="pillrow">
+        <div class="pill">Mastery (100%) ✅</div>
+        <div class="pill">Name + timestamps ✅</div>
+        <div class="pill">Turning point ✅</div>
+        <div class="pill">Submission ticket ✅</div>
+      </div>
+    </div>
+
+    <div id="errbox" class="errbox" role="alert">
+      <div class="t">On-page error box</div>
+      <div class="muted">Copy the details below if anything “white screens.”</div>
+      <pre id="errtext"></pre>
+    </div>
+
+    <div class="grid">
+      <section class="panel">
+        <div class="row">
+          <div class="label">QUESTION</div>
+          <div class="statline">
+            <div class="stat"><div class="big" id="qpos">—</div><div class="small">Progress</div></div>
+            <div class="stat"><div class="big" id="acc">—</div><div class="small">Accuracy</div></div>
+            <div class="stat"><div class="big" id="runtime">—</div><div class="small">Runtime</div></div>
+          </div>
+        </div>
+
+        <h2 class="qtitle" id="qtitle">Enter your name to begin</h2>
+        <p class="qtext" id="qtext">Your teacher requires a submission ticket at the end (no cropping). Use your real name.</p>
+
+        <div id="nameBox" class="field">
+          <label class="muted" for="studentName"><b>Student Name</b></label>
+          <input id="studentName" type="text" placeholder="e.g., Jordan Smith" autocomplete="name" />
+          <div class="actions">
+            <button class="btn primary" id="btnStart">Start</button>
+            <button class="btn" id="btnResetAll" title="Clears saved progress for this game only">Reset Game</button>
+          </div>
+          <div class="muted" style="margin-top:6px;font-size:12px;">
+            Progress saves in this browser until you finish or reset.
+          </div>
+        </div>
+
+        <div id="playBox" style="display:none;">
+          <h2 class="qtitle" id="scenarioTitle">—</h2>
+          <p class="qtext" id="scenarioPrompt">—</p>
+
+          <div class="cols">
+            <div class="box">
+              <h3>STEPS (CLICK IN ORDER)</h3>
+              <div id="pool"></div>
+            </div>
+            <div class="box">
+              <h3>YOUR SEQUENCE</h3>
+              <div id="sequence"></div>
+              <div class="actions" style="margin-top:6px">
+                <button class="btn" id="btnUndo" disabled>Undo</button>
+                <button class="btn" id="btnClear" disabled>Clear</button>
+                <button class="btn primary" id="btnCheck" disabled>Check Order</button>
+              </div>
+            </div>
+          </div>
+
+          <div id="feedback" class="msg" aria-live="polite">
+            <div class="t" id="fbTitle"></div>
+            <div class="b" id="fbBody"></div>
+          </div>
+
+          <div class="turning" id="turningBox">
+            <div class="label">TURNING POINT</div>
+            <div class="muted" style="margin-top:8px;line-height:1.35">
+              Which step is the turning point—the step where the issue shifts into an official government decision point (agenda, hearing, vote, etc.)?
+            </div>
+            <div class="opts" id="turningOpts"></div>
+          </div>
+
+          <div class="actions">
+            <button class="btn" id="btnHint" disabled>Hint</button>
+            <button class="btn primary" id="btnNext" disabled>Next</button>
+          </div>
+        </div>
+
+        <div id="finishBox" style="display:none;">
+          <h2 class="qtitle">Finish</h2>
+          <p class="qtext">
+            If you have <b>100% accuracy</b>, you’ll receive a submission ticket. If not, you must reset and replay for mastery.
+          </p>
+
+          <div id="finishMsg" class="msg warn" style="display:block;">
+            <div class="t" id="finishTitle">Checking mastery…</div>
+            <div class="b" id="finishBody">—</div>
+          </div>
+
+          <div id="ticket" class="ticket" style="display:none;">
+            <div><b>Submission Ticket</b> (screenshot this)</div>
+            <div class="muted" style="margin-top:6px;line-height:1.35">
+              Name: <span id="tName"></span><br/>
+              Date: <span id="tDate"></span><br/>
+              Start: <span id="tStart"></span><br/>
+              End: <span id="tEnd"></span><br/>
+              Runtime: <span id="tRun"></span><br/>
+              Accuracy: <span id="tAcc"></span>
+            </div>
+            <div class="code" id="tCode">—</div>
+            <div class="actions" style="margin-top:10px;">
+              <button class="btn primary" id="btnCopy">Copy Ticket Code</button>
+              <button class="btn" id="btnReset">Play Again</button>
+            </div>
+          </div>
+
+          <div class="actions" style="margin-top:10px;">
+            <button class="btn" onclick="location.href='../index.html'">Back to Hub</button>
+          </div>
+        </div>
+      </section>
+
+      <aside class="panel">
+        <div class="label">RULES</div>
+        <ul class="muted" style="margin:10px 0 0; line-height:1.45;">
+          <li><b>Mastery</b> = finish all items with <b>0 misses</b> (100% accuracy).</li>
+          <li>Wrong order / wrong turning point → hint appears → retry until correct, but accuracy keeps the miss.</li>
+          <li>Ticket at end includes name + timestamps + runtime.</li>
+        </ul>
+
+        <hr style="border:none;border-top:1px solid var(--line); margin:14px 0;">
+
+        <div class="label">WHAT THIS BUILDS</div>
+        <p class="muted" style="margin:10px 0 0; line-height:1.45;">
+          CS 1-style civic action plans: identify → research → propose → engage the right level of government → decision point → outcome.
+        </p>
+      </aside>
+    </div>
+  </div>
+
+<script>
+(() => {
+  // ---------------- Hardened shell ----------------
+  const errbox = document.getElementById('errbox');
+  const errtext = document.getElementById('errtext');
+  window.addEventListener('error', (e) => {
+    errbox.style.display = 'block';
+    errtext.textContent = `Error: ${e.message}\nSource: ${e.filename}:${e.lineno}:${e.colno}`;
+  });
+  window.addEventListener('unhandledrejection', (e) => {
+    errbox.style.display = 'block';
+    errtext.textContent = `Unhandled Promise Rejection:\n${(e.reason && e.reason.stack) ? e.reason.stack : e.reason}`;
+  });
+
+  // ---------------- Utilities ----------------
+  const pad2 = n => String(n).padStart(2,'0');
+  const fmtTime = (d) => {
+    const hr = d.getHours();
+    const ampm = hr >= 12 ? 'PM' : 'AM';
+    const h12 = hr % 12 || 12;
+    return `${h12}:${pad2(d.getMinutes())}:${pad2(d.getSeconds())} ${ampm}`;
+  };
+  const fmtDate = (d) => `${d.getMonth()+1}/${d.getDate()}/${d.getFullYear()}`;
+  const msToHMS = (ms) => {
+    const s = Math.max(0, Math.floor(ms/1000));
+    const hh = Math.floor(s/3600);
+    const mm = Math.floor((s%3600)/60);
+    const ss = s%60;
+    return `${hh}:${pad2(mm)}:${pad2(ss)}`;
+  };
+  const hash32 = (str) => {
+    let h = 2166136261 >>> 0;
+    for (let i=0;i<str.length;i++){
+      h ^= str.charCodeAt(i);
+      h = Math.imul(h, 16777619);
+    }
+    return h >>> 0;
+  };
+  const base36 = (n) => n.toString(36).toUpperCase();
+
+  function shuffle(arr){
+    const a = arr.slice();
+    for(let i=a.length-1;i>0;i--){
+      const j = Math.floor(Math.random()*(i+1));
+      [a[i],a[j]]=[a[j],a[i]];
+    }
+    return a;
+  }
+  function escapeHtml(s){
+    return String(s)
+      .replaceAll('&','&amp;')
+      .replaceAll('<','&lt;')
+      .replaceAll('>','&gt;')
+      .replaceAll('"','&quot;')
+      .replaceAll("'","&#039;");
+  }
+
+  // ---------------- QUESTIONS (25) ----------------
+  // Standards-supplemented sequence + turning-point items (CS 1 / civic & policy processes).
+  // You can swap in released items later if you want—this is built to meet the 25 minimum right now.
+  const QUESTIONS = [
+    {
+      id:"SEQ01",
+      title:"Safer Crosswalks Near School",
+      prompt:"A student group wants safer crosswalks near the high school.",
+      steps:[
+        "Identify the problem and define the goal clearly",
+        "Gather evidence (traffic data, near-miss reports, photos) and research current rules",
+        "Propose solutions (crosswalk repainting, flashing beacons, crossing guard) with costs/benefits",
+        "Attend the appropriate meeting (city council/traffic committee) and present the proposal during public comment"
+      ],
+      turningIndex:3,
+      hint:"The turning point is when it becomes an official decision point (agenda/hearing/public comment/vote)."
+    },
+    {
+      id:"SEQ02",
+      title:"Local Recycling Ordinance Support",
+      prompt:"A city is considering a recycling ordinance. You support it.",
+      steps:[
+        "Learn the ordinance details and meeting date (agenda) so you know what is being decided",
+        "Prepare evidence-based reasons and anticipate common counterarguments",
+        "Attend the city council public comment session and present your support",
+        "Follow up with council members after the meeting to reinforce your position"
+      ],
+      turningIndex:2,
+      hint:"Public comment at the city council meeting is the decision-point step."
+    },
+    {
+      id:"SEQ03",
+      title:"State Education Funding Change",
+      prompt:"Ohio is debating a statewide education funding change; you oppose the bill.",
+      steps:[
+        "Read reliable summaries and key sections of the bill to understand what it changes",
+        "Contact state legislators (emails/calls/letters) with a clear request and evidence",
+        "Encourage others to contact their legislators as well (organized outreach)",
+        "Track committee hearings/votes and respond at the next decision point"
+      ],
+      turningIndex:3,
+      hint:"Committee hearings/votes are where the bill moves (official decision point)."
+    },
+    {
+      id:"SEQ04",
+      title:"Park Maintenance After Budget Cuts",
+      prompt:"Your town can’t afford landscaping; you want parks maintained.",
+      steps:[
+        "Confirm the specific need (what maintenance is missing and when)",
+        "Organize volunteers and coordinate with the parks department for safety and scheduling",
+        "Carry out weekly maintenance with documented results (photos/logs)",
+        "Report outcomes to local officials to support future budgeting decisions"
+      ],
+      turningIndex:1,
+      hint:"The issue turns into action when you coordinate directly with the responsible local department."
+    },
+    {
+      id:"SEQ05",
+      title:"New Skatepark on City Land",
+      prompt:"The city debates installing a skatepark; you support it.",
+      steps:[
+        "Collect community support and evidence of need (surveys, examples from similar towns)",
+        "Prepare a short presentation focused on benefits, cost, and safety concerns",
+        "Attend the city council meeting and present during public comment",
+        "Propose a concrete next step (site study, budget line item, pilot project)"
+      ],
+      turningIndex:2,
+      hint:"City council public comment is the official decision-point step."
+    },
+    {
+      id:"SEQ06",
+      title:"Fixing a Dangerous Intersection",
+      prompt:"Drivers keep speeding at an intersection; residents want a stop sign.",
+      steps:[
+        "Document the problem (speed observations, incidents, near-misses)",
+        "Request a traffic study through the city/township process",
+        "Attend the meeting when the traffic study is discussed and advocate for a solution",
+        "Follow up after the decision (implementation timeline, signage installation)"
+      ],
+      turningIndex:2,
+      hint:"The turning point is when the study/agenda item is discussed in an official meeting."
+    },
+    {
+      id:"SEQ07",
+      title:"Changing a School Policy",
+      prompt:"Students want a change to a school policy (e.g., phone policy).",
+      steps:[
+        "Identify the exact policy rule and explain the problem it creates",
+        "Gather evidence and propose a realistic alternative",
+        "Present the proposal to the appropriate body (school board/administration meeting)",
+        "Adjust the proposal based on feedback and continue advocacy at the next meeting"
+      ],
+      turningIndex:2,
+      hint:"Turning point = presenting at the official decision-making body."
+    },
+    {
+      id:"SEQ08",
+      title:"Statewide Ballot Issue Support",
+      prompt:"You want action on a statewide issue through the ballot.",
+      steps:[
+        "Research the issue and confirm it fits the statewide ballot process",
+        "Draft/choose the petition language and understand signature requirements",
+        "Collect valid signatures and track verification rules",
+        "Submit signatures by deadlines to place the issue on the ballot"
+      ],
+      turningIndex:3,
+      hint:"Turning point is the formal submission that triggers official ballot review."
+    },
+    {
+      id:"SEQ09",
+      title:"Federal Policy Concern (Contacting Congress)",
+      prompt:"You want to influence a proposed federal privacy law.",
+      steps:[
+        "Read credible summaries and key provisions to understand the proposal",
+        "Identify your U.S. representative/senators and their current position",
+        "Contact their offices with a clear request and evidence (call/email/letter)",
+        "Track committee action and respond at the next decision point (hearing/vote)"
+      ],
+      turningIndex:3,
+      hint:"Committee hearings/votes are the federal decision-point steps."
+    },
+    {
+      id:"SEQ10",
+      title:"Community Flooding Mitigation",
+      prompt:"Your neighborhood floods after heavy rains; you want solutions.",
+      steps:[
+        "Collect evidence (photos, dates, locations) and identify patterns",
+        "Meet with local public works or attend a council meeting to raise the issue",
+        "Propose solutions (drainage improvements, maintenance schedules) with costs/benefits",
+        "Partner with civic organizations to support implementation and funding"
+      ],
+      turningIndex:1,
+      hint:"The turning point is bringing it into the official local process (public works/council)."
+    },
+    {
+      id:"SEQ11",
+      title:"Improving Emergency Services Support",
+      prompt:"A citizen wants emergency services supported locally and statewide.",
+      steps:[
+        "Support local services directly (volunteer, fundraising, meet with mayor/council)",
+        "Identify statewide gaps and relevant state officials (governor/General Assembly)",
+        "Communicate statewide concerns through petitions/letters and organized advocacy",
+        "Support candidates/platforms aligned with statewide emergency-service improvements"
+      ],
+      turningIndex:2,
+      hint:"Turning point = moving from local support to state-level engagement with state officials."
+    },
+    {
+      id:"SEQ12",
+      title:"Public Meeting Influence",
+      prompt:"A resident wants to influence a local ordinance decision.",
+      steps:[
+        "Find the meeting time and agenda item for the ordinance",
+        "Prepare brief, evidence-based reasons and a clear request",
+        "Give public comment during the meeting",
+        "Follow up with decision-makers and track the vote"
+      ],
+      turningIndex:2,
+      hint:"Public comment is the decision-point step."
+    },
+    {
+      id:"SEQ13",
+      title:"Evaluating Costs and Benefits of a Community Project",
+      prompt:"The city is choosing between building new vs renovating old facilities.",
+      steps:[
+        "Define the decision criteria (cost, maintenance, capacity, access, long-term use)",
+        "Collect projected cost data from qualified experts (architects/accountants)",
+        "Compare options and present findings to officials/public",
+        "Advocate for the option that best matches community needs and evidence"
+      ],
+      turningIndex:2,
+      hint:"Turning point is when evidence is formally presented to influence the decision."
+    },
+    {
+      id:"SEQ14",
+      title:"Responding to Opposition (Constructive Advocacy)",
+      prompt:"A controversial local policy debate becomes heated.",
+      steps:[
+        "Use credible information and clarify the actual facts of the issue",
+        "Listen to opposing concerns to identify shared goals",
+        "Propose workable compromises/solutions that address multiple concerns",
+        "Engage respectfully in official meetings where decisions will be made"
+      ],
+      turningIndex:3,
+      hint:"Turning point = engaging at the official meeting where the decision occurs."
+    },
+    {
+      id:"SEQ15",
+      title:"From Idea to Law (Basic Legislative Path)",
+      prompt:"A bill is introduced to change a state policy.",
+      steps:[
+        "Bill is introduced and assigned to a committee",
+        "Committee holds hearings, debates, and may amend the bill",
+        "Chamber votes; if passed, it moves to the other chamber for the same process",
+        "If both chambers pass, it goes to the governor for signature or veto"
+      ],
+      turningIndex:1,
+      hint:"Committee action (hearings/amendments) is often the key turning point."
+    },
+    {
+      id:"SEQ16",
+      title:"From Complaint to Court Case (Rights Claim)",
+      prompt:"A citizen believes a government action violated constitutional rights.",
+      steps:[
+        "Document the action and identify which right may be implicated",
+        "Seek legal guidance and file the case in the appropriate court",
+        "Present evidence/arguments and receive a ruling",
+        "Appeal if necessary through higher courts"
+      ],
+      turningIndex:1,
+      hint:"Filing in the appropriate court moves it into the official legal process."
+    },
+    {
+      id:"SEQ17",
+      title:"Treaty Ratification (Federal Process)",
+      prompt:"A president wants a treaty ratified.",
+      steps:[
+        "President negotiates the treaty",
+        "President submits the treaty to the Senate",
+        "Senate debates and votes; 2/3 approval is required",
+        "If approved, the treaty is ratified"
+      ],
+      turningIndex:2,
+      hint:"The Senate 2/3 vote is the decisive turning point."
+    },
+    {
+      id:"SEQ18",
+      title:"Persuasion vs Negotiation Strategy Choice",
+      prompt:"A leader wants support for a proposal in a divided group.",
+      steps:[
+        "Identify stakeholder groups and their concerns",
+        "Choose a strategy (consensus building/compromise/persuasion)",
+        "Meet, negotiate, and adjust positions to gain support",
+        "Hold a vote/decision once sufficient support exists"
+      ],
+      turningIndex:3,
+      hint:"The vote is the formal decision point where outcomes lock in."
+    },
+    {
+      id:"SEQ19",
+      title:"Verifying a Claim Before Sharing",
+      prompt:"A student sees a claim online that could influence opinion.",
+      steps:[
+        "Pause before sharing and identify what the claim is asserting",
+        "Check multiple credible sources for corroboration",
+        "Evaluate evidence quality and whether sources cite verifiable facts",
+        "Then decide whether to share, revise, or reject the claim"
+      ],
+      turningIndex:1,
+      hint:"Turning point = corroboration across credible sources."
+    },
+    {
+      id:"SEQ20",
+      title:"Organizing a Petition Campaign (Local Change)",
+      prompt:"Residents want a local change and plan to use a petition.",
+      steps:[
+        "Define the specific request and identify who has authority",
+        "Draft petition language that matches the request clearly",
+        "Collect signatures following rules (residency/validity)",
+        "Deliver the petition to the correct local official/body and request action"
+      ],
+      turningIndex:3,
+      hint:"Delivery to the correct decision-maker is the official action point."
+    },
+    {
+      id:"SEQ21",
+      title:"Building Community Support (Consensus Building)",
+      prompt:"A neighborhood is divided about a new policy.",
+      steps:[
+        "Hold listening sessions to identify shared concerns",
+        "Find areas of agreement to form a shared proposal",
+        "Bring the shared proposal to officials/meetings as a united message",
+        "Adjust based on feedback while keeping key shared goals"
+      ],
+      turningIndex:2,
+      hint:"Turning point = presenting a unified proposal to decision-makers."
+    },
+    {
+      id:"SEQ22",
+      title:"Implementing a Solution After Approval",
+      prompt:"A policy proposal has been approved; what comes next?",
+      steps:[
+        "Create an implementation timeline and assign responsibilities",
+        "Communicate changes to the public and affected groups",
+        "Monitor results with data and feedback",
+        "Revise implementation if problems arise"
+      ],
+      turningIndex:0,
+      hint:"Turning point = moving from decision to implementation plan."
+    },
+    {
+      id:"SEQ23",
+      title:"Interest Groups Influencing Policy",
+      prompt:"An interest group wants a policy change.",
+      steps:[
+        "Research the policy and identify key decision-makers",
+        "Develop an evidence-based position and messaging",
+        "Lobby officials / testify at hearings / mobilize supporters",
+        "Track votes and continue advocacy through the decision"
+      ],
+      turningIndex:2,
+      hint:"Testimony/lobbying at hearings is the key influence decision-point."
+    },
+    {
+      id:"SEQ24",
+      title:"Media & Public Opinion Influence",
+      prompt:"A policy debate becomes public and gains attention.",
+      steps:[
+        "Issue gains media coverage and public awareness increases",
+        "Public opinion begins to form and voters contact officials",
+        "Officials respond with statements, hearings, or agenda action",
+        "A vote/decision occurs"
+      ],
+      turningIndex:2,
+      hint:"Turning point = the issue entering official agenda/hearing space."
+    },
+    {
+      id:"SEQ25",
+      title:"From Concern to Election Action",
+      prompt:"A citizen feels poorly represented at the congressional level.",
+      steps:[
+        "Identify the representative’s voting record and positions",
+        "Compare positions to your values and community needs",
+        "Support a challenger or campaign to influence the election outcome",
+        "Vote and encourage turnout"
+      ],
+      turningIndex:2,
+      hint:"Turning point = active campaign involvement that changes election dynamics."
+    }
+  ];
+
+  // ---------------- State / DOM ----------------
+  const STORAGE_KEY = 'GOV_OST_GAME4_SEQUENCE_V1';
+
+  let state = { name:'', startedAtISO:'', startedAtMS:0, idx:0, attempts:0, correct:0 };
+
+  const elQpos = document.getElementById('qpos');
+  const elAcc = document.getElementById('acc');
+  const elRuntime = document.getElementById('runtime');
+
+  const elNameBox = document.getElementById('nameBox');
+  const elStudentName = document.getElementById('studentName');
+  const btnStart = document.getElementById('btnStart');
+  const btnResetAll = document.getElementById('btnResetAll');
+
+  const elPlayBox = document.getElementById('playBox');
+  const elScenarioTitle = document.getElementById('scenarioTitle');
+  const elScenarioPrompt = document.getElementById('scenarioPrompt');
+  const elPool = document.getElementById('pool');
+  const elSequence = document.getElementById('sequence');
+
+  const btnUndo = document.getElementById('btnUndo');
+  const btnClear = document.getElementById('btnClear');
+  const btnCheck = document.getElementById('btnCheck');
+
+  const elFeedback = document.getElementById('feedback');
+  const elFbTitle = document.getElementById('fbTitle');
+  const elFbBody = document.getElementById('fbBody');
+  const btnHint = document.getElementById('btnHint');
+  const btnNext = document.getElementById('btnNext');
+
+  const elTurningBox = document.getElementById('turningBox');
+  const elTurningOpts = document.getElementById('turningOpts');
+
+  const elFinishBox = document.getElementById('finishBox');
+  const elFinishTitle = document.getElementById('finishTitle');
+  const elFinishBody = document.getElementById('finishBody');
+  const elTicket = document.getElementById('ticket');
+
+  const elTName = document.getElementById('tName');
+  const elTDate = document.getElementById('tDate');
+  const elTStart = document.getElementById('tStart');
+  const elTEnd = document.getElementById('tEnd');
+  const elTRun = document.getElementById('tRun');
+  const elTAcc = document.getElementById('tAcc');
+  const elTCode = document.getElementById('tCode');
+  const btnCopy = document.getElementById('btnCopy');
+  const btnReset = document.getElementById('btnReset');
+
+  // current item working state
+  let working = { pool:[], chosen:[], locked:false, orderOk:false, turningOk:false };
+
+  function save(){ localStorage.setItem(STORAGE_KEY, JSON.stringify(state)); }
+  function load(){
+    try{
+      const raw = localStorage.getItem(STORAGE_KEY);
+      if(!raw) return false;
+      const parsed = JSON.parse(raw);
+      if(!parsed || !parsed.startedAtISO || !parsed.name) return false;
+      state = parsed;
+      return true;
+    }catch{ return false; }
+  }
+  function clearSave(){ localStorage.removeItem(STORAGE_KEY); }
+
+  function updateStats(){
+    const total = QUESTIONS.length;
+    const pos = Math.min(state.idx+1, total);
+    elQpos.textContent = `${pos} / ${total}`;
+    const acc = state.attempts ? Math.round((state.correct/state.attempts)*100) : 0;
+    elAcc.textContent = `${acc}%`;
+    const rt = state.startedAtMS ? (Date.now() - state.startedAtMS) : 0;
+    elRuntime.textContent = msToHMS(rt);
+  }
+  setInterval(updateStats, 500);
+
+  function setFeedback(kind, title, body){
+    elFeedback.className = `msg ${kind}`;
+    elFbTitle.textContent = title;
+    elFbBody.textContent = body;
+  }
+  function clearFeedback(){
+    elFeedback.className = 'msg';
+    elFbTitle.textContent = '';
+    elFbBody.textContent = '';
+  }
+
+  function render(){
+    const q = QUESTIONS[state.idx];
+    elScenarioTitle.textContent = q.title;
+    elScenarioPrompt.textContent = q.prompt;
+
+    // pool
+    elPool.innerHTML = '';
+    working.pool.forEach((s, i) => {
+      const b = document.createElement('button');
+      b.className = 'step';
+      b.innerHTML = `<span class="n">•</span>${escapeHtml(s)}`;
+      b.disabled = working.locked;
+      b.addEventListener('click', () => addStep(i));
+      elPool.appendChild(b);
+    });
+
+    // chosen
+    elSequence.innerHTML = '';
+    working.chosen.forEach((s, i) => {
+      const b = document.createElement('button');
+      b.className = 'step chosen';
+      b.innerHTML = `<span class="n">${i+1}.</span>${escapeHtml(s)}`;
+      b.disabled = true;
+      elSequence.appendChild(b);
+    });
+
+    btnUndo.disabled = working.locked || working.chosen.length === 0;
+    btnClear.disabled = working.locked || working.chosen.length === 0;
+    btnCheck.disabled = working.locked || working.chosen.length !== q.steps.length;
+
+    // turning point visibility
+    elTurningBox.style.display = working.orderOk ? 'block' : 'none';
+
+    updateStats();
+    save();
+  }
+
+  function initItem(){
+    const q = QUESTIONS[state.idx];
+    working = {
+      pool: shuffle(q.steps),
+      chosen: [],
+      locked: false,
+      orderOk: false,
+      turningOk: false
+    };
+    clearFeedback();
+    btnHint.disabled = true;
+    btnNext.disabled = true;
+    elTurningOpts.innerHTML = '';
+    elTurningBox.style.display = 'none';
+    render();
+  }
+
+  function addStep(poolIndex){
+    if(working.locked) return;
+    const step = working.pool.splice(poolIndex, 1)[0];
+    working.chosen.push(step);
+    btnHint.disabled = true;
+    clearFeedback();
+    render();
+  }
+
+  btnUndo.addEventListener('click', () => {
+    if(working.locked || working.chosen.length === 0) return;
+    const last = working.chosen.pop();
+    working.pool.push(last);
+    working.pool = shuffle(working.pool); // keep it from being predictable
+    btnHint.disabled = true;
+    clearFeedback();
+    render();
+  });
+
+  btnClear.addEventListener('click', () => {
+    if(working.locked) return;
+    const q = QUESTIONS[state.idx];
+    working.pool = shuffle(q.steps);
+    working.chosen = [];
+    btnHint.disabled = true;
+    clearFeedback();
+    render();
+  });
+
+  btnCheck.addEventListener('click', () => {
+    const q = QUESTIONS[state.idx];
+    state.attempts += 1;
+
+    const chosen = working.chosen;
+    const correct = q.steps;
+
+    const ok = chosen.length === correct.length && chosen.every((s,i)=>s===correct[i]);
+
+    if(ok){
+      state.correct += 1;
+      working.orderOk = true;
+      setFeedback('good', 'Order correct ✅', 'Now choose the turning point step.');
+      buildTurningPointChoices();
+      btnNext.disabled = true;
+      btnHint.disabled = true;
+    }else{
+      working.orderOk = false;
+      setFeedback('bad', 'Not yet ❌', 'Rebuild the sequence. Click “Hint” if you need help.');
+      btnHint.disabled = false;
+    }
+
+    save();
+    render();
+  });
+
+  btnHint.addEventListener('click', () => {
+    const q = QUESTIONS[state.idx];
+    setFeedback('warn', 'Hint 💡', q.hint || 'Look for the step where the issue becomes an official decision point.');
+    btnHint.disabled = true;
+  });
+
+  function buildTurningPointChoices(){
+    const q = QUESTIONS[state.idx];
+    elTurningOpts.innerHTML = '';
+    const choices = q.steps.map((s, idx) => ({ idx, text: s }));
+    // shuffle for unpredictability
+    const shuffled = shuffle(choices);
+
+    shuffled.forEach((c) => {
+      const b = document.createElement('button');
+      b.className = 'optbtn';
+      b.innerHTML = escapeHtml(c.text);
+      b.addEventListener('click', () => answerTurning(c.idx));
+      elTurningOpts.appendChild(b);
+    });
+  }
+
+  function answerTurning(chosenIndex){
+    const q = QUESTIONS[state.idx];
+    state.attempts += 1;
+
+    const correct = (chosenIndex === q.turningIndex);
+    if(correct){
+      state.correct += 1;
+      working.turningOk = true;
+      setFeedback('good', 'Turning point correct ✅', 'Click Next to continue.');
+      // lock turning choices
+      Array.from(elTurningOpts.querySelectorAll('button')).forEach(b => b.disabled = true);
+      btnNext.disabled = false;
+      btnHint.disabled = true;
+      save();
+    }else{
+      working.turningOk = false;
+      setFeedback('bad', 'Not yet ❌', 'Try again. Click “Hint” if you need help.');
+      btnHint.disabled = false;
+      save();
+    }
+    updateStats();
+  }
+
+  btnNext.addEventListener('click', () => {
+    state.idx += 1;
+    if(state.idx >= QUESTIONS.length){
+      showFinish();
+      return;
+    }
+    initItem();
+  });
+
+  function showFinish(){
+    elNameBox.style.display = 'none';
+    elPlayBox.style.display = 'none';
+    elFinishBox.style.display = '';
+
+    const acc = state.attempts ? Math.round((state.correct/state.attempts)*100) : 0;
+    const ended = new Date();
+
+    if(acc === 100 && state.attempts >= QUESTIONS.length*2){ // sequence check + turning point each
+      elFinishTitle.textContent = 'Mastery achieved ✅';
+      elFinishBody.textContent = 'You finished with 100% accuracy. Screenshot the ticket (no cropping).';
+
+      const start = new Date(state.startedAtISO);
+      const runMS = Date.now() - state.startedAtMS;
+
+      elTName.textContent = state.name;
+      elTDate.textContent = fmtDate(ended);
+      elTStart.textContent = fmtTime(start);
+      elTEnd.textContent = fmtTime(ended);
+      elTRun.textContent = msToHMS(runMS);
+      elTAcc.textContent = `${acc}%`;
+
+      const raw = `${state.name}|${state.startedAtISO}|${ended.toISOString()}|${state.correct}|${state.attempts}|${QUESTIONS.length}`;
+      const code = `GOV-SEQ-${base36(hash32(raw))}-${base36(hash32(raw+'TP')).slice(0,4)}`;
+      elTCode.textContent = code;
+
+      elTicket.style.display = '';
+      clearSave();
+    }else{
+      elFinishTitle.textContent = 'Mastery NOT achieved ❌';
+      elFinishBody.textContent = `Accuracy: ${acc}%. You must replay for 100% (0 misses). Click “Play Again.”`;
+      elTicket.style.display = 'none';
+    }
+
+    updateStats();
+  }
+
+  btnCopy.addEventListener('click', async () => {
+    try{
+      await navigator.clipboard.writeText(elTCode.textContent.trim());
+      btnCopy.textContent = 'Copied ✅';
+      setTimeout(()=>btnCopy.textContent='Copy Ticket Code', 1100);
+    }catch{
+      btnCopy.textContent = 'Copy failed';
+      setTimeout(()=>btnCopy.textContent='Copy Ticket Code', 1100);
+    }
+  });
+
+  btnReset.addEventListener('click', () => { clearSave(); location.reload(); });
+  btnResetAll.addEventListener('click', () => { clearSave(); location.reload(); });
+
+  btnStart.addEventListener('click', () => {
+    const name = (elStudentName.value || '').trim();
+    if(name.length < 2){
+      setFeedback('bad', 'Name required', 'Enter your name to begin.');
+      elFeedback.style.display = 'block';
+      return;
+    }
+    state.name = name;
+    const start = new Date();
+    state.startedAtISO = start.toISOString();
+    state.startedAtMS = Date.now();
+    state.idx = 0;
+    state.attempts = 0;
+    state.correct = 0;
+    save();
+
+    elNameBox.style.display = 'none';
+    elPlayBox.style.display = '';
+    initItem();
+  });
+
+  // Resume saved
+  if(load()){
+    elStudentName.value = state.name || '';
+    elNameBox.style.display = 'none';
+    elPlayBox.style.display = '';
+    initItem();
+  }
+
+})();
+</script>
+</body>
+</html>
