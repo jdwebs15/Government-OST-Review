@@ -1,4 +1,15 @@
 <script>
+/* =========================================================
+   LEGEND ARCADE SCRIPT (bells + whistles)
+   Requires these elements in your HTML:
+   - #question, #choices, #xp, #level, #streak, #badge
+   - #progress (inner bar div)
+   - #ticket
+   - canvas#confetti
+   - div#popLayer
+   - a container with class ".card" (for screen shake)
+   ========================================================= */
+
 // =========================
 // SOUND EFFECTS (synced)
 // =========================
@@ -7,11 +18,13 @@ const SFX = {
   wrong: new Audio("https://assets.mixkit.co/sfx/preview/mixkit-wrong-answer-fail-notification-946.mp3"),
   level: new Audio("https://assets.mixkit.co/sfx/preview/mixkit-game-level-completed-2059.mp3"),
   boom: new Audio("https://assets.mixkit.co/sfx/preview/mixkit-arcade-game-explosion-2759.mp3"),
-  sparkle: new Audio("https://assets.mixkit.co/sfx/preview/mixkit-magical-coin-win-1936.mp3")
+  sparkle: new Audio("https://assets.mixkit.co/sfx/preview/mixkit-magical-coin-win-1936.mp3"),
+  tick: new Audio("https://assets.mixkit.co/sfx/preview/mixkit-interface-click-1126.mp3")
 };
 Object.values(SFX).forEach(a => { a.preload = "auto"; a.volume = 0.65; });
 SFX.boom.volume = 0.55;
 SFX.sparkle.volume = 0.60;
+SFX.tick.volume = 0.35;
 
 // clone-play helper (so bursts can overlap)
 function playSfx(audio){
@@ -22,8 +35,23 @@ function playSfx(audio){
   }catch(e){}
 }
 
+// Try to unlock audio on first user gesture (helps on iOS / strict browsers)
+let audioUnlocked = false;
+function unlockAudioOnce(){
+  if(audioUnlocked) return;
+  audioUnlocked = true;
+  Object.values(SFX).forEach(a=>{
+    try{
+      const b = a.cloneNode();
+      b.volume = 0;
+      b.play().then(()=>b.pause()).catch(()=>{});
+    }catch(e){}
+  });
+}
+window.addEventListener("pointerdown", unlockAudioOnce, { once:true });
+
 // =========================
-// QUESTIONS (same as before)
+// QUESTIONS (demo set)
 // =========================
 const questions=[
   {q:"Why was the 1851 Ohio Constitution adopted?",a:["To limit legislative power and state debt","To expand slavery","To eliminate courts"],c:0},
@@ -44,8 +72,11 @@ let index=0;
 let xp=0;
 let level=1;
 let streak=0;
+let bestStreak=0;
 let answered=false;
-let name="";
+let selectedIdx=null;
+
+let name="";               // optional: if you add a name input, set it
 let startTime=new Date();
 
 // =========================
@@ -60,12 +91,16 @@ const badgeEl=document.getElementById("badge");
 const cardEl=document.querySelector(".card");
 const popLayer=document.getElementById("popLayer");
 
+const progressBar=document.getElementById("progress");
+const ticketEl=document.getElementById("ticket");
+
 // =========================
-// FX: shake, glow, popups, badge unlock
+// FX HELPERS
 // =========================
-function triggerShake(){
+function triggerShake(intensity=1){
+  // intensity can scale shake duration slightly via CSS class
   cardEl.classList.remove("shake");
-  void cardEl.offsetWidth; // restart animation
+  void cardEl.offsetWidth;
   cardEl.classList.add("shake");
 }
 
@@ -76,6 +111,7 @@ function glowXP(){
 }
 
 function popup(text, anchorEl){
+  if(!popLayer || !anchorEl) return;
   const r = anchorEl.getBoundingClientRect();
   const p = document.createElement("div");
   p.className = "popup";
@@ -92,26 +128,47 @@ function badgeUnlock(newText){
   void badgeEl.offsetWidth;
   badgeEl.classList.add("badgeUnlock");
   playSfx(SFX.sparkle);
+  // small fireworks pop on badge unlock
+  fireworkBurst(canvas.width/2, canvas.height*0.22, 2.2);
+}
+
+function setProgress(){
+  // show answered progress (question index completed)
+  const pct = Math.round((index / questions.length) * 100);
+  if(progressBar) progressBar.style.width = pct + "%";
 }
 
 // =========================
-// RENDER
+// RENDER (with click-select + submit)
 // =========================
 function render(){
   const q=questions[index];
-  qDiv.innerHTML=`<h3>${q.q}</h3>`;
-  cDiv.innerHTML="";
   answered=false;
+  selectedIdx=null;
 
+  qDiv.innerHTML = `
+    <h3 style="margin:0 0 6px">Question ${index+1} / ${questions.length}</h3>
+    <div style="opacity:.92">${q.q}</div>
+  `;
+
+  cDiv.innerHTML="";
   q.a.forEach((choice,i)=>{
     const div=document.createElement("div");
     div.className="choice";
     div.textContent=choice;
-    div.onclick=()=>check(i,div);
+
+    div.addEventListener("click", ()=>{
+      if(answered) return;
+      playSfx(SFX.tick);
+      selectedIdx = i;
+      [...cDiv.querySelectorAll(".choice")].forEach(x=>x.classList.remove("sel"));
+      div.classList.add("sel");
+    });
+
     cDiv.appendChild(div);
   });
 
-  document.getElementById("progress").style.width=((index)/questions.length*100)+"%";
+  setProgress();
 }
 
 function updateStats(){
@@ -121,65 +178,110 @@ function updateStats(){
 }
 
 // =========================
-// GAME LOGIC (with FX)
+// SUBMIT & NEXT
 // =========================
-function check(i,div){
-  if(answered) return; // only first click counts
+function submit(){
+  if(answered) return;
+  if(selectedIdx===null){
+    popup("Pick an answer!", lvlEl);
+    triggerShake();
+    playSfx(SFX.wrong);
+    return;
+  }
 
-  const correct = (i===questions[index].c);
+  const q = questions[index];
+  const correct = (selectedIdx === q.c);
+
+  // mark choices
+  const choicesEls = [...cDiv.querySelectorAll(".choice")];
+  choicesEls.forEach((el,i)=>{
+    el.style.pointerEvents="none";
+    if(i === q.c) el.classList.add("correct");
+    if(i === selectedIdx && i !== q.c) el.classList.add("wrong");
+  });
+
+  answered = true;
+
   if(correct){
-    answered=true;
-    div.classList.add("correct");
     playSfx(SFX.correct);
 
-    // XP + streak multiplier
     const gain = 10 + (streak*2);
     xp += gain;
     streak++;
+    if(streak > bestStreak) bestStreak = streak;
 
     glowXP();
     popup(`+${gain} XP`, xpEl);
 
-    // Level up every 30 XP chunks (simple feel-good pacing)
+    // LEVEL UP pacing
     const newLevel = 1 + Math.floor(xp / 30);
     if(newLevel > level){
       level = newLevel;
       playSfx(SFX.level);
-      badgeUnlock(level >= 6 ? "Ohio Icon" : (level >= 4 ? "Civic Champion" : "Reform Ranger"));
-      // fireworks burst on level-up too
-      fireworkBurst(window.innerWidth/2, window.innerHeight/2, 2);
+
+      // animated badge ladder
+      if(level >= 8) badgeUnlock("STATEHOUSE LEGEND");
+      else if(level >= 6) badgeUnlock("Ohio Icon");
+      else if(level >= 4) badgeUnlock("Civic Champion");
+      else badgeUnlock("Reform Ranger");
+
+      // bigger fireworks on level-up
+      fireworkBurst(canvas.width/2, canvas.height*0.28, 3.3);
     }
 
     updateStats();
+
+    // optional: auto-advance after short delay
+    setTimeout(()=> next(), 650);
+
   } else {
-    answered=true;
-    div.classList.add("wrong");
     playSfx(SFX.wrong);
     triggerShake();
-    streak=0;
+
+    popup("❌", streakEl);
+    popup("Streak broken!", streakEl);
+
+    streak = 0;
     updateStats();
-    popup("STREAK BROKEN!", streakEl);
+    // require manual next (prevents “miss + auto advance”)
   }
 }
 
 function next(){
+  if(!answered){
+    // force submission before moving on (feels more game-like)
+    popup("Submit first!", lvlEl);
+    triggerShake();
+    return;
+  }
+
   index++;
-  if(index>=questions.length){
+
+  if(index >= questions.length){
     celebrate();
     return;
   }
+
   render();
 }
+
+// expose for your buttons if you have them
+window.submit = submit;
+window.next = next;
 
 // =========================
 // CONFETTI + FIREWORKS (animated, continuous)
 // =========================
 const canvas = document.getElementById("confetti");
 const ctx = canvas.getContext("2d");
+
 let confetti = [];
 let fireworks = [];
 let animRunning = false;
 let animStopAt = 0;
+
+// Smooth audio sync pulses during celebration
+let beatTimer = null;
 
 function resizeCanvas(){
   canvas.width = window.innerWidth;
@@ -187,13 +289,13 @@ function resizeCanvas(){
 }
 window.addEventListener("resize", resizeCanvas);
 
-function startCelebrationFX(durationMs=9000){
+function startCelebrationFX(durationMs=9500){
   resizeCanvas();
   animStopAt = performance.now() + durationMs;
 
   // build confetti field
   confetti = [];
-  const count = 220;
+  const count = 240;
   for(let i=0;i<count;i++){
     confetti.push({
       x: Math.random()*canvas.width,
@@ -208,19 +310,30 @@ function startCelebrationFX(durationMs=9000){
     });
   }
 
-  // initial big burst
-  fireworkBurst(canvas.width/2, canvas.height*0.38, 4);
+  // initial big burst (center)
+  fireworkBurst(canvas.width/2, canvas.height*0.38, 4.2);
 
   if(!animRunning){
     animRunning = true;
     playSfx(SFX.boom); // synced start
     requestAnimationFrame(loopFX);
   }
+
+  // confetti-synced sound pulses (subtle)
+  if(beatTimer) clearInterval(beatTimer);
+  beatTimer = setInterval(()=>{
+    // gentle sparkle tick while celebration is active
+    if(performance.now() < animStopAt){
+      playSfx(SFX.sparkle);
+    }else{
+      clearInterval(beatTimer);
+      beatTimer = null;
+    }
+  }, 1200);
 }
 
 function fireworkBurst(x,y,intensity=3){
-  // create a burst of particles from (x,y)
-  const burstCount = 45 + intensity*18;
+  const burstCount = Math.floor(55 + intensity*18);
   for(let i=0;i<burstCount;i++){
     const ang = Math.random()*Math.PI*2;
     const spd = (Math.random()*3.0 + 2.2) * intensity;
@@ -228,9 +341,9 @@ function fireworkBurst(x,y,intensity=3){
       x,y,
       vx: Math.cos(ang)*spd,
       vy: Math.sin(ang)*spd,
-      life: 70 + Math.random()*25,
+      life: 70 + Math.random()*30,
       age: 0,
-      size: 2 + Math.random()*2,
+      size: 1.8 + Math.random()*2.4,
       color: `hsl(${Math.random()*360}, 100%, 60%)`
     });
   }
@@ -248,11 +361,9 @@ function loopFX(t){
     p.y += p.vy;
     p.rot += p.vr;
 
-    // wrap
     if(p.x < -20) p.x = canvas.width+20;
     if(p.x > canvas.width+20) p.x = -20;
 
-    // respawn top
     if(p.y > canvas.height+30){
       p.y = -20;
       p.x = Math.random()*canvas.width;
@@ -267,7 +378,6 @@ function loopFX(t){
     if(p.shape === "rect"){
       ctx.fillRect(-p.size/2,-p.size/2,p.size,p.size);
     } else {
-      // ribbon-ish
       ctx.beginPath();
       ctx.moveTo(-p.size, 0);
       ctx.quadraticCurveTo(0, -p.size, p.size, 0);
@@ -281,7 +391,6 @@ function loopFX(t){
   fireworks = fireworks.filter(f => f.age < f.life);
   fireworks.forEach(f=>{
     f.age++;
-    // gravity + drag
     f.vy += 0.04;
     f.vx *= 0.99;
     f.vy *= 0.99;
@@ -297,19 +406,18 @@ function loopFX(t){
     ctx.globalAlpha = 1;
   });
 
-  // auto bursts for “show”
-  if(Math.random() < 0.05){
+  // showy extra bursts during celebration
+  if(Math.random() < 0.045){
     fireworkBurst(
-      canvas.width*(0.25 + Math.random()*0.5),
-      canvas.height*(0.18 + Math.random()*0.25),
-      2
+      canvas.width*(0.22 + Math.random()*0.56),
+      canvas.height*(0.12 + Math.random()*0.28),
+      2.0
     );
   }
 
   if(t < animStopAt){
     requestAnimationFrame(loopFX);
   } else {
-    // stop and clear
     ctx.clearRect(0,0,canvas.width,canvas.height);
     fireworks = [];
     confetti = [];
@@ -318,34 +426,41 @@ function loopFX(t){
 }
 
 // =========================
-// CELEBRATE
+// CELEBRATE (ticket + runtime)
 // =========================
 function celebrate(){
-  document.getElementById("progress").style.width="100%";
-  startCelebrationFX(9500); // continuous falling confetti + fireworks
+  if(progressBar) progressBar.style.width = "100%";
+
+  // big badge + fireworks show
   badgeUnlock("STATEHOUSE LEGEND");
+  startCelebrationFX(10000);
 
   const endTime = new Date();
   const runtimeSec = Math.max(0, Math.floor((endTime - startTime)/1000));
   const mm = String(Math.floor(runtimeSec/60)).padStart(2,"0");
   const ss = String(runtimeSec%60).padStart(2,"0");
 
-  document.getElementById("ticket").innerHTML=`
+  const studentLine = name ? `STUDENT: ${name}<br>` : "";
+
+  ticketEl.innerHTML = `
     <div class="ticket">
       <h2>🏆 Mastery Complete!</h2>
-      XP Earned: ${xp}<br>
-      Level: ${level}<br>
-      Streak Best: (watch the next build 😉)<br>
+      ${studentLine}
+      XP Earned: <b>${xp}</b><br>
+      Level: <b>${level}</b><br>
+      Best Streak: <b>${bestStreak}</b><br>
       Started: ${startTime}<br>
       Completed: ${endTime}<br>
-      Runtime: ${mm}:${ss}
-    </div>`;
+      Runtime: <b>${mm}:${ss}</b>
+    </div>
+  `;
+
+  // optional: small screen shake for celebration impact
+  triggerShake();
 }
 
-// expose next() for your button
-window.next = next;
-
 // initial paint
+resizeCanvas();
 render();
 updateStats();
 </script>
