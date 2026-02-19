@@ -1,13 +1,288 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1"/>
+  <title>Ohio Constitution — Legend Arcade Edition</title>
+
+  <!-- IMPORTANT: from /games folder back to repo root -->
+  <link rel="stylesheet" href="../styles.css" />
+
+  <style>
+    /* --- Arcade-only visuals (isolated to this file) --- */
+    :root{
+      --arcadeCard: rgba(15,23,42,.88);
+      --arcadeBorder: rgba(255,255,255,.12);
+      --accent:#38bdf8;
+      --good:#22c55e;
+      --bad:#ef4444;
+      --gold:#facc15;
+    }
+
+    .arcadeWrap{
+      width:min(980px,92vw);
+      margin:26px auto 46px;
+    }
+
+    .arcadeTop{
+      display:flex;
+      justify-content:space-between;
+      gap:16px;
+      align-items:flex-start;
+      margin-bottom:14px;
+    }
+
+    .arcadeTitle h1{
+      margin:6px 0 6px;
+      font-size:28px;
+      letter-spacing:.2px;
+    }
+    .arcadeTitle .sub{
+      margin:0;
+      color:var(--muted);
+      max-width:760px;
+      line-height:1.35;
+    }
+
+    .arcadeCard{
+      background:var(--arcadeCard);
+      border:1px solid var(--arcadeBorder);
+      border-radius:18px;
+      padding:18px;
+      box-shadow: var(--shadow);
+      backdrop-filter: blur(8px);
+      position:relative;
+      overflow:hidden;
+    }
+
+    .statRow{
+      display:flex;
+      flex-wrap:wrap;
+      gap:10px;
+      align-items:center;
+      justify-content:space-between;
+      margin:12px 0 12px;
+      font-weight:800;
+    }
+
+    .statGroup{
+      display:flex;
+      flex-wrap:wrap;
+      gap:12px;
+      align-items:center;
+    }
+
+    .badge{
+      padding:6px 12px;
+      border-radius:999px;
+      font-size:12px;
+      background:rgba(250,204,21,.16);
+      border:1px solid rgba(250,204,21,.55);
+      color:var(--text);
+      letter-spacing:.06em;
+      text-transform:uppercase;
+    }
+
+    .progressbar{
+      height:8px;
+      background:rgba(255,255,255,.06);
+      border-radius:999px;
+      overflow:hidden;
+      margin:10px 0 14px;
+    }
+    .progress{
+      height:100%;
+      width:0%;
+      background:linear-gradient(90deg,#38bdf8,#22d3ee);
+      transition:.35s ease;
+    }
+
+    #question h3{
+      margin:0 0 8px;
+      font-size:16px;
+      color:var(--muted);
+      letter-spacing:.06em;
+      text-transform:uppercase;
+    }
+    #question .qtext{
+      font-size:18px;
+      line-height:1.35;
+      margin-bottom:10px;
+    }
+
+    .choice{
+      margin:10px 0;
+      padding:12px 14px;
+      border-radius:14px;
+      border:1px solid rgba(255,255,255,.12);
+      cursor:pointer;
+      transition:.2s ease;
+      user-select:none;
+      background:rgba(255,255,255,.02);
+    }
+    .choice:hover{
+      border-color:rgba(56,189,248,.55);
+      background:rgba(56,189,248,.08);
+    }
+    .choice.sel{
+      outline:2px solid rgba(56,189,248,.55);
+      background:rgba(56,189,248,.10);
+    }
+    .choice.correct{
+      background:rgba(34,197,94,.18);
+      border-color:rgba(34,197,94,.55);
+    }
+    .choice.wrong{
+      background:rgba(239,68,68,.18);
+      border-color:rgba(239,68,68,.55);
+    }
+
+    .btnRow{
+      display:flex;
+      gap:10px;
+      margin-top:12px;
+      flex-wrap:wrap;
+    }
+    .btn{
+      padding:10px 14px;
+      border-radius:14px;
+      border:1px solid rgba(255,255,255,.12);
+      background:rgba(255,255,255,.04);
+      color:var(--text);
+      font-weight:900;
+      cursor:pointer;
+      transition:.15s ease;
+    }
+    .btn.primary{
+      border:none;
+      background:linear-gradient(90deg,#38bdf8,#22d3ee);
+      color:#071018;
+    }
+    .btn:hover{ transform: translateY(-1px); }
+
+    .ticket{
+      margin-top:16px;
+      padding:14px;
+      border-radius:16px;
+      background:rgba(34,197,94,.12);
+      border:1px solid rgba(34,197,94,.55);
+      color:var(--text);
+      line-height:1.45;
+    }
+
+    /* ===== FX Animations ===== */
+    @keyframes shake{
+      0%,100%{ transform: translate3d(0,0,0); }
+      10%{ transform: translate3d(-6px,2px,0) rotate(-.4deg); }
+      20%{ transform: translate3d(6px,-2px,0) rotate(.4deg); }
+      30%{ transform: translate3d(-5px,1px,0) rotate(-.3deg); }
+      40%{ transform: translate3d(5px,-1px,0) rotate(.3deg); }
+      50%{ transform: translate3d(-4px,1px,0) rotate(-.2deg); }
+      60%{ transform: translate3d(4px,-1px,0) rotate(.2deg); }
+      70%{ transform: translate3d(-3px,1px,0) rotate(-.15deg); }
+      80%{ transform: translate3d(3px,-1px,0) rotate(.15deg); }
+      90%{ transform: translate3d(-2px,1px,0) rotate(-.1deg); }
+    }
+    .arcadeCard.shake{ animation: shake 520ms ease-in-out; }
+
+    @keyframes xpGlow{
+      0%{ text-shadow:0 0 0 rgba(56,189,248,0); transform:scale(1); }
+      40%{ text-shadow:0 0 18px rgba(56,189,248,.85),0 0 36px rgba(34,197,94,.35); transform:scale(1.08); }
+      100%{ text-shadow:0 0 0 rgba(56,189,248,0); transform:scale(1); }
+    }
+    .xpGlow{ animation: xpGlow 520ms ease-out; display:inline-block; }
+
+    @keyframes badgePop{
+      0%{ transform:scale(.9); filter:brightness(1); }
+      35%{ transform:scale(1.18); filter:brightness(1.35); }
+      100%{ transform:scale(1); filter:brightness(1); }
+    }
+    .badgeUnlock{ animation: badgePop 700ms cubic-bezier(.2,.9,.2,1); }
+
+    .popLayer{
+      position:fixed;
+      inset:0;
+      pointer-events:none;
+      z-index:50;
+    }
+    .popup{
+      position:absolute;
+      font-weight:900;
+      padding:6px 10px;
+      border-radius:999px;
+      background: rgba(250,204,21,.18);
+      border:1px solid rgba(250,204,21,.55);
+      color:#fff;
+      text-shadow: 0 0 10px rgba(250,204,21,.55);
+      transform: translate(-50%, 0);
+      opacity:0;
+      animation: floatUp 950ms ease-out forwards;
+    }
+    @keyframes floatUp{
+      0%{ opacity:0; transform:translate(-50%,10px) scale(.96); }
+      15%{ opacity:1; transform:translate(-50%,0) scale(1.05); }
+      100%{ opacity:0; transform:translate(-50%,-52px) scale(1); }
+    }
+
+    canvas.confetti{
+      position:fixed;
+      inset:0;
+      width:100%;
+      height:100%;
+      pointer-events:none;
+      z-index:40;
+    }
+  </style>
+</head>
+
+<body>
+  <div class="arcadeWrap">
+    <header class="arcadeTop">
+      <div class="arcadeTitle">
+        <div class="kicker">LEGEND — ARCADE PROTOTYPE</div>
+        <h1>Ohio Constitution — Legend Arcade Edition</h1>
+        <p class="sub">
+          Demo build: XP + levels + streak + sound + confetti/fireworks + ticket.
+          (This is for capability testing — not the final bundled CS review game.)
+        </p>
+      </div>
+      <div class="meta">
+        <div class="pill">XP + Levels ✅</div>
+        <div class="pill">SFX ✅</div>
+        <div class="pill">Confetti/Fireworks ✅</div>
+      </div>
+    </header>
+
+    <main class="arcadeCard card" id="arcadeCard">
+      <div class="statRow">
+        <div class="statGroup">
+          <div>XP: <span id="xp">0</span></div>
+          <div>Level: <span id="level">1</span></div>
+          <div>Streak: <span id="streak">0</span></div>
+        </div>
+        <div class="badge" id="badge">Reform Rookie</div>
+      </div>
+
+      <div class="progressbar"><div class="progress" id="progress"></div></div>
+
+      <div id="question"></div>
+      <div id="choices"></div>
+
+      <div class="btnRow">
+        <button class="btn primary" type="button" onclick="submit()">Submit</button>
+        <button class="btn" type="button" onclick="next()">Next</button>
+      </div>
+
+      <div id="ticket"></div>
+    </main>
+  </div>
+
+  <div class="popLayer" id="popLayer"></div>
+  <canvas class="confetti" id="confetti"></canvas>
+
 <script>
 /* =========================================================
    LEGEND ARCADE SCRIPT (bells + whistles)
-   Requires these elements in your HTML:
-   - #question, #choices, #xp, #level, #streak, #badge
-   - #progress (inner bar div)
-   - #ticket
-   - canvas#confetti
-   - div#popLayer
-   - a container with class ".card" (for screen shake)
    ========================================================= */
 
 // =========================
@@ -26,7 +301,6 @@ SFX.boom.volume = 0.55;
 SFX.sparkle.volume = 0.60;
 SFX.tick.volume = 0.35;
 
-// clone-play helper (so bursts can overlap)
 function playSfx(audio){
   try{
     const a = audio.cloneNode();
@@ -35,7 +309,7 @@ function playSfx(audio){
   }catch(e){}
 }
 
-// Try to unlock audio on first user gesture (helps on iOS / strict browsers)
+// Unlock audio on first interaction (browser policy)
 let audioUnlocked = false;
 function unlockAudioOnce(){
   if(audioUnlocked) return;
@@ -75,9 +349,7 @@ let streak=0;
 let bestStreak=0;
 let answered=false;
 let selectedIdx=null;
-
-let name="";               // optional: if you add a name input, set it
-let startTime=new Date();
+const startTime = new Date();
 
 // =========================
 // DOM
@@ -88,17 +360,15 @@ const xpEl=document.getElementById("xp");
 const lvlEl=document.getElementById("level");
 const streakEl=document.getElementById("streak");
 const badgeEl=document.getElementById("badge");
-const cardEl=document.querySelector(".card");
+const cardEl=document.getElementById("arcadeCard");
 const popLayer=document.getElementById("popLayer");
-
 const progressBar=document.getElementById("progress");
 const ticketEl=document.getElementById("ticket");
 
 // =========================
-// FX HELPERS
+// FX: shake, glow, popups, badge unlock
 // =========================
-function triggerShake(intensity=1){
-  // intensity can scale shake duration slightly via CSS class
+function triggerShake(){
   cardEl.classList.remove("shake");
   void cardEl.offsetWidth;
   cardEl.classList.add("shake");
@@ -111,7 +381,6 @@ function glowXP(){
 }
 
 function popup(text, anchorEl){
-  if(!popLayer || !anchorEl) return;
   const r = anchorEl.getBoundingClientRect();
   const p = document.createElement("div");
   p.className = "popup";
@@ -128,27 +397,30 @@ function badgeUnlock(newText){
   void badgeEl.offsetWidth;
   badgeEl.classList.add("badgeUnlock");
   playSfx(SFX.sparkle);
-  // small fireworks pop on badge unlock
   fireworkBurst(canvas.width/2, canvas.height*0.22, 2.2);
 }
 
 function setProgress(){
-  // show answered progress (question index completed)
-  const pct = Math.round((index / questions.length) * 100);
-  if(progressBar) progressBar.style.width = pct + "%";
+  progressBar.style.width = Math.round((index / questions.length) * 100) + "%";
+}
+
+function updateStats(){
+  xpEl.textContent=xp;
+  lvlEl.textContent=level;
+  streakEl.textContent=streak;
 }
 
 // =========================
-// RENDER (with click-select + submit)
+// RENDER (select + submit)
 // =========================
 function render(){
-  const q=questions[index];
+  const q = questions[index];
   answered=false;
   selectedIdx=null;
 
   qDiv.innerHTML = `
-    <h3 style="margin:0 0 6px">Question ${index+1} / ${questions.length}</h3>
-    <div style="opacity:.92">${q.q}</div>
+    <h3>Question ${index+1} / ${questions.length}</h3>
+    <div class="qtext">${q.q}</div>
   `;
 
   cDiv.innerHTML="";
@@ -171,18 +443,12 @@ function render(){
   setProgress();
 }
 
-function updateStats(){
-  xpEl.textContent=xp;
-  lvlEl.textContent=level;
-  streakEl.textContent=streak;
-}
-
 // =========================
 // SUBMIT & NEXT
 // =========================
 function submit(){
   if(answered) return;
-  if(selectedIdx===null){
+  if(selectedIdx === null){
     popup("Pick an answer!", lvlEl);
     triggerShake();
     playSfx(SFX.wrong);
@@ -191,14 +457,11 @@ function submit(){
 
   const q = questions[index];
   const correct = (selectedIdx === q.c);
-
-  // mark choices
   const choicesEls = [...cDiv.querySelectorAll(".choice")];
-  choicesEls.forEach((el,i)=>{
-    el.style.pointerEvents="none";
-    if(i === q.c) el.classList.add("correct");
-    if(i === selectedIdx && i !== q.c) el.classList.add("wrong");
-  });
+  choicesEls.forEach(el => el.style.pointerEvents="none");
+
+  if(choicesEls[q.c]) choicesEls[q.c].classList.add("correct");
+  if(!correct && choicesEls[selectedIdx]) choicesEls[selectedIdx].classList.add("wrong");
 
   answered = true;
 
@@ -213,50 +476,41 @@ function submit(){
     glowXP();
     popup(`+${gain} XP`, xpEl);
 
-    // LEVEL UP pacing
     const newLevel = 1 + Math.floor(xp / 30);
     if(newLevel > level){
       level = newLevel;
       playSfx(SFX.level);
 
-      // animated badge ladder
       if(level >= 8) badgeUnlock("STATEHOUSE LEGEND");
       else if(level >= 6) badgeUnlock("Ohio Icon");
       else if(level >= 4) badgeUnlock("Civic Champion");
       else badgeUnlock("Reform Ranger");
 
-      // bigger fireworks on level-up
       fireworkBurst(canvas.width/2, canvas.height*0.28, 3.3);
     }
 
     updateStats();
 
-    // optional: auto-advance after short delay
+    // auto-advance on correct
     setTimeout(()=> next(), 650);
 
   } else {
     playSfx(SFX.wrong);
     triggerShake();
-
-    popup("❌", streakEl);
-    popup("Streak broken!", streakEl);
-
+    popup("STREAK BROKEN!", streakEl);
     streak = 0;
     updateStats();
-    // require manual next (prevents “miss + auto advance”)
   }
 }
 
 function next(){
   if(!answered){
-    // force submission before moving on (feels more game-like)
     popup("Submit first!", lvlEl);
     triggerShake();
     return;
   }
 
   index++;
-
   if(index >= questions.length){
     celebrate();
     return;
@@ -265,12 +519,12 @@ function next(){
   render();
 }
 
-// expose for your buttons if you have them
+// expose for button onclick
 window.submit = submit;
 window.next = next;
 
 // =========================
-// CONFETTI + FIREWORKS (animated, continuous)
+// CONFETTI + FIREWORKS (animated)
 // =========================
 const canvas = document.getElementById("confetti");
 const ctx = canvas.getContext("2d");
@@ -279,8 +533,6 @@ let confetti = [];
 let fireworks = [];
 let animRunning = false;
 let animStopAt = 0;
-
-// Smooth audio sync pulses during celebration
 let beatTimer = null;
 
 function resizeCanvas(){
@@ -293,7 +545,6 @@ function startCelebrationFX(durationMs=9500){
   resizeCanvas();
   animStopAt = performance.now() + durationMs;
 
-  // build confetti field
   confetti = [];
   const count = 240;
   for(let i=0;i<count;i++){
@@ -310,25 +561,18 @@ function startCelebrationFX(durationMs=9500){
     });
   }
 
-  // initial big burst (center)
   fireworkBurst(canvas.width/2, canvas.height*0.38, 4.2);
 
   if(!animRunning){
     animRunning = true;
-    playSfx(SFX.boom); // synced start
+    playSfx(SFX.boom);
     requestAnimationFrame(loopFX);
   }
 
-  // confetti-synced sound pulses (subtle)
   if(beatTimer) clearInterval(beatTimer);
   beatTimer = setInterval(()=>{
-    // gentle sparkle tick while celebration is active
-    if(performance.now() < animStopAt){
-      playSfx(SFX.sparkle);
-    }else{
-      clearInterval(beatTimer);
-      beatTimer = null;
-    }
+    if(performance.now() < animStopAt) playSfx(SFX.sparkle);
+    else { clearInterval(beatTimer); beatTimer = null; }
   }, 1200);
 }
 
@@ -387,7 +631,7 @@ function loopFX(t){
     ctx.restore();
   });
 
-  // fireworks particles
+  // fireworks
   fireworks = fireworks.filter(f => f.age < f.life);
   fireworks.forEach(f=>{
     f.age++;
@@ -406,7 +650,6 @@ function loopFX(t){
     ctx.globalAlpha = 1;
   });
 
-  // showy extra bursts during celebration
   if(Math.random() < 0.045){
     fireworkBurst(
       canvas.width*(0.22 + Math.random()*0.56),
@@ -426,12 +669,10 @@ function loopFX(t){
 }
 
 // =========================
-// CELEBRATE (ticket + runtime)
+// CELEBRATE (ticket)
 // =========================
 function celebrate(){
-  if(progressBar) progressBar.style.width = "100%";
-
-  // big badge + fireworks show
+  progressBar.style.width = "100%";
   badgeUnlock("STATEHOUSE LEGEND");
   startCelebrationFX(10000);
 
@@ -440,12 +681,9 @@ function celebrate(){
   const mm = String(Math.floor(runtimeSec/60)).padStart(2,"0");
   const ss = String(runtimeSec%60).padStart(2,"0");
 
-  const studentLine = name ? `STUDENT: ${name}<br>` : "";
-
   ticketEl.innerHTML = `
     <div class="ticket">
       <h2>🏆 Mastery Complete!</h2>
-      ${studentLine}
       XP Earned: <b>${xp}</b><br>
       Level: <b>${level}</b><br>
       Best Streak: <b>${bestStreak}</b><br>
@@ -455,12 +693,13 @@ function celebrate(){
     </div>
   `;
 
-  // optional: small screen shake for celebration impact
   triggerShake();
 }
 
-// initial paint
+// init
 resizeCanvas();
 render();
 updateStats();
 </script>
+</body>
+</html>
