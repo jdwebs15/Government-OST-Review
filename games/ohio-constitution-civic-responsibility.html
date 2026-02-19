@@ -197,6 +197,22 @@ location.reload();
 window.restart=function(){location.reload();};
 
 renderStart();
+  // ===== Restart + Back/Forward Cache Fix =====
+// When a user returns to this page via the Back button,
+// Chrome may restore the old "finished" state from bfcache.
+// This forces a clean reload so the game starts fresh.
+window.addEventListener("pageshow", (e) => {
+  if (e.persisted) window.location.reload();
+});
+
+function restartGame(){
+  // If you ever add persistence later, clear it here:
+  // localStorage.removeItem("LEGEND_STATE:" + location.pathname);
+  // sessionStorage.removeItem("LEGEND_STATE:" + location.pathname);
+
+  window.location.reload();
+}
+
 </script>
 </body>
 </html>
