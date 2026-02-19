@@ -413,71 +413,457 @@
   // Item 1: GOV.3 new 2025 item (MCQ)
   // Item 2: Q152 grid (source -> type of info)
   // Item 3: Q165 credibility claim (MCQ)
-  const QUESTIONS = [
-    {
-      id: 'GOV3-Q4-2025',
-      type: 'mcq',
-      title: 'Released Item — Credible Sources',
-      prompt:
+ const QUESTIONS = [
+  // =========================
+  // RELEASED (verbatim)
+  // =========================
+  {
+    id: 'GOV3_NEW_2025_VERIFY_SOCIAL',
+    type: 'mcq',
+    title: 'Verify Information (Released)',
+    prompt:
 `A citizen reads something negative about a political candidate on social media. If the information is true, it could change her opinion of the candidate. How can she most effectively verify the information she reads?`,
-      options: [
-        'She can find the same information in multiple credible sources.',
-        'She can research the opposing candidate’s response to the information.',
-        'She can share the information on social media and ask for confirmation.',
-        'She can read the candidate’s campaign website for confirmation.'
-      ],
-      answerIndex: 0,
-      hint: 'Look for a method that checks the claim against MORE THAN ONE credible source (not social media sharing or campaign messaging).',
-      explain: 'Correct: verifying by finding the same information in multiple credible sources is the most effective way to confirm accuracy.'
-    },
-    {
-      id: 'Q152',
-      type: 'grid_single_per_row',
-      title: 'Released Item — Evidence Types (Select the boxes)',
-      prompt:
+    options: [
+      'She can find the same information in multiple credible sources.',
+      'She can research the opposing candidate’s response to the information.',
+      'She can share the information on social media and ask for confirmation.',
+      'She can read the candidate’s campaign website for confirmation.'
+    ],
+    answerIndex: 0,
+    hint: 'Best practice: corroborate using multiple credible sources.',
+    explain: 'Correct: verifying by finding the same information in multiple credible sources is the strongest method.'
+  },
+  {
+    id: 'Q152_SOURCE_TYPES_GRID',
+    type: 'grid_single_per_row',
+    title: 'Source Types: What Each Source Provides (Released)',
+    prompt:
 `A student is writing a research paper about impoundment. She is searching for sources of information about the events in the timeline. Select the boxes to identify the type of information that could be found for each of the sources listed.`,
-      // For each row, exactly ONE checkbox is correct (as shown in the released key)
-      grid: {
-        columns: ['Specific facts about the events', 'Opinions of people at the time of the events', 'Expert research about the events'],
-        rows: [
-          {
-            source: 'An article in a scholarly journal about President Jefferson’s use of impoundment',
-            correctCol: 2
-          },
-          {
-            source: 'A record of the testimony before the Supreme Court in Train v. City of New York',
-            correctCol: 0
-          },
-          {
-            source: 'The record of the reaction of President Nixon to the Clean Water Act',
-            correctCol: 0
-          },
-          {
-            source: 'An editorial article written by a lawmaker in support of the Impoundment Control Act of 1974',
-            correctCol: 1
-          }
-        ]
-      },
-      hint: 'Ask: is it expert analysis (scholarly journal), primary record (testimony/reaction), or opinion writing (editorial)?',
-      explain: 'Correct mapping matches the released item’s keyed source-to-information relationships.'
-    },
-    {
-      id: 'Q165',
-      type: 'mcq',
-      title: 'Released Item — Evaluating Credibility',
-      prompt:
-`Citizens must choose between a plan to build a new city auditorium or a plan to restore the old one. Supporters of the new auditorium claim that building a new auditorium would be more economical than restoring the old one. In evaluating the credibility of this claim, citizens should pay particular attention to:`,
-      options: [
-        'The number of performances held in the auditorium each year',
-        'The amount of money the supporters spend on promoting their position',
-        'The popularity of the supporters as community leaders',
-        'The projected cost data provided by architects and accountants'
+    grid: {
+      columns: [
+        'Specific facts about the events',
+        'Opinions of people at the time of the events',
+        'Expert research about the events'
       ],
-      answerIndex: 3,
-      hint: 'To judge an “economical” claim, focus on objective cost projections from qualified experts.',
-      explain: 'Correct: projected cost data from architects/accountants is the most relevant evidence for evaluating the claim.'
-    }
-  ];
+      rows: [
+        { source: 'An article in a scholarly journal about President Jefferson’s use of impoundment', correctCol: 2 },
+        { source: 'A record of the testimony before the Supreme Court in Train v. City of New York', correctCol: 0 },
+        { source: 'The record of the reaction of President Nixon to the Clean Water Act', correctCol: 0 },
+        { source: 'An editorial article written by a lawmaker in support of the Impoundment Control Act of 1974', correctCol: 1 }
+      ]
+    },
+    hint: 'Scholarly journal = expert research. Testimony/records = facts. Editorial = opinions.',
+    explain: 'Correct: match each source to the type of information it most reliably provides.'
+  },
+  {
+    id: 'Q165_CREDIBILITY_COST_DATA',
+    type: 'mcq',
+    title: 'Evaluate a Claim: What to Trust (Released)',
+    prompt:
+`Citizens must choose between a plan to build a new city auditorium or a plan to restore the old one. Supporters of the new auditorium claim that building a new auditorium would be more economical than restoring the old one. In evaluating the credibility of this claim, citizens should pay particular attention to:`,
+    options: [
+      'The number of performances held in the auditorium each year',
+      'The amount of money the supporters spend on promoting their position',
+      'The popularity of the supporters as community leaders',
+      'The projected cost data provided by architects and accountants'
+    ],
+    answerIndex: 3,
+    hint: 'For a cost claim, the strongest evidence is professional cost projections/data.',
+    explain: 'Correct: projected cost data from architects/accountants is the most relevant and credible evidence.'
+  },
+
+  // =========================
+  // STANDARDS-SUPPLEMENTED (CS 3)
+  // =========================
+  {
+    id: 'CS3_SUPP_01',
+    type: 'mcq',
+    title: 'Author Qualifications',
+    prompt:
+`A news article about a new city budget is written by someone with no stated experience, no sources cited, and no links to official documents. Which factor MOST weakens the credibility of this source?`,
+    options: [
+      'It uses a headline to get attention',
+      'It lacks supporting evidence and documented sources',
+      'It was posted online instead of printed',
+      'It discusses a controversial topic'
+    ],
+    answerIndex: 1,
+    hint: 'Credibility depends on evidence and sources you can verify.',
+    explain: 'Correct: missing evidence/sources makes the claim difficult to verify and less credible.'
+  },
+  {
+    id: 'CS3_SUPP_02',
+    type: 'mcq',
+    title: 'Corroboration',
+    prompt:
+`A student finds a surprising claim about voting rules on a blog. What is the BEST next step to evaluate credibility?`,
+    options: [
+      'Share the blog post to see if others agree',
+      'Look for the same claim in multiple credible sources',
+      'Assume it is true because it sounds reasonable',
+      'Only check the blog’s comment section'
+    ],
+    answerIndex: 1,
+    hint: 'Cross-check with credible sources.',
+    explain: 'Correct: corroborating across credible sources is the strongest verification step.'
+  },
+  {
+    id: 'CS3_SUPP_03',
+    type: 'mcq',
+    title: 'Bias vs Evidence',
+    prompt:
+`A source strongly supports one side of an issue, but includes verifiable data, cites reputable studies, and reaches logical conclusions. Which statement BEST describes the source?`,
+    options: [
+      'It is not credible because it has a viewpoint',
+      'It may have bias, but it can still be credible if evidence is strong',
+      'It is credible only if it has no opinion at all',
+      'It is automatically unreliable because it is persuasive'
+    ],
+    answerIndex: 1,
+    hint: 'Bias can exist, but evidence and logic matter most.',
+    explain: 'Correct: a source can have a perspective and still be credible when evidence is verifiable and reasoning is logical.'
+  },
+  {
+    id: 'CS3_SUPP_04',
+    type: 'mcq',
+    title: 'Internal Consistency',
+    prompt:
+`A report contradicts itself: the introduction says taxes increased, but the data table shows taxes decreased. Which credibility factor is MOST directly affected?`,
+    options: [
+      'Internal consistency',
+      'Popularity of the author',
+      'Entertainment value',
+      'Use of quotations'
+    ],
+    answerIndex: 0,
+    hint: 'Contradictions inside a source hurt consistency.',
+    explain: 'Correct: internal contradictions undermine internal consistency and credibility.'
+  },
+  {
+    id: 'CS3_SUPP_05',
+    type: 'mcq',
+    title: 'Context of Creation',
+    prompt:
+`A statistic about school funding appears in a campaign ad. Which question BEST helps evaluate credibility based on circumstances of creation?`,
+    options: [
+      'Does the ad include bright colors?',
+      'Who created the ad, and what is their goal?',
+      'Is the ad longer than 30 seconds?',
+      'Is the ad on television?'
+    ],
+    answerIndex: 1,
+    hint: 'Ask who made it and why.',
+    explain: 'Correct: understanding who created the message and their purpose is key to evaluating credibility.'
+  },
+  {
+    id: 'CS3_SUPP_06',
+    type: 'mcq',
+    title: 'Primary vs Secondary',
+    prompt:
+`Which source is MOST likely a primary source about a city council decision?`,
+    options: [
+      'A city council meeting minutes document',
+      'A textbook summary of local government',
+      'A blog post reacting to the decision',
+      'A documentary made years later'
+    ],
+    answerIndex: 0,
+    hint: 'Primary sources come from the time/event itself.',
+    explain: 'Correct: official meeting minutes are a primary source record.'
+  },
+  {
+    id: 'CS3_SUPP_07',
+    type: 'mcq',
+    title: 'Best Evidence for a Claim',
+    prompt:
+`A claim says a new recycling policy reduced landfill waste by 20%. Which evidence would BEST support this claim?`,
+    options: [
+      'A resident’s opinion that trash looks lower',
+      'A data report comparing landfill tonnage before and after the policy',
+      'A social media poll about recycling',
+      'A campaign flyer supporting recycling'
+    ],
+    answerIndex: 1,
+    hint: 'Quantitative claims require relevant data.',
+    explain: 'Correct: before/after landfill tonnage data directly tests the claim.'
+  },
+  {
+    id: 'CS3_SUPP_08',
+    type: 'mcq',
+    title: 'Unstated Assumptions',
+    prompt:
+`A speaker says, “This policy will fail because it failed in another city,” but provides no details about how the cities compare. What is the BEST critique?`,
+    options: [
+      'The argument relies on an unstated assumption that the situations are the same',
+      'The argument includes too many statistics',
+      'The argument uses too many quotes',
+      'The argument is too long'
+    ],
+    answerIndex: 0,
+    hint: 'Look for missing assumptions/comparisons.',
+    explain: 'Correct: it assumes the cities are comparable without evidence.'
+  },
+  {
+    id: 'CS3_SUPP_09',
+    type: 'mcq',
+    title: 'Evidence vs Popularity',
+    prompt:
+`A claim is supported by a popular influencer, but no evidence is provided. What should matter MOST when evaluating credibility?`,
+    options: [
+      'Number of followers',
+      'Quality of supporting evidence and verification',
+      'How confident the influencer sounds',
+      'How often the claim is repeated'
+    ],
+    answerIndex: 1,
+    hint: 'Evidence > popularity.',
+    explain: 'Correct: credibility depends on verifiable evidence and sound reasoning.'
+  },
+  {
+    id: 'CS3_SUPP_10',
+    type: 'mcq',
+    title: 'Logical Conclusions',
+    prompt:
+`A source provides accurate facts but makes a conclusion that does not follow from those facts. Which credibility factor is MOST weakened?`,
+    options: [
+      'Use of supporting evidence and logical conclusions',
+      'Spelling and grammar',
+      'Length of the article',
+      'Number of images'
+    ],
+    answerIndex: 0,
+    hint: 'Facts must lead to valid conclusions.',
+    explain: 'Correct: weak reasoning undermines credibility even if some facts are correct.'
+  },
+
+  // Grid practice (single correct per row)
+  {
+    id: 'CS3_SUPP_11',
+    type: 'grid_single_per_row',
+    title: 'Which Source is Most Credible?',
+    prompt:
+`Select the most credible source for each research goal.`,
+    grid: {
+      columns: ['Most credible choice A', 'Most credible choice B', 'Most credible choice C'],
+      rows: [
+        { source: 'Find the exact wording of a city ordinance passed last month', correctCol: 0 },
+        { source: 'Understand how a policy affected the local budget over time', correctCol: 1 },
+        { source: 'Learn expert analysis of a Supreme Court decision', correctCol: 2 }
+      ]
+    },
+    hint: 'A=official text. B=data/budget report. C=expert/peer-reviewed legal analysis.',
+    explain: 'Correct: choose sources that best match the task—official documents, data reports, or expert analysis.'
+  },
+  {
+    id: 'CS3_SUPP_12',
+    type: 'mcq',
+    title: 'Reputation of Organization',
+    prompt:
+`Two articles report the same event. One is published by an established news organization that lists editors and corrections; the other is anonymous with no contact information. Which factor MOST supports the first article’s credibility?`,
+    options: [
+      'It is longer',
+      'It has clear accountability and reputation',
+      'It uses stronger language',
+      'It has more ads'
+    ],
+    answerIndex: 1,
+    hint: 'Accountability + reputation are credibility factors.',
+    explain: 'Correct: transparent editorial accountability supports credibility.'
+  },
+  {
+    id: 'CS3_SUPP_13',
+    type: 'mcq',
+    title: 'Agreement with Other Credible Sources',
+    prompt:
+`A claim appears in one source but is contradicted by multiple credible sources. What is the BEST conclusion?`,
+    options: [
+      'The claim is definitely true because it is unique',
+      'The claim is definitely false because it is controversial',
+      'The claim is less credible until corroborated with reliable evidence',
+      'The claim becomes credible if shared widely'
+    ],
+    answerIndex: 2,
+    hint: 'Conflicts require corroboration.',
+    explain: 'Correct: lack of agreement with credible sources reduces credibility until verified.'
+  },
+  {
+    id: 'CS3_SUPP_14',
+    type: 'mcq',
+    title: 'Most Relevant Evidence',
+    prompt:
+`A group claims a new public transit plan will reduce traffic. Which is the MOST relevant evidence to examine?`,
+    options: [
+      'Bus paint color options',
+      'Projected ridership and traffic models from transportation planners',
+      'Opinions from a sports team’s fans',
+      'Number of social media likes'
+    ],
+    answerIndex: 1,
+    hint: 'Use expert projections and models related to traffic.',
+    explain: 'Correct: ridership/traffic projections are the most relevant evidence.'
+  },
+  {
+    id: 'CS3_SUPP_15',
+    type: 'mcq',
+    title: 'Identify Perspective',
+    prompt:
+`Why is identifying a source’s perspective or position important when analyzing a civic issue?`,
+    options: [
+      'So you can ignore sources with any opinion',
+      'So you can understand potential bias and evaluate evidence fairly',
+      'So you can pick the source you like best',
+      'So you can avoid reading multiple sources'
+    ],
+    answerIndex: 1,
+    hint: 'Perspective helps detect bias and evaluate evidence.',
+    explain: 'Correct: knowing perspective helps evaluate bias, assumptions, and evidence quality.'
+  },
+  {
+    id: 'CS3_SUPP_16',
+    type: 'mcq',
+    title: 'Best Verification Combo',
+    prompt:
+`A student wants to verify a claim about a proposed state law. Which combination is BEST?`,
+    options: [
+      'A meme + a comment thread',
+      'The bill text + a nonpartisan analysis + reputable reporting',
+      'Only a candidate’s campaign speech',
+      'Only a friend’s summary'
+    ],
+    answerIndex: 1,
+    hint: 'Primary document + credible analysis + reputable reporting = strongest.',
+    explain: 'Correct: triangulating across primary text and credible analyses is best.'
+  },
+  {
+    id: 'CS3_SUPP_17',
+    type: 'mcq',
+    title: 'Outdated Information',
+    prompt:
+`A source about election rules is from 2008 and has not been updated. What is the BEST concern?`,
+    options: [
+      'The font is old',
+      'The information may be outdated and inaccurate today',
+      'Older sources are always incorrect',
+      'Only print sources can be current'
+    ],
+    answerIndex: 1,
+    hint: 'Timeliness matters for rules/policies that change.',
+    explain: 'Correct: older sources can be useful, but policy/rules may have changed.'
+  },
+  {
+    id: 'CS3_SUPP_18',
+    type: 'mcq',
+    title: 'Distinguish Fact vs Opinion',
+    prompt:
+`Which statement is MOST clearly an opinion?`,
+    options: [
+      'The city council voted 5–2 on the ordinance',
+      'The ordinance takes effect on July 1',
+      'The ordinance is a terrible idea that will hurt families',
+      'The ordinance requires two trash containers'
+    ],
+    answerIndex: 2,
+    hint: 'Opinions use value judgments like “terrible.”',
+    explain: 'Correct: the statement uses a value judgment rather than verifiable information.'
+  },
+  {
+    id: 'CS3_SUPP_19',
+    type: 'mcq',
+    title: 'Reliable Data Source',
+    prompt:
+`A student needs reliable data about local unemployment. Which source is MOST credible?`,
+    options: [
+      'An anonymous post claiming “everyone is unemployed”',
+      'A government labor statistics report with methodology explained',
+      'A rumor shared in a group chat',
+      'A single person’s story'
+    ],
+    answerIndex: 1,
+    hint: 'Look for transparent methodology and official data.',
+    explain: 'Correct: official statistics with explained methods are most credible.'
+  },
+  {
+    id: 'CS3_SUPP_20',
+    type: 'mcq',
+    title: 'Detecting Manipulation',
+    prompt:
+`A graphic shows only part of a chart’s timeline to make a trend look dramatic. Which credibility factor is MOST affected?`,
+    options: [
+      'Use of supporting evidence',
+      'Circumstances and presentation that may mislead',
+      'Writer’s handwriting',
+      'Number of citations'
+    ],
+    answerIndex: 1,
+    hint: 'How info is presented can mislead.',
+    explain: 'Correct: selective presentation can distort meaning and reduces credibility.'
+  },
+  {
+    id: 'CS3_SUPP_21',
+    type: 'mcq',
+    title: 'Best Source for “What the Law Says”',
+    prompt:
+`A student wants to know exactly what a proposed law would require. Which source is BEST?`,
+    options: [
+      'The actual text of the bill',
+      'A social media summary',
+      'A parody video',
+      'A friend’s opinion'
+    ],
+    answerIndex: 0,
+    hint: 'Go to the primary document.',
+    explain: 'Correct: the bill text is the most direct and accurate source for requirements.'
+  },
+  {
+    id: 'CS3_SUPP_22',
+    type: 'mcq',
+    title: 'Conflict of Interest',
+    prompt:
+`A study praising a new product is funded by the company that sells it. What is the BEST evaluation?`,
+    options: [
+      'Funding source can create potential bias; check methods and corroborate',
+      'Funding source proves it is false',
+      'Funding source proves it is true',
+      'Funding source does not matter'
+    ],
+    answerIndex: 0,
+    hint: 'Potential bias ≠ automatic false; verify methods and corroborate.',
+    explain: 'Correct: consider conflict of interest and verify through methods and other credible sources.'
+  },
+  {
+    id: 'CS3_SUPP_23',
+    type: 'mcq',
+    title: 'Choosing the Best Evidence',
+    prompt:
+`A claim says a policy “improved student performance.” What evidence would be BEST?`,
+    options: [
+      'A teacher saying “it feels better”',
+      'Before-and-after performance data with comparable measures',
+      'A slogan on a poster',
+      'A celebrity endorsement'
+    ],
+    answerIndex: 1,
+    hint: 'Use measurable outcome data.',
+    explain: 'Correct: comparing measurable performance data is best evidence.'
+  },
+  {
+    id: 'CS3_SUPP_24',
+    type: 'mcq',
+    title: 'When Sources Disagree',
+    prompt:
+`Two credible sources disagree about the effect of a policy. What is the BEST next step?`,
+    options: [
+      'Pick the one that matches your opinion',
+      'Check their evidence, methods, and data sources; look for additional credible sources',
+      'Assume both are lying',
+      'Ignore both and use social media'
+    ],
+    answerIndex: 1,
+    hint: 'Compare evidence and methods; triangulate.',
+    explain: 'Correct: evaluate evidence/methods and seek additional credible corroboration.'
+  }
+];
+
 
   // ---------- DOM ----------
   const elQpos = document.getElementById('qpos');
