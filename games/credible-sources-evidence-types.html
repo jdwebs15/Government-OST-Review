@@ -1,0 +1,847 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Credible Sources & Evidence Types (CS 3) — Government OST Review</title>
+
+  <!-- Use your hub stylesheet for consistent look -->
+  <link rel="stylesheet" href="../styles.css" />
+
+  <style>
+    /* Game-specific layout (works even if styles.css is missing) */
+    :root{
+      --bg:#0b1220;
+      --panel:#121a2f;
+      --card:#111a2e;
+      --text:#e7eefc;
+      --muted:#a8b4cf;
+      --line:rgba(255,255,255,.12);
+      --shadow:0 18px 55px rgba(0,0,0,.40);
+      --radius:18px;
+      --good:#2bd576;
+      --bad:#ff5c7a;
+      --warn:#ffd166;
+      --accent:#7aa2ff;
+      --mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+    }
+    *{box-sizing:border-box}
+    body{
+      margin:0;
+      background:linear-gradient(180deg,#0b1220,#070b14);
+      color:var(--text);
+      font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial;
+      min-height:100vh;
+    }
+    .wrap{ width:min(980px, 92vw); margin: 22px auto 40px; }
+    .topbar{
+      background:rgba(255,255,255,.03);
+      border:1px solid var(--line);
+      border-radius:var(--radius);
+      padding:18px 18px 14px;
+      box-shadow:var(--shadow);
+      display:flex; gap:14px; align-items:flex-start; justify-content:space-between;
+    }
+    .kicker{letter-spacing:.14em; font-size:12px; color:var(--muted); font-weight:700}
+    h1{margin:6px 0 6px; font-size:24px}
+    .sub{margin:0; color:var(--muted); line-height:1.35}
+    .pillrow{display:flex; gap:8px; flex-wrap:wrap; justify-content:flex-end}
+    .pill{
+      border:1px solid var(--line);
+      background:rgba(255,255,255,.02);
+      padding:6px 10px;
+      border-radius:999px;
+      font-size:12px;
+      color:var(--muted);
+      white-space:nowrap;
+    }
+
+    .grid{display:grid; grid-template-columns: 1.1fr .9fr; gap:14px; margin-top:14px;}
+    @media (max-width: 900px){ .grid{grid-template-columns:1fr;} }
+
+    .panel{
+      background:rgba(255,255,255,.03);
+      border:1px solid var(--line);
+      border-radius:var(--radius);
+      box-shadow:var(--shadow);
+      padding:16px;
+    }
+    .row{display:flex; gap:10px; align-items:center; justify-content:space-between; flex-wrap:wrap}
+    .label{color:var(--muted); font-size:12px; letter-spacing:.08em; font-weight:800}
+    .statline{display:flex; gap:10px; flex-wrap:wrap; align-items:center}
+    .stat{
+      background:rgba(255,255,255,.02);
+      border:1px solid var(--line);
+      border-radius:12px;
+      padding:10px 12px;
+      min-width: 140px;
+    }
+    .stat .big{font-size:16px; font-weight:800}
+    .stat .small{font-size:12px; color:var(--muted); margin-top:2px}
+
+    .qtitle{margin:10px 0 6px; font-size:18px}
+    .qtext{color:var(--text); line-height:1.4; margin:0 0 12px}
+    .opts{display:grid; gap:10px; margin-top:10px}
+    .optbtn{
+      text-align:left;
+      width:100%;
+      border-radius:14px;
+      border:1px solid var(--line);
+      background:rgba(255,255,255,.02);
+      padding:12px 12px;
+      color:var(--text);
+      cursor:pointer;
+      transition: transform .04s ease, border-color .15s ease, background .15s ease;
+    }
+    .optbtn:hover{border-color:rgba(122,162,255,.45)}
+    .optbtn:active{transform: scale(.995)}
+    .optbtn[disabled]{opacity:.65; cursor:not-allowed}
+    .optbtn .ltr{
+      font-family:var(--mono);
+      font-weight:900;
+      margin-right:8px;
+      color:var(--accent);
+    }
+
+    .msg{
+      border-radius:14px;
+      border:1px solid var(--line);
+      padding:12px;
+      margin-top:12px;
+      display:none;
+    }
+    .msg.good{display:block; border-color: rgba(43,213,118,.35); background: rgba(43,213,118,.08);}
+    .msg.bad{display:block; border-color: rgba(255,92,122,.35); background: rgba(255,92,122,.08);}
+    .msg.warn{display:block; border-color: rgba(255,209,102,.35); background: rgba(255,209,102,.08);}
+    .msg .t{font-weight:800; margin-bottom:4px}
+    .msg .b{color:var(--muted); line-height:1.35}
+
+    .actions{display:flex; gap:10px; flex-wrap:wrap; margin-top:12px}
+    .btn{
+      border-radius:14px;
+      border:1px solid var(--line);
+      background:rgba(255,255,255,.02);
+      color:var(--text);
+      padding:10px 12px;
+      cursor:pointer;
+      font-weight:800;
+    }
+    .btn:hover{border-color:rgba(122,162,255,.45)}
+    .btn.primary{
+      border-color: rgba(122,162,255,.45);
+      background: rgba(122,162,255,.10);
+    }
+    .btn[disabled]{opacity:.6; cursor:not-allowed}
+
+    .field{
+      display:grid; gap:6px; margin-top:10px;
+    }
+    input[type="text"]{
+      width:100%;
+      padding:12px 12px;
+      border-radius:14px;
+      border:1px solid var(--line);
+      background:rgba(255,255,255,.02);
+      color:var(--text);
+      outline:none;
+    }
+    input[type="text"]:focus{border-color:rgba(122,162,255,.55)}
+
+    /* Grid question (Q152) */
+    .gridq{margin-top:12px; border:1px solid var(--line); border-radius:14px; overflow:hidden}
+    .gridq .hdr{
+      display:grid;
+      grid-template-columns: 1.4fr 1fr 1fr 1fr;
+      gap:0;
+      background:rgba(255,255,255,.03);
+      border-bottom:1px solid var(--line);
+    }
+    .gridq .hdr div{
+      padding:10px 10px;
+      font-size:12px;
+      color:var(--muted);
+      font-weight:900;
+      letter-spacing:.06em;
+    }
+    .gridq .r{
+      display:grid;
+      grid-template-columns: 1.4fr 1fr 1fr 1fr;
+      border-bottom:1px solid var(--line);
+    }
+    .gridq .r:last-child{border-bottom:none}
+    .gridq .cell{padding:10px 10px}
+    .gridq .src{color:var(--text); line-height:1.35}
+    .gridq label{display:flex; align-items:center; gap:8px; color:var(--muted); font-size:13px}
+    .gridq input{transform: translateY(1px);}
+
+    /* Error box */
+    .errbox{
+      display:none;
+      margin-top:14px;
+      border:1px solid rgba(255,92,122,.45);
+      background: rgba(255,92,122,.10);
+      border-radius:14px;
+      padding:12px;
+    }
+    .errbox .t{font-weight:900}
+    .errbox pre{margin:8px 0 0; white-space:pre-wrap; color:var(--text); font-family:var(--mono); font-size:12px}
+    .muted{color:var(--muted)}
+    .mono{font-family:var(--mono)}
+    .ticket{
+      margin-top:12px;
+      border:1px solid rgba(43,213,118,.35);
+      background: rgba(43,213,118,.07);
+      border-radius:14px;
+      padding:12px;
+    }
+    .ticket .code{
+      font-family:var(--mono);
+      font-weight:900;
+      letter-spacing:.06em;
+      padding:10px;
+      border-radius:12px;
+      border:1px solid var(--line);
+      background:rgba(255,255,255,.02);
+      margin-top:8px;
+      word-break:break-word;
+    }
+  </style>
+</head>
+
+<body>
+  <div class="wrap">
+    <div class="topbar">
+      <div>
+        <div class="kicker">GOVERNMENT OST REVIEW</div>
+        <h1>Credible Sources &amp; Evidence Types (CS 3)</h1>
+        <p class="sub">
+          Released items (verbatim). Mastery requires <b>100% accuracy</b>. Wrong answers trigger a hint and retry; accuracy reflects the miss.
+        </p>
+      </div>
+      <div class="pillrow">
+        <div class="pill">Mastery (100%) ✅</div>
+        <div class="pill">Name + timestamps ✅</div>
+        <div class="pill">Submission ticket ✅</div>
+      </div>
+    </div>
+
+    <div id="errbox" class="errbox" role="alert">
+      <div class="t">On-page error box</div>
+      <div class="muted">Copy the details below if anything “white screens.”</div>
+      <pre id="errtext"></pre>
+    </div>
+
+    <div class="grid">
+      <!-- MAIN -->
+      <section class="panel">
+        <div class="row">
+          <div class="label">QUESTION</div>
+          <div class="statline">
+            <div class="stat">
+              <div class="big" id="qpos">—</div>
+              <div class="small">Progress</div>
+            </div>
+            <div class="stat">
+              <div class="big" id="acc">—</div>
+              <div class="small">Accuracy</div>
+            </div>
+            <div class="stat">
+              <div class="big" id="runtime">—</div>
+              <div class="small">Runtime</div>
+            </div>
+          </div>
+        </div>
+
+        <h2 class="qtitle" id="qtitle">Enter your name to begin</h2>
+        <p class="qtext" id="qtext">Your teacher requires a submission ticket at the end (no cropping). Use your real name.</p>
+
+        <div id="nameBox" class="field">
+          <label class="muted" for="studentName"><b>Student Name</b></label>
+          <input id="studentName" type="text" placeholder="e.g., Jordan Smith" autocomplete="name" />
+          <div class="actions">
+            <button class="btn primary" id="btnStart">Start</button>
+            <button class="btn" id="btnResetAll" title="Clears saved progress for this game only">Reset Game</button>
+          </div>
+          <div class="muted" style="margin-top:6px;font-size:12px;">
+            Note: progress is saved in this browser (localStorage) until you finish or reset.
+          </div>
+        </div>
+
+        <div id="questionBox" style="display:none;">
+          <div id="mcqBox" style="display:none;">
+            <div class="opts" id="opts"></div>
+          </div>
+
+          <div id="gridBox" style="display:none;">
+            <p class="qtext" id="gridPrompt"></p>
+            <div class="gridq" id="gridQ"></div>
+            <div class="actions">
+              <button class="btn primary" id="btnSubmitGrid">Submit</button>
+            </div>
+          </div>
+
+          <div id="feedback" class="msg" aria-live="polite">
+            <div class="t" id="fbTitle"></div>
+            <div class="b" id="fbBody"></div>
+          </div>
+
+          <div class="actions">
+            <button class="btn" id="btnHint" disabled>Hint</button>
+            <button class="btn primary" id="btnNext" disabled>Next</button>
+          </div>
+        </div>
+
+        <div id="finishBox" style="display:none;">
+          <h2 class="qtitle">Finish</h2>
+          <p class="qtext">
+            If you have <b>100% accuracy</b>, you’ll receive a submission ticket. If not, you must reset and replay for mastery.
+          </p>
+
+          <div id="finishMsg" class="msg warn" style="display:block;">
+            <div class="t" id="finishTitle">Checking mastery…</div>
+            <div class="b" id="finishBody">—</div>
+          </div>
+
+          <div id="ticket" class="ticket" style="display:none;">
+            <div><b>Submission Ticket</b> (screenshot this)</div>
+            <div class="muted" style="margin-top:6px;line-height:1.35">
+              Name: <span id="tName"></span><br/>
+              Date: <span id="tDate"></span><br/>
+              Start: <span id="tStart"></span><br/>
+              End: <span id="tEnd"></span><br/>
+              Runtime: <span id="tRun"></span><br/>
+              Accuracy: <span id="tAcc"></span>
+            </div>
+            <div class="code" id="tCode">—</div>
+            <div class="actions" style="margin-top:10px;">
+              <button class="btn primary" id="btnCopy">Copy Ticket Code</button>
+              <button class="btn" id="btnReset">Play Again</button>
+            </div>
+          </div>
+
+          <div class="actions" style="margin-top:10px;">
+            <button class="btn" id="btnBackHome" onclick="location.href='../index.html'">Back to Hub</button>
+          </div>
+        </div>
+      </section>
+
+      <!-- SIDE INFO -->
+      <aside class="panel">
+        <div class="label">RULES</div>
+        <ul class="muted" style="margin:10px 0 0; line-height:1.45;">
+          <li><b>Mastery</b> = finish all items with <b>0 misses</b> (100% accuracy).</li>
+          <li>Wrong answer → hint appears → you retry until correct, but accuracy keeps the miss.</li>
+          <li>Ticket at end includes name + timestamps + runtime.</li>
+        </ul>
+
+        <hr style="border:none;border-top:1px solid var(--line); margin:14px 0;">
+
+        <div class="label">WHAT THIS GAME PRACTICES</div>
+        <p class="muted" style="margin:10px 0 0; line-height:1.45;">
+          Evaluating credibility of claims and identifying what different sources provide (facts, opinions at the time, expert research).
+        </p>
+
+        <hr style="border:none;border-top:1px solid var(--line); margin:14px 0;">
+
+        <div class="label">SAVED PROGRESS</div>
+        <p class="muted" style="margin:10px 0 0; line-height:1.45;">
+          Progress saves automatically for this game in this browser. Reset removes saved data for this game only.
+        </p>
+      </aside>
+    </div>
+  </div>
+
+<script>
+(() => {
+  // ---------- Hardened shell + on-page error box ----------
+  const errbox = document.getElementById('errbox');
+  const errtext = document.getElementById('errtext');
+  window.addEventListener('error', (e) => {
+    errbox.style.display = 'block';
+    errtext.textContent = `Error: ${e.message}\nSource: ${e.filename}:${e.lineno}:${e.colno}`;
+  });
+  window.addEventListener('unhandledrejection', (e) => {
+    errbox.style.display = 'block';
+    errtext.textContent = `Unhandled Promise Rejection:\n${(e.reason && e.reason.stack) ? e.reason.stack : e.reason}`;
+  });
+
+  // ---------- Utilities ----------
+  const pad2 = n => String(n).padStart(2,'0');
+  const fmtTime = (d) => {
+    const hr = d.getHours();
+    const ampm = hr >= 12 ? 'PM' : 'AM';
+    const h12 = hr % 12 || 12;
+    return `${h12}:${pad2(d.getMinutes())}:${pad2(d.getSeconds())} ${ampm}`;
+  };
+  const fmtDate = (d) => `${d.getMonth()+1}/${d.getDate()}/${d.getFullYear()}`;
+  const msToHMS = (ms) => {
+    const s = Math.max(0, Math.floor(ms/1000));
+    const hh = Math.floor(s/3600);
+    const mm = Math.floor((s%3600)/60);
+    const ss = s%60;
+    return `${hh}:${pad2(mm)}:${pad2(ss)}`;
+  };
+  const now = () => new Date();
+
+  // small deterministic hash for ticket
+  const hash32 = (str) => {
+    let h = 2166136261 >>> 0;
+    for (let i=0;i<str.length;i++){
+      h ^= str.charCodeAt(i);
+      h = Math.imul(h, 16777619);
+    }
+    return h >>> 0;
+  };
+  const base36 = (n) => n.toString(36).toUpperCase();
+
+  // ---------- State ----------
+  const STORAGE_KEY = 'GOV_OST_CS3_V1';
+
+  let state = {
+    name: '',
+    startedAtISO: '',
+    startedAtMS: 0,
+    idx: 0,
+    attempts: 0,
+    correct: 0,
+    missed: 0,
+    // per-question: {attempted:boolean, solved:boolean}
+    qmeta: []
+  };
+
+  // ---------- Released items (verbatim) ----------
+  // Item 1: GOV.3 new 2025 item (MCQ)
+  // Item 2: Q152 grid (source -> type of info)
+  // Item 3: Q165 credibility claim (MCQ)
+  const QUESTIONS = [
+    {
+      id: 'GOV3-Q4-2025',
+      type: 'mcq',
+      title: 'Released Item — Credible Sources',
+      prompt:
+`A citizen reads something negative about a political candidate on social media. If the information is true, it could change her opinion of the candidate. How can she most effectively verify the information she reads?`,
+      options: [
+        'She can find the same information in multiple credible sources.',
+        'She can research the opposing candidate’s response to the information.',
+        'She can share the information on social media and ask for confirmation.',
+        'She can read the candidate’s campaign website for confirmation.'
+      ],
+      answerIndex: 0,
+      hint: 'Look for a method that checks the claim against MORE THAN ONE credible source (not social media sharing or campaign messaging).',
+      explain: 'Correct: verifying by finding the same information in multiple credible sources is the most effective way to confirm accuracy.'
+    },
+    {
+      id: 'Q152',
+      type: 'grid_single_per_row',
+      title: 'Released Item — Evidence Types (Select the boxes)',
+      prompt:
+`A student is writing a research paper about impoundment. She is searching for sources of information about the events in the timeline. Select the boxes to identify the type of information that could be found for each of the sources listed.`,
+      // For each row, exactly ONE checkbox is correct (as shown in the released key)
+      grid: {
+        columns: ['Specific facts about the events', 'Opinions of people at the time of the events', 'Expert research about the events'],
+        rows: [
+          {
+            source: 'An article in a scholarly journal about President Jefferson’s use of impoundment',
+            correctCol: 2
+          },
+          {
+            source: 'A record of the testimony before the Supreme Court in Train v. City of New York',
+            correctCol: 0
+          },
+          {
+            source: 'The record of the reaction of President Nixon to the Clean Water Act',
+            correctCol: 0
+          },
+          {
+            source: 'An editorial article written by a lawmaker in support of the Impoundment Control Act of 1974',
+            correctCol: 1
+          }
+        ]
+      },
+      hint: 'Ask: is it expert analysis (scholarly journal), primary record (testimony/reaction), or opinion writing (editorial)?',
+      explain: 'Correct mapping matches the released item’s keyed source-to-information relationships.'
+    },
+    {
+      id: 'Q165',
+      type: 'mcq',
+      title: 'Released Item — Evaluating Credibility',
+      prompt:
+`Citizens must choose between a plan to build a new city auditorium or a plan to restore the old one. Supporters of the new auditorium claim that building a new auditorium would be more economical than restoring the old one. In evaluating the credibility of this claim, citizens should pay particular attention to:`,
+      options: [
+        'The number of performances held in the auditorium each year',
+        'The amount of money the supporters spend on promoting their position',
+        'The popularity of the supporters as community leaders',
+        'The projected cost data provided by architects and accountants'
+      ],
+      answerIndex: 3,
+      hint: 'To judge an “economical” claim, focus on objective cost projections from qualified experts.',
+      explain: 'Correct: projected cost data from architects/accountants is the most relevant evidence for evaluating the claim.'
+    }
+  ];
+
+  // ---------- DOM ----------
+  const elQpos = document.getElementById('qpos');
+  const elAcc = document.getElementById('acc');
+  const elRuntime = document.getElementById('runtime');
+
+  const elNameBox = document.getElementById('nameBox');
+  const elStudentName = document.getElementById('studentName');
+  const btnStart = document.getElementById('btnStart');
+  const btnResetAll = document.getElementById('btnResetAll');
+
+  const elQuestionBox = document.getElementById('questionBox');
+  const elMcqBox = document.getElementById('mcqBox');
+  const elGridBox = document.getElementById('gridBox');
+
+  const elQtitle = document.getElementById('qtitle');
+  const elQtext = document.getElementById('qtext');
+  const elOpts = document.getElementById('opts');
+
+  const elGridPrompt = document.getElementById('gridPrompt');
+  const elGridQ = document.getElementById('gridQ');
+  const btnSubmitGrid = document.getElementById('btnSubmitGrid');
+
+  const elFeedback = document.getElementById('feedback');
+  const elFbTitle = document.getElementById('fbTitle');
+  const elFbBody = document.getElementById('fbBody');
+  const btnHint = document.getElementById('btnHint');
+  const btnNext = document.getElementById('btnNext');
+
+  const elFinishBox = document.getElementById('finishBox');
+  const elFinishTitle = document.getElementById('finishTitle');
+  const elFinishBody = document.getElementById('finishBody');
+  const elTicket = document.getElementById('ticket');
+
+  const elTName = document.getElementById('tName');
+  const elTDate = document.getElementById('tDate');
+  const elTStart = document.getElementById('tStart');
+  const elTEnd = document.getElementById('tEnd');
+  const elTRun = document.getElementById('tRun');
+  const elTAcc = document.getElementById('tAcc');
+  const elTCode = document.getElementById('tCode');
+  const btnCopy = document.getElementById('btnCopy');
+  const btnReset = document.getElementById('btnReset');
+
+  // ---------- Persistence ----------
+  function save(){
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+  }
+  function load(){
+    try{
+      const raw = localStorage.getItem(STORAGE_KEY);
+      if(!raw) return false;
+      const parsed = JSON.parse(raw);
+      if(!parsed || !parsed.startedAtISO || !parsed.name) return false;
+      state = parsed;
+      return true;
+    }catch{ return false; }
+  }
+  function clearSave(){
+    localStorage.removeItem(STORAGE_KEY);
+  }
+
+  // ---------- Stats ----------
+  function updateStats(){
+    const total = QUESTIONS.length;
+    const pos = Math.min(state.idx+1, total);
+    elQpos.textContent = `${pos} / ${total}`;
+
+    const acc = state.attempts ? Math.round((state.correct/state.attempts)*100) : 0;
+    elAcc.textContent = `${acc}%`;
+
+    const rt = state.startedAtMS ? (Date.now() - state.startedAtMS) : 0;
+    elRuntime.textContent = msToHMS(rt);
+  }
+
+  // runtime ticker
+  setInterval(() => updateStats(), 500);
+
+  // ---------- UI helpers ----------
+  function setFeedback(kind, title, body){
+    elFeedback.className = `msg ${kind}`;
+    elFbTitle.textContent = title;
+    elFbBody.textContent = body;
+  }
+  function clearFeedback(){
+    elFeedback.className = 'msg';
+    elFbTitle.textContent = '';
+    elFbBody.textContent = '';
+    elFeedback.style.display = 'none';
+    // then show only when class includes good/bad/warn:
+    // we rely on CSS display rules, but keep safe:
+    elFeedback.style.display = '';
+  }
+
+  function showQuestion(){
+    const q = QUESTIONS[state.idx];
+    clearFeedback();
+
+    btnNext.disabled = true;
+    btnHint.disabled = true;
+
+    elQtitle.textContent = q.title;
+    elQtext.textContent = q.prompt;
+
+    // hide all types
+    elMcqBox.style.display = 'none';
+    elGridBox.style.display = 'none';
+
+    if(q.type === 'mcq'){
+      elMcqBox.style.display = '';
+      elOpts.innerHTML = '';
+      const letters = ['A','B','C','D','E','F'];
+      q.options.forEach((text, i) => {
+        const b = document.createElement('button');
+        b.className = 'optbtn';
+        b.innerHTML = `<span class="ltr">${letters[i]}.</span>${escapeHtml(text)}`;
+        b.addEventListener('click', () => answerMCQ(i));
+        elOpts.appendChild(b);
+      });
+    }
+
+    if(q.type === 'grid_single_per_row'){
+      elGridBox.style.display = '';
+      elGridPrompt.textContent = q.prompt;
+
+      // Build grid
+      const cols = q.grid.columns;
+      const rows = q.grid.rows;
+
+      elGridQ.innerHTML = '';
+      const hdr = document.createElement('div');
+      hdr.className = 'hdr';
+      hdr.innerHTML = `<div class="cell"></div>` +
+        cols.map(c=>`<div class="cell">${escapeHtml(c)}</div>`).join('');
+      elGridQ.appendChild(hdr);
+
+      rows.forEach((r, rowIdx) => {
+        const row = document.createElement('div');
+        row.className = 'r';
+
+        const src = document.createElement('div');
+        src.className = 'cell src';
+        src.textContent = r.source;
+
+        row.appendChild(src);
+
+        cols.forEach((c, colIdx) => {
+          const cell = document.createElement('div');
+          cell.className = 'cell';
+          const id = `g_${rowIdx}_${colIdx}`;
+          cell.innerHTML = `
+            <label>
+              <input type="checkbox" id="${id}" data-row="${rowIdx}" data-col="${colIdx}">
+              <span class="mono">${colIdx===0?'A':colIdx===1?'B':'C'}</span>
+            </label>
+          `;
+          row.appendChild(cell);
+        });
+
+        elGridQ.appendChild(row);
+      });
+
+      // enforce one checked per row (like typical OST UI)
+      elGridQ.querySelectorAll('input[type="checkbox"]').forEach(cb=>{
+        cb.addEventListener('change', () => {
+          if(!cb.checked) return;
+          const row = cb.dataset.row;
+          elGridQ.querySelectorAll(`input[data-row="${row}"]`).forEach(other=>{
+            if(other !== cb) other.checked = false;
+          });
+        });
+      });
+    }
+
+    updateStats();
+    save();
+  }
+
+  function disableOptions(disabled){
+    document.querySelectorAll('.optbtn').forEach(b => b.disabled = disabled);
+    elGridQ.querySelectorAll('input[type="checkbox"]').forEach(cb => cb.disabled = disabled);
+    btnSubmitGrid.disabled = disabled;
+  }
+
+  // ---------- Answering ----------
+  function answerMCQ(choiceIdx){
+    const q = QUESTIONS[state.idx];
+
+    state.attempts += 1;
+
+    const correct = (choiceIdx === q.answerIndex);
+    if(correct){
+      state.correct += 1;
+      setFeedback('good', 'Correct ✅', q.explain);
+      disableOptions(true);
+      btnNext.disabled = false;
+      btnHint.disabled = true;
+      save();
+    } else {
+      state.missed += 1;
+      setFeedback('bad', 'Not yet ❌', 'Try again. Click “Hint” if you need help.');
+      btnHint.disabled = false;
+      btnNext.disabled = true;
+      save();
+    }
+    updateStats();
+  }
+
+  btnHint.addEventListener('click', () => {
+    const q = QUESTIONS[state.idx];
+    setFeedback('warn', 'Hint 💡', q.hint);
+    btnHint.disabled = true;
+  });
+
+  btnNext.addEventListener('click', () => {
+    state.idx += 1;
+    if(state.idx >= QUESTIONS.length){
+      showFinish();
+      return;
+    }
+    disableOptions(false);
+    showQuestion();
+  });
+
+  btnSubmitGrid.addEventListener('click', () => {
+    const q = QUESTIONS[state.idx];
+    state.attempts += 1;
+
+    // collect selections (one per row required for "best shot")
+    const rows = q.grid.rows;
+    const selections = rows.map((r, rowIdx) => {
+      const checked = elGridQ.querySelector(`input[data-row="${rowIdx}"]:checked`);
+      return checked ? Number(checked.dataset.col) : -1;
+    });
+
+    // require all rows selected to score as correct
+    const allSelected = selections.every(v => v !== -1);
+    const allCorrect = allSelected && selections.every((v, rowIdx) => v === rows[rowIdx].correctCol);
+
+    if(allCorrect){
+      state.correct += 1;
+      setFeedback('good', 'Correct ✅', q.explain);
+      disableOptions(true);
+      btnNext.disabled = false;
+      btnHint.disabled = true;
+      save();
+    } else {
+      state.missed += 1;
+      if(!allSelected){
+        setFeedback('bad', 'Not yet ❌', 'Make a selection in every row, then submit again. You can use “Hint.”');
+      } else {
+        setFeedback('bad', 'Not yet ❌', 'Some rows are incorrect. Use “Hint,” adjust, and submit again.');
+      }
+      btnHint.disabled = false;
+      btnNext.disabled = true;
+      save();
+    }
+    updateStats();
+  });
+
+  // ---------- Finish / Ticket ----------
+  function showFinish(){
+    elNameBox.style.display = 'none';
+    elQuestionBox.style.display = 'none';
+    elFinishBox.style.display = '';
+
+    const acc = state.attempts ? Math.round((state.correct/state.attempts)*100) : 0;
+    const ended = now();
+
+    if(acc === 100 && state.attempts >= QUESTIONS.length){
+      // Mastery
+      elFinishTitle.textContent = 'Mastery achieved ✅';
+      elFinishBody.textContent = 'You finished with 100% accuracy. Screenshot the ticket (no cropping).';
+
+      const start = new Date(state.startedAtISO);
+      const runMS = Date.now() - state.startedAtMS;
+
+      elTName.textContent = state.name;
+      elTDate.textContent = fmtDate(ended);
+      elTStart.textContent = fmtTime(start);
+      elTEnd.textContent = fmtTime(ended);
+      elTRun.textContent = msToHMS(runMS);
+      elTAcc.textContent = `${acc}%`;
+
+      // Ticket code (deterministic + time-bound)
+      const raw = `${state.name}|${state.startedAtISO}|${ended.toISOString()}|${state.correct}|${state.attempts}`;
+      const code = `GOV-CS3-${base36(hash32(raw))}-${base36(hash32(raw+'X')).slice(0,4)}`;
+
+      elTCode.textContent = code;
+
+      elTicket.style.display = '';
+      clearSave(); // completed game: remove saved progress so next attempt is fresh
+    } else {
+      elFinishTitle.textContent = 'Mastery NOT achieved ❌';
+      elFinishBody.textContent = `Accuracy: ${acc}%. You must replay for 100% (0 misses). Click “Play Again.”`;
+      elTicket.style.display = 'none';
+    }
+
+    updateStats();
+  }
+
+  btnCopy.addEventListener('click', async () => {
+    try{
+      await navigator.clipboard.writeText(elTCode.textContent.trim());
+      btnCopy.textContent = 'Copied ✅';
+      setTimeout(()=>btnCopy.textContent='Copy Ticket Code', 1100);
+    }catch{
+      btnCopy.textContent = 'Copy failed';
+      setTimeout(()=>btnCopy.textContent='Copy Ticket Code', 1100);
+    }
+  });
+
+  btnReset.addEventListener('click', () => {
+    clearSave();
+    location.reload();
+  });
+
+  btnResetAll.addEventListener('click', () => {
+    clearSave();
+    location.reload();
+  });
+
+  // ---------- Start ----------
+  btnStart.addEventListener('click', () => {
+    const name = (elStudentName.value || '').trim();
+    if(name.length < 2){
+      setFeedback('bad', 'Name required', 'Enter your name to begin.');
+      elFeedback.style.display = 'block';
+      return;
+    }
+    state.name = name;
+    const start = now();
+    state.startedAtISO = start.toISOString();
+    state.startedAtMS = Date.now();
+    state.idx = 0;
+    state.attempts = 0;
+    state.correct = 0;
+    state.missed = 0;
+    state.qmeta = QUESTIONS.map(()=>({}));
+    save();
+
+    elNameBox.style.display = 'none';
+    elQuestionBox.style.display = '';
+    showQuestion();
+  });
+
+  // resume if saved
+  if(load()){
+    elStudentName.value = state.name || '';
+    elNameBox.style.display = 'none';
+    elQuestionBox.style.display = '';
+    showQuestion();
+  }
+
+  // HTML escape for safe rendering
+  function escapeHtml(s){
+    return String(s)
+      .replaceAll('&','&amp;')
+      .replaceAll('<','&lt;')
+      .replaceAll('>','&gt;')
+      .replaceAll('"','&quot;')
+      .replaceAll("'","&#039;");
+  }
+})();
+</script>
+</body>
+</html>
