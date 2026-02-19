@@ -127,4 +127,613 @@ input{
     <div class="topbar">
       <div>
         <h2>Bill of Rights & Incorporation — CS 8</h2>
+        <p class="sub">Mastery = 100% accuracy (0 misses). Released items first, supplemented to 25+.</p>
+      </div>
+      <div class="pills">
+        <div class="pill"><small>Student</small> <span id="studentName">—</span></div>
+        <div class="pill"><small>Q</small> <span id="qNum">0</span>/<span id="qTotal">0</span></div>
+        <div class="pill"><small>Accuracy</small> <span id="acc">—</span></div>
+        <div class="pill"><small>Time</small> <span id="clock">00:00</span></div>
+      </div>
+    </div>
+
+    <div class="hr"></div>
+
+    <!-- START SCREEN -->
+    <div id="startScreen">
+      <p class="sub" style="margin-top:0;">
+        Enter your name to begin. You must complete all questions with <b>0 misses</b> to finish.
+      </p>
+      <div style="display:flex; gap:10px; flex-wrap:wrap; align-items:center;">
+        <input id="nameInput" type="text" placeholder="Enter your name (First + Last)" autocomplete="name"/>
+        <button id="startBtn">Start</button>
+      </div>
+      <p class="small" style="margin-top:10px;">
+        Tip: If you miss any question, you can still correct it to move on, but your accuracy will drop and you’ll need to replay for mastery.
+      </p>
+    </div>
+
+    <!-- GAME SCREEN -->
+    <div id="gameScreen" style="display:none;">
+      <div id="game"></div>
+      <div id="feedback" class="msg"></div>
+
+      <div class="controls">
+        <button id="submitBtn">Submit</button>
+        <button id="hintBtn" disabled>Hint</button>
+        <button id="nextBtn" disabled>Next</button>
+        <button id="restartBtn" title="Hard restart (fresh attempt)">Restart</button>
+      </div>
+    </div>
+
+    <!-- FINISH SCREEN -->
+    <div id="finishScreen" style="display:none;">
+      <h3 style="margin:0 0 8px 0;">Attempt Summary</h3>
+      <p class="sub" style="margin:0 0 10px 0;" id="summaryLine"></p>
+
+      <div class="codebox" id="summaryBox"></div>
+
+      <div class="controls">
+        <button id="playAgainBtn">Play Again</button>
+      </div>
+
+      <p class="small" style="margin-top:10px;">
+        Take a screenshot of this summary if you need to submit proof.
+      </p>
+    </div>
+
+  </div>
+</div>
+
+<script>
+/* =========================================================
+   HARD RESTART + BACK/FORWARD CACHE FIX
+   ========================================================= */
+const FORCE_FRESH_ATTEMPT = true;
+
+function purgeGameState(){
+  const path = location.pathname;
+  const killIfMatch = (k) => {
+    if(!k) return false;
+    return (
+      k.includes(path) ||
+      k.startsWith("LEGEND_") ||
+      k.startsWith("LEGEND_STATE") ||
+      k.startsWith("GAME_STATE") ||
+      k.startsWith("STATE:") ||
+      k.includes("submission") ||
+      k.includes("attempt") ||
+      k.includes("progress")
+    );
+  };
+
+  try{
+    for(let i = sessionStorage.length - 1; i >= 0; i--){
+      const k = sessionStorage.key(i);
+      if(killIfMatch(k)) sessionStorage.removeItem(k);
+    }
+  }catch(e){}
+
+  try{
+    for(let i = localStorage.length - 1; i >= 0; i--){
+      const k = localStorage.key(i);
+      if(killIfMatch(k)) localStorage.removeItem(k);
+    }
+  }catch(e){}
+
+  try{ history.replaceState(null, "", location.pathname); }catch(e){}
+}
+
+function hardRestart(){
+  purgeGameState();
+  location.replace(location.pathname + "?r=" + Date.now());
+}
+
+window.addEventListener("pageshow", (e) => {
+  if (e.persisted) {
+    purgeGameState();
+    location.replace(location.pathname + "?r=" + Date.now());
+  }
+});
+
+if(FORCE_FRESH_ATTEMPT){ purgeGameState(); }
+
+/* ===============================
+   QUESTION BANK (25)
+   =============================== */
+const QUESTIONS = [
+  {released:true, prompt:`Which Supreme Court case required states to provide legal counsel to defendants who could not afford an attorney?`,
+   choices:["Gideon v. Wainwright","Marbury v. Madison","McCulloch v. Maryland","Brown v. Board of Education"],
+   correct:0, hint:"This case incorporated the Sixth Amendment right to counsel."},
+
+  {released:true, prompt:`Which amendment protects citizens from unreasonable searches and seizures?`,
+   choices:["First Amendment","Fourth Amendment","Eighth Amendment","Tenth Amendment"],
+   correct:1, hint:"Think: warrants and probable cause."},
+
+  {released:true, prompt:`Which amendment protects the right to freedom of speech and peaceful assembly?`,
+   choices:["First Amendment","Second Amendment","Fifth Amendment","Ninth Amendment"],
+   correct:0, hint:"This amendment lists five freedoms."},
+
+  {prompt:`Which amendment protects individuals from self-incrimination?`,
+   choices:["Fourth","Fifth","Sixth","Eighth"],
+   correct:1, hint:"'I plead the Fifth.'"},
+  {prompt:`Which amendment guarantees a speedy and public trial?`,
+   choices:["Fourth","Sixth","Seventh","Tenth"],
+   correct:1, hint:"Rights of the accused."},
+  {prompt:`Which amendment prohibits cruel and unusual punishment?`,
+   choices:["First","Eighth","Ninth","Tenth"],
+   correct:1, hint:"Think prison conditions and excessive punishment."},
+  {prompt:`The incorporation doctrine applied most Bill of Rights protections to states through which amendment?`,
+   choices:["10th","14th","2nd","7th"],
+   correct:1, hint:"The 14th Amendment Due Process Clause is the key."},
+  {prompt:`Which scenario is protected by the First Amendment?`,
+   choices:["Peaceful protest in a public park","Stealing private property","Driving without a license","Breaking into a home"],
+   correct:0, hint:"Speech + assembly."},
+  {prompt:`Which amendment protects freedom of religion?`,
+   choices:["1st","3rd","6th","9th"],
+   correct:0, hint:"Establishment + Free Exercise."},
+  {prompt:`Which protection requires police to have probable cause before issuing a warrant?`,
+   choices:["4th Amendment","6th Amendment","8th Amendment","9th Amendment"],
+   correct:0, hint:"Search and seizure."},
+  {prompt:`Which amendment protects against double jeopardy?`,
+   choices:["4th","5th","6th","8th"],
+   correct:1, hint:"You can't be tried twice for the same crime."},
+  {prompt:`Which amendment protects the right to bear arms?`,
+   choices:["1st","2nd","4th","9th"],
+   correct:1, hint:"Right to keep and bear arms."},
+  {prompt:`Which amendment protects the right to petition the government?`,
+   choices:["1st","3rd","7th","10th"],
+   correct:0, hint:"One of the five freedoms."},
+  {prompt:`Which amendment reserves powers not delegated to the federal government to the states?`,
+   choices:["8th","9th","10th","14th"],
+   correct:2, hint:"Federalism protection."},
+  {prompt:`Which amendment requires due process of law?`,
+   choices:["5th","7th","8th","10th"],
+   correct:0, hint:"No person shall be deprived of life, liberty, or property without due process."},
+  {prompt:`Which amendment protects the right to an impartial jury?`,
+   choices:["6th","7th","8th","9th"],
+   correct:0, hint:"Criminal trials."},
+  {prompt:`Which amendment protects against excessive bail?`,
+   choices:["4th","6th","8th","10th"],
+   correct:2, hint:"The Eighth also bans excessive fines and cruel and unusual punishment."},
+  {prompt:`Which scenario would violate the First Amendment?`,
+   choices:["Government banning peaceful protest","Charging someone for theft","Arresting someone for assault","Requiring driver’s license"],
+   correct:0, hint:"Peaceful expression."},
+  {prompt:`Which clause in the 14th Amendment made incorporation possible?`,
+   choices:["Equal Protection","Due Process","Privileges and Immunities","Commerce Clause"],
+   correct:1, hint:"Key phrase: no state shall deprive... without due process."},
+  {prompt:`Which amendment protects freedom of the press?`,
+   choices:["1st","2nd","4th","6th"],
+   correct:0, hint:"One of the five freedoms."},
+  {prompt:`Which amendment protects citizens from quartering soldiers in their homes?`,
+   choices:["2nd","3rd","5th","8th"],
+   correct:1, hint:"Rarely tested but important."},
+  {prompt:`Which amendment ensures that rights not specifically listed are still retained by the people?`,
+   choices:["7th","8th","9th","10th"],
+   correct:2, hint:"Unenumerated rights."},
+  {prompt:`Which amendment protects the right to confront witnesses?`,
+   choices:["5th","6th","8th","10th"],
+   correct:1, hint:"Rights of the accused."},
+  {prompt:`Which scenario demonstrates incorporation?`,
+   choices:["A state must provide a jury trial","A city passes a parking ordinance","A governor vetoes a bill","A senator filibusters"],
+   correct:0, hint:"States required to follow Bill of Rights protections (via the 14th)."},
+  {prompt:`Which right is protected by the Sixth Amendment?`,
+   choices:["Right to counsel","Freedom of speech","Protection from self-incrimination","Protection from unreasonable searches"],
+   correct:0, hint:"Gideon v. Wainwright."}
+];
+
+/* ===============================
+   ELEMENTS
+   =============================== */
+const startScreen = document.getElementById("startScreen");
+const gameScreen  = document.getElementById("gameScreen");
+const finishScreen= document.getElementById("finishScreen");
+
+const nameInput   = document.getElementById("nameInput");
+const startBtn    = document.getElementById("startBtn");
+
+const studentNameEl = document.getElementById("studentName");
+const qNumEl      = document.getElementById("qNum");
+const qTotalEl    = document.getElementById("qTotal");
+const accEl       = document.getElementById("acc");
+const clockEl     = document.getElementById("clock");
+
+const game        = document.getElementById("game");
+const feedback    = document.getElementById("feedback");
+const submitBtn   = document.getElementById("submitBtn");
+const hintBtn     = document.getElementById("hintBtn");
+const nextBtn     = document.getElementById("nextBtn");
+const restartBtn  = document.getElementById("restartBtn");
+
+const summaryLine = document.getElementById("summaryLine");
+const summaryBox  = document.getElementById("summaryBox");
+const playAgainBtn= document.getElementById("playAgainBtn");
+
+/* ===============================
+   STATE
+   =============================== */
+let studentName = "";
+let index = 0;
+
+let attempts = 0;   // every submit counts as an attempt
+let correct  = 0;   // number of correct submits
+let misses   = 0;   // number of incorrect submits (what mastery cares about)
+
+let selected = null;
+let locked = false;           // lock after correct until Next
+let missedThisQuestion = false;
+
+let startTime = null;         // Date object
+let endTime = null;           // Date object
+let timerId = null;
+
+/* ===============================
+   HELPERS
+   =============================== */
+qTotalEl.textContent = QUESTIONS.length;
+
+function pad2(n){ return String(n).padStart(2,"0"); }
+
+function formatTime(d){
+  // local machine time (student device)
+  const yy = d.getFullYear();
+  const mm = pad2(d.getMonth()+1);
+  const dd = pad2(d.getDate());
+  let hh = d.getHours();
+  const min = pad2(d.getMinutes());
+  const ss = pad2(d.getSeconds());
+  const ampm = hh >= 12 ? "PM" : "AM";
+  hh = hh % 12; if(hh === 0) hh = 12;
+  return `${mm}/${dd}/${yy} ${hh}:${min}:${ss} ${ampm}`;
+}
+
+function elapsedString(){
+  if(!startTime) return "00:00";
+  const ms = Date.now() - startTime.getTime();
+  const totalSec = Math.floor(ms/1000);
+  const m = Math.floor(totalSec/60);
+  const s = totalSec % 60;
+  return `${pad2(m)}:${pad2(s)}`;
+}
+
+function updateHUD(){
+  qNumEl.textContent = String(index + 1);
+  const acc = attempts ? Math.round((correct/attempts)*100) : 100;
+  accEl.textContent = `${acc}%`;
+  clockEl.textContent = elapsedString();
+}
+
+function setFeedback(kind, text){
+  feedback.className = "msg " + kind;
+  feedback.textContent = text;
+}
+function clearFeedback(){
+  feedback.className = "msg";
+  feedback.textContent = "";
+}
+
+function startClock(){
+  if(timerId) clearInterval(timerId);
+  timerId = setInterval(()=>{ clockEl.textContent = elapsedString(); }, 250);
+}
+
+function stopClock(){
+  if(timerId) clearInterval(timerId);
+  timerId = null;
+}
+
+function renderChoices(q){
+  const wrap = document.createElement("div");
+  q.choices.forEach((c,i)=>{
+    const div = document.createElement("div");
+    div.className = "choice";
+    div.textContent = c;
+
+    div.addEventListener("click", ()=>{
+      if(locked) return;
+      selected = i;
+      [...wrap.querySelectorAll(".choice")].forEach(el=>el.classList.remove("selected"));
+      div.classList.add("selected");
+    });
+
+    wrap.appendChild(div);
+  });
+  return wrap;
+}
+
+function lockChoices(showCorrect){
+  const q = QUESTIONS[index];
+  const nodes = [...game.querySelectorAll(".choice")];
+  nodes.forEach((node, i)=>{
+    node.classList.add("locked");
+    node.classList.remove("selected");
+    if(showCorrect){
+      if(i === q.correct) node.classList.add("correct");
+      if(selected !== null && selected !== q.correct && i === selected) node.classList.add("wrong");
+    }
+  });
+}
+
+function loadQuestion(){
+  locked = false;
+  missedThisQuestion = false;
+  selected = null;
+
+  clearFeedback();
+  hintBtn.disabled = true;
+  nextBtn.disabled = true;
+  submitBtn.disabled = false;
+
+  updateHUD();
+
+  const q = QUESTIONS[index];
+  game.innerHTML = "";
+  const p = document.createElement("p");
+  p.style.marginTop = "0";
+  p.textContent = q.prompt;
+  game.appendChild(p);
+  game.appendChild(renderChoices(q));
+}
+
+function finish(){
+  endTime = new Date();
+  stopClock();
+  updateHUD();
+
+  const acc = attempts ? Math.round((correct/attempts)*100) : 0;
+  const mastery = (misses === 0) && (index >= QUESTIONS.length);
+
+  const line = mastery
+    ? `✅ MASTERED — 100% accuracy (0 misses)`
+    : `❌ Not Mastered — ${acc}% accuracy (${misses} miss${misses===1?"":"es"})`;
+
+  summaryLine.textContent = line;
+
+  const summary =
+`Student: ${studentName}
+Date/Time Started: ${formatTime(startTime)}
+Date/Time Completed: ${formatTime(endTime)}
+Time Elapsed: ${elapsedString()}
+
+Questions: ${QUESTIONS.length}
+Attempts: ${attempts}
+Correct: ${correct}
+Misses: ${misses}
+Accuracy: ${acc}%
+
+Result: ${mastery ? "MASTERED (0 misses)" : "REPLAY for 0 misses"}`;
+
+  summaryBox.textContent = summary;
+
+  gameScreen.style.display = "none";
+  finishScreen.style.display = "block";
+}
+
+/* ===============================
+   START FLOW
+   =============================== */
+function begin(){
+  const n = (nameInput.value || "").trim();
+  if(n.length < 2){
+    alert("Please enter your name to begin.");
+    nameInput.focus();
+    return;
+  }
+  studentName = n;
+  studentNameEl.textContent = studentName;
+
+  startTime = new Date();
+  startClock();
+
+  // reset state
+  index = 0;
+  attempts = 0;
+  correct = 0;
+  misses = 0;
+
+  startScreen.style.display = "none";
+  finishScreen.style.display = "none";
+  gameScreen.style.display = "block";
+
+  loadQuestion();
+  updateHUD();
+}
+
+startBtn.addEventListener("click", begin);
+nameInput.addEventListener("keydown", (e)=>{
+  if(e.key === "Enter") begin();
+});
+
+/* ===============================
+   BUTTONS
+   =============================== */
+submitBtn.addEventListener("click", ()=>{
+  if(locked) return;
+  if(selected === null){
+    alert("Select an answer.");
+    return;
+  }
+
+  attempts++;
+  const q = QUESTIONS[index];
+
+  if(selected === q.correct){
+    correct++;
+    locked = true;
+    submitBtn.disabled = true;
+    hintBtn.disabled = true;
+    nextBtn.disabled = false;
+
+    setFeedback("good", missedThisQuestion ? "Correct (but your earlier miss still counts)." : "Correct.");
+    lockChoices(true);
+  } else {
+    // miss counts every time they submit wrong
+    misses++;
+    missedThisQuestion = true;
+
+    setFeedback("bad", "Incorrect. Click Hint, then try again. (Miss recorded.)");
+    hintBtn.disabled = false;
+  }
+
+  updateHUD();
+});
+
+hintBtn.addEventListener("click", ()=>{
+  const q = QUESTIONS[index];
+  setFeedback("warn", "Hint: " + (q.hint || "Think about the right being tested."));
+  hintBtn.disabled = true;
+});
+
+nextBtn.addEventListener("click", ()=>{
+  index++;
+
+  if(index >= QUESTIONS.length){
+    finish();
+    return;
+  }
+
+  loadQuestion();
+});
+
+restartBtn.addEventListener("click", hardRestart);
+playAgainBtn.addEventListener("click", hardRestart);
+
+/* ===============================
+   INITIAL HUD (pre-start)
+   =============================== */
+qNumEl.textContent = "0";
+accEl.textContent = "—";
+clockEl.textContent = "00:00";
+</script>
+</body>
+</html>
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>Bill of Rights & Incorporation — CS 8 (OST Review)</title>
+<link rel="stylesheet" href="../styles.css"/>
+
+<style>
+:root{
+  --bg:#0b1220;
+  --text:#e7eefc;
+  --muted:#a8b4cf;
+  --line:rgba(255,255,255,.12);
+  --good:#2bd576;
+  --bad:#ff5c7a;
+  --warn:#ffd166;
+  --accent:#7aa2ff;
+  --panel:rgba(255,255,255,.03);
+}
+*{box-sizing:border-box}
+body{
+  margin:0;
+  background:linear-gradient(180deg,#0b1220,#070b14);
+  color:var(--text);
+  font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial;
+}
+.wrap{width:min(1000px,92vw);margin:30px auto;}
+.panel{
+  background:var(--panel);
+  border:1px solid var(--line);
+  border-radius:16px;
+  padding:20px;
+}
+h2{margin:0 0 6px 0}
+.sub{color:var(--muted);margin:0 0 12px 0}
+
+.topbar{
+  display:flex;
+  justify-content:space-between;
+  align-items:flex-start;
+  gap:12px;
+  flex-wrap:wrap;
+  margin-bottom:10px;
+}
+.pills{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
+.pill{
+  border:1px solid var(--line);
+  background:rgba(255,255,255,.02);
+  padding:6px 10px;
+  border-radius:999px;
+  font-weight:800;
+}
+.pill small{color:var(--muted);font-weight:700}
+.hr{height:1px;background:var(--line);margin:14px 0;}
+
+.choice{
+  display:block;
+  border:1px solid var(--line);
+  padding:10px;
+  border-radius:12px;
+  margin-bottom:8px;
+  cursor:pointer;
+  background:rgba(255,255,255,.02);
+  user-select:none;
+}
+.choice:hover{border-color:var(--accent);}
+.choice.selected{
+  border-color:var(--accent);
+  outline:2px solid rgba(122,162,255,.25);
+}
+.choice.locked{cursor:default;opacity:.95}
+.choice.correct{
+  border-color:rgba(43,213,118,.7);
+  background:rgba(43,213,118,.08);
+}
+.choice.wrong{
+  border-color:rgba(255,92,122,.7);
+  background:rgba(255,92,122,.08);
+}
+
+.msg{margin-top:10px;padding:10px;border-radius:12px;display:none;}
+.msg.good{background:rgba(43,213,118,.08);border:1px solid rgba(43,213,118,.4);display:block;}
+.msg.bad{background:rgba(255,92,122,.08);border:1px solid rgba(255,92,122,.4);display:block;}
+.msg.warn{background:rgba(255,209,102,.08);border:1px solid rgba(255,209,102,.4);display:block;}
+
+.controls{display:flex;gap:10px;flex-wrap:wrap;margin-top:14px;}
+button{
+  padding:10px 14px;
+  border-radius:12px;
+  border:1px solid var(--line);
+  background:rgba(255,255,255,.03);
+  color:var(--text);
+  cursor:pointer;
+  font-weight:900;
+}
+button:hover{border-color:var(--accent);}
+button:disabled{opacity:.45;cursor:not-allowed}
+
+input{
+  padding:10px 12px;
+  border-radius:12px;
+  border:1px solid var(--line);
+  background:rgba(255,255,255,.03);
+  color:var(--text);
+  font-weight:800;
+  width:min(420px,100%);
+}
+
+.small{color:var(--muted);font-size:.95rem}
+.codebox{
+  border:1px solid var(--line);
+  border-radius:14px;
+  padding:12px;
+  background:rgba(255,255,255,.02);
+  overflow:auto;
+  font-family:ui-monospace,SFMono-Regular,Menlo,Monaco,Consolas,"Liberation Mono","Courier New",monospace;
+  white-space:pre-wrap;
+}
+</style>
+</head>
+
+<body>
+<div class="wrap">
+  <div class="panel">
+
+    <div class="topbar">
+      <div>
+        <h2>Bill of Rights & Incorporation — CS 8</h2>
         <p class="sub">Mastery = 100% accuracy (0 misses). Released items first, supplemen
