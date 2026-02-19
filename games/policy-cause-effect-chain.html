@@ -1,0 +1,833 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Policy Cause → Effect Chain — Build the 3-Step Outcome (OST Review)</title>
+  <link rel="stylesheet" href="../styles.css" />
+
+  <style>
+    :root{
+      --bg:#0b1220; --text:#e7eefc; --muted:#a8b4cf; --line:rgba(255,255,255,.12);
+      --shadow:0 18px 55px rgba(0,0,0,.40); --radius:18px;
+      --good:#2bd576; --bad:#ff5c7a; --warn:#ffd166; --accent:#7aa2ff;
+      --mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+    }
+    *{box-sizing:border-box}
+    body{margin:0;background:linear-gradient(180deg,#0b1220,#070b14);color:var(--text);font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial;min-height:100vh}
+    .wrap{width:min(980px,92vw);margin:22px auto 40px}
+    .topbar{
+      background:rgba(255,255,255,.03);border:1px solid var(--line);border-radius:var(--radius);
+      padding:18px 18px 14px;box-shadow:var(--shadow);display:flex;gap:14px;align-items:flex-start;justify-content:space-between
+    }
+    .kicker{letter-spacing:.14em;font-size:12px;color:var(--muted);font-weight:800}
+    h1{margin:6px 0 6px;font-size:24px}
+    .sub{margin:0;color:var(--muted);line-height:1.35}
+    .pillrow{display:flex;gap:8px;flex-wrap:wrap;justify-content:flex-end}
+    .pill{border:1px solid var(--line);background:rgba(255,255,255,.02);padding:6px 10px;border-radius:999px;font-size:12px;color:var(--muted);white-space:nowrap}
+
+    .grid{display:grid;grid-template-columns:1.15fr .85fr;gap:14px;margin-top:14px}
+    @media (max-width:900px){.grid{grid-template-columns:1fr}}
+    .panel{background:rgba(255,255,255,.03);border:1px solid var(--line);border-radius:var(--radius);box-shadow:var(--shadow);padding:16px}
+
+    .row{display:flex;gap:10px;align-items:center;justify-content:space-between;flex-wrap:wrap}
+    .label{color:var(--muted);font-size:12px;letter-spacing:.08em;font-weight:900}
+    .statline{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
+    .stat{background:rgba(255,255,255,.02);border:1px solid var(--line);border-radius:12px;padding:10px 12px;min-width:140px}
+    .stat .big{font-size:16px;font-weight:900}
+    .stat .small{font-size:12px;color:var(--muted);margin-top:2px}
+
+    .qtitle{margin:10px 0 6px;font-size:18px}
+    .qtext{margin:0 0 12px;color:var(--text);line-height:1.4;white-space:pre-wrap}
+
+    .field{display:grid;gap:6px;margin-top:10px}
+    input[type="text"]{
+      width:100%;padding:12px 12px;border-radius:14px;border:1px solid var(--line);
+      background:rgba(255,255,255,.02);color:var(--text);outline:none
+    }
+    input[type="text"]:focus{border-color:rgba(122,162,255,.55)}
+
+    .actions{display:flex;gap:10px;flex-wrap:wrap;margin-top:12px}
+    .btn{
+      border-radius:14px;border:1px solid var(--line);background:rgba(255,255,255,.02);
+      color:var(--text);padding:10px 12px;cursor:pointer;font-weight:900
+    }
+    .btn:hover{border-color:rgba(122,162,255,.45)}
+    .btn.primary{border-color:rgba(122,162,255,.45);background:rgba(122,162,255,.10)}
+    .btn[disabled]{opacity:.6;cursor:not-allowed}
+
+    .msg{border-radius:14px;border:1px solid var(--line);padding:12px;margin-top:12px;display:none}
+    .msg.good{display:block;border-color:rgba(43,213,118,.35);background:rgba(43,213,118,.08)}
+    .msg.bad{display:block;border-color:rgba(255,92,122,.35);background:rgba(255,92,122,.08)}
+    .msg.warn{display:block;border-color:rgba(255,209,102,.35);background:rgba(255,209,102,.08)}
+    .msg .t{font-weight:900;margin-bottom:4px}
+    .msg .b{color:var(--muted);line-height:1.35}
+
+    .errbox{display:none;margin-top:14px;border:1px solid rgba(255,92,122,.45);background:rgba(255,92,122,.10);border-radius:14px;padding:12px}
+    .errbox .t{font-weight:900}
+    .errbox pre{margin:8px 0 0;white-space:pre-wrap;color:var(--text);font-family:var(--mono);font-size:12px}
+
+    /* Chain builder */
+    .chain{
+      display:grid;
+      gap:12px;
+      margin-top:10px;
+    }
+    .stepBox{
+      border:1px solid var(--line);
+      background:rgba(255,255,255,.02);
+      border-radius:14px;
+      padding:12px;
+    }
+    .stepBox .st{font-size:12px;color:var(--muted);letter-spacing:.08em;font-weight:900}
+    .stepBox .desc{margin:6px 0 10px;color:var(--muted);line-height:1.35}
+    select{
+      width:100%;
+      padding:12px 10px;
+      border-radius:14px;
+      border:1px solid var(--line);
+      background:rgba(255,255,255,.02);
+      color:var(--text);
+      outline:none;
+    }
+    select:focus{border-color:rgba(122,162,255,.55)}
+    .lockNote{font-size:12px;color:var(--muted);margin-top:8px}
+
+    .ticket{
+      margin-top:12px;border:1px solid rgba(43,213,118,.35);background:rgba(43,213,118,.07);border-radius:14px;padding:12px
+    }
+    .ticket .code{
+      font-family:var(--mono);font-weight:900;letter-spacing:.06em;padding:10px;border-radius:12px;border:1px solid var(--line);
+      background:rgba(255,255,255,.02);margin-top:8px;word-break:break-word
+    }
+    .muted{color:var(--muted)}
+  </style>
+</head>
+
+<body>
+  <div class="wrap">
+    <div class="topbar">
+      <div>
+        <div class="kicker">GOVERNMENT OST REVIEW</div>
+        <h1>Policy Cause → Effect Chain — Build the 3-Step Outcome</h1>
+        <p class="sub">
+          Build a 3-step chain (cause → intermediate → outcome). Steps unlock in order. Wrong answers trigger a hint and retry, but mastery requires <b>100% accuracy</b>.
+          Ticket includes name + timestamps + runtime.
+        </p>
+      </div>
+      <div class="pillrow">
+        <div class="pill">Mastery (100%) ✅</div>
+        <div class="pill">3-step chain ✅</div>
+        <div class="pill">Name + timestamps ✅</div>
+        <div class="pill">Submission ticket ✅</div>
+      </div>
+    </div>
+
+    <div id="errbox" class="errbox" role="alert">
+      <div class="t">On-page error box</div>
+      <div class="muted">Copy the details below if anything “white screens.”</div>
+      <pre id="errtext"></pre>
+    </div>
+
+    <div class="grid">
+      <section class="panel">
+        <div class="row">
+          <div class="label">QUESTION</div>
+          <div class="statline">
+            <div class="stat"><div class="big" id="qpos">—</div><div class="small">Progress</div></div>
+            <div class="stat"><div class="big" id="acc">—</div><div class="small">Accuracy</div></div>
+            <div class="stat"><div class="big" id="runtime">—</div><div class="small">Runtime</div></div>
+          </div>
+        </div>
+
+        <h2 class="qtitle" id="qtitle">Enter your name to begin</h2>
+        <p class="qtext" id="qtext">Your teacher requires a submission ticket at the end (no cropping). Use your real name.</p>
+
+        <div id="nameBox" class="field">
+          <label class="muted" for="studentName"><b>Student Name</b></label>
+          <input id="studentName" type="text" placeholder="e.g., Jordan Smith" autocomplete="name" />
+          <div class="actions">
+            <button class="btn primary" id="btnStart">Start</button>
+            <button class="btn" id="btnResetAll" title="Clears saved progress for this game only">Reset Game</button>
+          </div>
+          <div class="muted" style="margin-top:6px;font-size:12px;">
+            Progress saves in this browser until you finish or reset.
+          </div>
+        </div>
+
+        <div id="playBox" style="display:none;">
+          <h2 class="qtitle" id="scenarioTitle">—</h2>
+          <p class="qtext" id="scenarioPrompt">—</p>
+
+          <div class="chain">
+            <div class="stepBox">
+              <div class="st">STEP 1 — CAUSE</div>
+              <div class="desc">Choose the initiating cause (what starts the chain).</div>
+              <select id="sel1"></select>
+            </div>
+
+            <div class="stepBox">
+              <div class="st">STEP 2 — INTERMEDIATE</div>
+              <div class="desc">Choose what happens next because of Step 1.</div>
+              <select id="sel2" disabled></select>
+              <div class="lockNote" id="lock2">Locked until Step 1 is correct.</div>
+            </div>
+
+            <div class="stepBox">
+              <div class="st">STEP 3 — OUTCOME</div>
+              <div class="desc">Choose the final outcome because of Step 2.</div>
+              <select id="sel3" disabled></select>
+              <div class="lockNote" id="lock3">Locked until Step 2 is correct.</div>
+            </div>
+          </div>
+
+          <div class="actions">
+            <button class="btn primary" id="btnCheck1">Check Step 1</button>
+            <button class="btn primary" id="btnCheck2" disabled>Check Step 2</button>
+            <button class="btn primary" id="btnCheck3" disabled>Check Step 3</button>
+            <button class="btn" id="btnHint" disabled>Hint</button>
+            <button class="btn" id="btnResetChain">Reset This Chain</button>
+          </div>
+
+          <div id="feedback" class="msg" aria-live="polite">
+            <div class="t" id="fbTitle"></div>
+            <div class="b" id="fbBody"></div>
+          </div>
+
+          <div class="actions">
+            <button class="btn primary" id="btnNext" disabled>Next</button>
+          </div>
+        </div>
+
+        <div id="finishBox" style="display:none;">
+          <h2 class="qtitle">Finish</h2>
+          <p class="qtext">
+            If you have <b>100% accuracy</b>, you’ll receive a submission ticket. If not, you must reset and replay for mastery.
+          </p>
+
+          <div id="finishMsg" class="msg warn" style="display:block;">
+            <div class="t" id="finishTitle">Checking mastery…</div>
+            <div class="b" id="finishBody">—</div>
+          </div>
+
+          <div id="ticket" class="ticket" style="display:none;">
+            <div><b>Submission Ticket</b> (screenshot this)</div>
+            <div class="muted" style="margin-top:6px;line-height:1.35">
+              Name: <span id="tName"></span><br/>
+              Date: <span id="tDate"></span><br/>
+              Start: <span id="tStart"></span><br/>
+              End: <span id="tEnd"></span><br/>
+              Runtime: <span id="tRun"></span><br/>
+              Accuracy: <span id="tAcc"></span>
+            </div>
+            <div class="code" id="tCode">—</div>
+            <div class="actions" style="margin-top:10px;">
+              <button class="btn primary" id="btnCopy">Copy Ticket Code</button>
+              <button class="btn" id="btnReset">Play Again</button>
+            </div>
+          </div>
+
+          <div class="actions" style="margin-top:10px;">
+            <button class="btn" onclick="location.href='../index.html'">Back to Hub</button>
+          </div>
+        </div>
+      </section>
+
+      <aside class="panel">
+        <div class="label">RULES</div>
+        <ul class="muted" style="margin:10px 0 0; line-height:1.45;">
+          <li><b>Mastery</b> = finish all items with <b>0 misses</b> (100% accuracy).</li>
+          <li>Wrong step → hint appears → retry until correct, but accuracy keeps the miss.</li>
+          <li>Steps unlock in order (1 → 2 → 3).</li>
+          <li>Ticket at end includes name + timestamps + runtime.</li>
+        </ul>
+
+        <hr style="border:none;border-top:1px solid var(--line); margin:14px 0;">
+
+        <div class="label">WHAT THIS TARGETS</div>
+        <p class="muted" style="margin:10px 0 0; line-height:1.45;">
+          Cause/effect reasoning in government contexts: policy choices → citizen/government responses → outcomes.
+        </p>
+      </aside>
+    </div>
+  </div>
+
+<script>
+(() => {
+  // ---------------- Hardened shell ----------------
+  const errbox = document.getElementById('errbox');
+  const errtext = document.getElementById('errtext');
+  window.addEventListener('error', (e) => {
+    errbox.style.display = 'block';
+    errtext.textContent = `Error: ${e.message}\nSource: ${e.filename}:${e.lineno}:${e.colno}`;
+  });
+  window.addEventListener('unhandledrejection', (e) => {
+    errbox.style.display = 'block';
+    errtext.textContent = `Unhandled Promise Rejection:\n${(e.reason && e.reason.stack) ? e.reason.stack : e.reason}`;
+  });
+
+  // ---------------- Utilities ----------------
+  const pad2 = n => String(n).padStart(2,'0');
+  const fmtTime = (d) => {
+    const hr = d.getHours();
+    const ampm = hr >= 12 ? 'PM' : 'AM';
+    const h12 = hr % 12 || 12;
+    return `${h12}:${pad2(d.getMinutes())}:${pad2(d.getSeconds())} ${ampm}`;
+  };
+  const fmtDate = (d) => `${d.getMonth()+1}/${d.getDate()}/${d.getFullYear()}`;
+  const msToHMS = (ms) => {
+    const s = Math.max(0, Math.floor(ms/1000));
+    const hh = Math.floor(s/3600);
+    const mm = Math.floor((s%3600)/60);
+    const ss = s%60;
+    return `${hh}:${pad2(mm)}:${pad2(ss)}`;
+  };
+  const hash32 = (str) => {
+    let h = 2166136261 >>> 0;
+    for (let i=0;i<str.length;i++){
+      h ^= str.charCodeAt(i);
+      h = Math.imul(h, 16777619);
+    }
+    return h >>> 0;
+  };
+  const base36 = (n) => n.toString(36).toUpperCase();
+  function shuffle(arr){
+    const a = arr.slice();
+    for(let i=a.length-1;i>0;i--){
+      const j = Math.floor(Math.random()*(i+1));
+      [a[i],a[j]]=[a[j],a[i]];
+    }
+    return a;
+  }
+
+  // ---------------- CHAINS (25) ----------------
+  // Standards-supplemented. (You can swap in verbatim released items later where you want.)
+  const CHAINS = [
+    { id:"C01", title:"Voter Education & Turnout",
+      prompt:"A school runs a strong voter-education campaign for eligible seniors.",
+      s1:"Students learn registration deadlines and how to evaluate candidates/issues",
+      s2:"More eligible students register and show up to vote",
+      s3:"Youth turnout increases and elected officials pay more attention to those concerns",
+      hint:"Think: information → participation → political impact."
+    },
+    { id:"C02", title:"President Vetoes a Bill",
+      prompt:"Congress passes a bill, but the President vetoes it.",
+      s1:"The President rejects the bill using veto power",
+      s2:"Congress must either revise the bill or attempt an override vote",
+      s3:"The bill fails unless Congress overrides with a 2/3 vote in each chamber",
+      hint:"Veto triggers the override/revise decision."
+    },
+    { id:"C03", title:"Congress Overrides a Veto",
+      prompt:"The President vetoes a bill, but Congress still wants it to become law.",
+      s1:"Congress holds an override vote after the veto",
+      s2:"Each chamber reaches the 2/3 threshold for override",
+      s3:"The bill becomes law despite the President’s veto",
+      hint:"Two-thirds override makes it law."
+    },
+    { id:"C04", title:"Fourth Amendment & Warrant Requirement",
+      prompt:"Police want to search a home for evidence connected to a crime.",
+      s1:"Police apply for a warrant based on probable cause",
+      s2:"A judge issues a warrant describing the place to be searched and items to be seized",
+      s3:"The search is more likely to be constitutional and evidence is more likely admissible",
+      hint:"Probable cause → warrant → lawful search."
+    },
+    { id:"C05", title:"No Speedy Trial",
+      prompt:"A defendant waits years in jail before getting a trial.",
+      s1:"The court delays the trial for an unreasonably long time",
+      s2:"The defendant’s Sixth Amendment speedy-trial right is violated",
+      s3:"The case may be dismissed or evidence/conviction may be overturned on appeal",
+      hint:"Delay → violation → remedy."
+    },
+    { id:"C06", title:"Brown v. Board Enforcement",
+      prompt:"A school district refuses to desegregate after Brown v. Board.",
+      s1:"Federal courts order desegregation based on the Supreme Court decision",
+      s2:"Federal enforcement actions support implementation of the court order",
+      s3:"Segregated school policies begin to change because the ruling is enforced",
+      hint:"Court order → enforcement → policy change."
+    },
+    { id:"C07", title:"Interest Group Mobilizes Supporters",
+      prompt:"An interest group wants a new environmental regulation.",
+      s1:"The group researches the issue and lobbies officials / testifies at hearings",
+      s2:"Supporters contact legislators and public attention increases",
+      s3:"Lawmakers are more likely to move the proposal forward (agenda/hearing/vote)",
+      hint:"Lobby/testify → mobilize → decision movement."
+    },
+    { id:"C08", title:"Media Coverage & Public Opinion",
+      prompt:"A policy issue becomes widely covered in the news.",
+      s1:"Media coverage increases public awareness of the issue",
+      s2:"Citizens discuss the issue and contact public officials",
+      s3:"Officials respond by holding hearings or introducing policy changes",
+      hint:"Coverage → citizen pressure → government response."
+    },
+    { id:"C09", title:"State vs Federal Power (Federalism)",
+      prompt:"A state and the federal government both regulate different aspects of an issue.",
+      s1:"Federalism divides power between national and state governments",
+      s2:"Each level uses its own powers (laws/regulations) in its area of authority",
+      s3:"Policy outcomes vary across states while federal rules set nationwide baselines",
+      hint:"Shared power → different actions → mixed outcomes."
+    },
+    { id:"C10", title:"Amendment Lowers Voting Age",
+      prompt:"A constitutional amendment changes who can vote in federal elections.",
+      s1:"The 26th Amendment is ratified",
+      s2:"The minimum voting age becomes 18 in federal elections",
+      s3:"More young citizens can participate in elections",
+      hint:"26th → 18 → expanded participation."
+    },
+    { id:"C11", title:"Treaty Process",
+      prompt:"The U.S. enters a treaty with another country.",
+      s1:"The President negotiates a treaty with a foreign government",
+      s2:"The Senate votes on ratification (2/3 required)",
+      s3:"If ratified, the treaty becomes a binding agreement for the U.S.",
+      hint:"Negotiate → Senate ratify → binding treaty."
+    },
+    { id:"C12", title:"Court Declares Law Unconstitutional",
+      prompt:"A law is challenged for violating constitutional rights.",
+      s1:"A lawsuit is filed and reaches the courts",
+      s2:"The court uses judicial review to evaluate constitutionality",
+      s3:"If unconstitutional, the law is struck down or cannot be enforced",
+      hint:"Challenge → review → strike down."
+    },
+    { id:"C13", title:"Bill of Rights Added",
+      prompt:"States hesitate to ratify the Constitution without protections for individual liberties.",
+      s1:"Anti-Federalists demand explicit protections of rights",
+      s2:"Support grows for adding amendments that limit government power",
+      s3:"The Bill of Rights is adopted as the first ten amendments",
+      hint:"Concerns → promise protections → Bill of Rights."
+    },
+    { id:"C14", title:"Electoral College Fix (1800)",
+      prompt:"The election of 1800 exposes a flaw in electoral voting procedures.",
+      s1:"A tie occurs because electors did not separate votes for President and Vice President",
+      s2:"The 12th Amendment changes how Electoral College votes are cast",
+      s3:"Future elections reduce the likelihood of the same tie problem",
+      hint:"Tie/flaw → 12th Amendment → corrected process."
+    },
+    { id:"C15", title:"Public Comment Influences Local Decision",
+      prompt:"A citizen wants a city council to adopt a traffic-safety change.",
+      s1:"The citizen prepares evidence and attends the meeting when the issue is on the agenda",
+      s2:"They speak during public comment and contact council members",
+      s3:"Council is more likely to schedule a vote or fund the change",
+      hint:"Agenda + comment → contact → decision movement."
+    },
+    { id:"C16", title:"Consensus Building Before Vote",
+      prompt:"A party caucus meets before a floor vote to get members aligned.",
+      s1:"Members discuss the bill and concerns inside the group",
+      s2:"Leaders build agreement and unify members around a shared position",
+      s3:"The party votes more consistently as a bloc during the official vote",
+      hint:"Internal agreement → unity → consistent vote."
+    },
+    { id:"C17", title:"Compromise to Pass a Bill",
+      prompt:"A bill lacks enough votes to pass, but supporters still want it enacted.",
+      s1:"Supporters negotiate changes to address objections",
+      s2:"Opponents gain concessions and some switch to support",
+      s3:"The revised bill gains enough votes to pass",
+      hint:"Change terms → gain votes → pass."
+    },
+    { id:"C18", title:"Protest + Petition",
+      prompt:"Citizens want to pressure lawmakers to address a civil-rights concern.",
+      s1:"Citizens organize peaceful assembly and petition officials",
+      s2:"Public pressure increases and officials receive sustained demands for action",
+      s3:"Lawmakers are more likely to propose or support policy changes",
+      hint:"Assembly/petition → pressure → action."
+    },
+    { id:"C19", title:"Being Informed as Civic Responsibility",
+      prompt:"A voter wants to vote responsibly in an upcoming election.",
+      s1:"The voter researches candidates, issues, and credible sources",
+      s2:"They evaluate claims and identify strong evidence vs misinformation",
+      s3:"They vote based on informed reasoning and priorities",
+      hint:"Research → evaluate → informed vote."
+    },
+    { id:"C20", title:"Rights of the Accused (Counsel)",
+      prompt:"A person is charged with a serious crime but cannot afford an attorney.",
+      s1:"The defendant requests legal counsel",
+      s2:"The court appoints counsel to ensure fair trial rights",
+      s3:"The defendant has representation during critical stages of prosecution",
+      hint:"Request → appointed counsel → fair process."
+    },
+    { id:"C21", title:"Policy Evaluation After Implementation",
+      prompt:"A city implements a new policy to reduce speeding in neighborhoods.",
+      s1:"The city installs traffic-calming measures and updates enforcement",
+      s2:"Officials collect data on speeds/accidents and get community feedback",
+      s3:"The city adjusts the policy based on evidence (expand/modify/remove)",
+      hint:"Implement → collect data → adjust."
+    },
+    { id:"C22", title:"Unlawful Search Consequence",
+      prompt:"Police search a home without a warrant when one is required.",
+      s1:"Police conduct a search without probable cause/warrant in a situation that requires it",
+      s2:"The defense challenges the search as unconstitutional under the Fourth Amendment",
+      s3:"Evidence may be excluded and the case may weaken significantly",
+      hint:"Bad search → challenge → evidence excluded."
+    },
+    { id:"C23", title:"Levels of Government & Matching Authority",
+      prompt:"A citizen tries to solve a pothole problem on a local road.",
+      s1:"The citizen identifies the correct level/agency responsible (city/township/county)",
+      s2:"They submit a service request and attend the appropriate local meeting if needed",
+      s3:"The issue is more likely to be fixed because the request goes to the right authority",
+      hint:"Right authority → right channel → better outcome."
+    },
+    { id:"C24", title:"Elections & Policy",
+      prompt:"A political party wins more seats in an election.",
+      s1:"The party wins offices through elections",
+      s2:"Officeholders set agendas, vote on bills, and shape public policy",
+      s3:"Public policy shifts toward the party’s platform goals",
+      hint:"Win office → control agenda → policy shift."
+    },
+    { id:"C25", title:"Civil Liberties Protected by Limits",
+      prompt:"Citizens worry government might overreach.",
+      s1:"Constitutional limits and individual rights restrict what government can do",
+      s2:"Courts can enforce those limits when violations occur",
+      s3:"Civil liberties are more likely protected even when government power expands",
+      hint:"Limits + enforcement → protected liberties."
+    }
+  ];
+
+  // For each chain, build three dropdown sets:
+  // Step 1 options: the correct s1 + 3 s1 decoys
+  // Step 2 options: correct s2 + 3 s2 decoys
+  // Step 3 options: correct s3 + 3 s3 decoys
+  function buildDecoyPool(key){
+    return CHAINS.map(c => c[key]);
+  }
+
+  const S1_POOL = buildDecoyPool('s1');
+  const S2_POOL = buildDecoyPool('s2');
+  const S3_POOL = buildDecoyPool('s3');
+
+  // ---------------- State / DOM ----------------
+  const STORAGE_KEY = 'GOV_OST_GAME6_CHAIN_V1';
+  let state = { name:'', startedAtISO:'', startedAtMS:0, idx:0, attempts:0, correct:0, order:[] };
+
+  const elQpos = document.getElementById('qpos');
+  const elAcc = document.getElementById('acc');
+  const elRuntime = document.getElementById('runtime');
+
+  const elNameBox = document.getElementById('nameBox');
+  const elStudentName = document.getElementById('studentName');
+  const btnStart = document.getElementById('btnStart');
+  const btnResetAll = document.getElementById('btnResetAll');
+
+  const elPlayBox = document.getElementById('playBox');
+  const elScenarioTitle = document.getElementById('scenarioTitle');
+  const elScenarioPrompt = document.getElementById('scenarioPrompt');
+
+  const sel1 = document.getElementById('sel1');
+  const sel2 = document.getElementById('sel2');
+  const sel3 = document.getElementById('sel3');
+
+  const lock2 = document.getElementById('lock2');
+  const lock3 = document.getElementById('lock3');
+
+  const btnCheck1 = document.getElementById('btnCheck1');
+  const btnCheck2 = document.getElementById('btnCheck2');
+  const btnCheck3 = document.getElementById('btnCheck3');
+
+  const btnHint = document.getElementById('btnHint');
+  const btnResetChain = document.getElementById('btnResetChain');
+  const btnNext = document.getElementById('btnNext');
+
+  const elFeedback = document.getElementById('feedback');
+  const elFbTitle = document.getElementById('fbTitle');
+  const elFbBody = document.getElementById('fbBody');
+
+  const elFinishBox = document.getElementById('finishBox');
+  const elFinishTitle = document.getElementById('finishTitle');
+  const elFinishBody = document.getElementById('finishBody');
+  const elTicket = document.getElementById('ticket');
+
+  const elTName = document.getElementById('tName');
+  const elTDate = document.getElementById('tDate');
+  const elTStart = document.getElementById('tStart');
+  const elTEnd = document.getElementById('tEnd');
+  const elTRun = document.getElementById('tRun');
+  const elTAcc = document.getElementById('tAcc');
+  const elTCode = document.getElementById('tCode');
+  const btnCopy = document.getElementById('btnCopy');
+  const btnReset = document.getElementById('btnReset');
+
+  let stage = 1; // 1,2,3
+  let lastHintUsed = false;
+
+  function save(){ localStorage.setItem(STORAGE_KEY, JSON.stringify(state)); }
+  function load(){
+    try{
+      const raw = localStorage.getItem(STORAGE_KEY);
+      if(!raw) return false;
+      const parsed = JSON.parse(raw);
+      if(!parsed || !parsed.startedAtISO || !parsed.name) return false;
+      state = parsed;
+      return true;
+    }catch{ return false; }
+  }
+  function clearSave(){ localStorage.removeItem(STORAGE_KEY); }
+
+  function updateStats(){
+    const total = CHAINS.length;
+    const pos = Math.min(state.idx+1, total);
+    elQpos.textContent = `${pos} / ${total}`;
+    const acc = state.attempts ? Math.round((state.correct/state.attempts)*100) : 0;
+    elAcc.textContent = `${acc}%`;
+    const rt = state.startedAtMS ? (Date.now() - state.startedAtMS) : 0;
+    elRuntime.textContent = msToHMS(rt);
+  }
+  setInterval(updateStats, 500);
+
+  function setFeedback(kind, title, body){
+    elFeedback.className = `msg ${kind}`;
+    elFbTitle.textContent = title;
+    elFbBody.textContent = body;
+  }
+  function clearFeedback(){
+    elFeedback.className = 'msg';
+    elFbTitle.textContent = '';
+    elFbBody.textContent = '';
+  }
+
+  function setSelectOptions(selectEl, choices){
+    selectEl.innerHTML = '';
+    const opt0 = document.createElement('option');
+    opt0.value = '';
+    opt0.textContent = 'Select…';
+    selectEl.appendChild(opt0);
+
+    choices.forEach(t => {
+      const o = document.createElement('option');
+      o.value = t;
+      o.textContent = t;
+      selectEl.appendChild(o);
+    });
+  }
+
+  function pickDecoys(pool, correctText, count){
+    const candidates = pool.filter(x => x !== correctText);
+    const picked = shuffle(candidates).slice(0, count);
+    return shuffle([correctText, ...picked]);
+  }
+
+  function showChain(){
+    clearFeedback();
+    btnNext.disabled = true;
+    btnHint.disabled = true;
+    lastHintUsed = false;
+
+    stage = 1;
+
+    sel2.disabled = true;
+    sel3.disabled = true;
+    lock2.style.display = '';
+    lock3.style.display = '';
+    btnCheck2.disabled = true;
+    btnCheck3.disabled = true;
+
+    const chain = CHAINS[state.order[state.idx]];
+    elScenarioTitle.textContent = chain.title;
+    elScenarioPrompt.textContent = chain.prompt;
+
+    const s1Choices = pickDecoys(S1_POOL, chain.s1, 3);
+    const s2Choices = pickDecoys(S2_POOL, chain.s2, 3);
+    const s3Choices = pickDecoys(S3_POOL, chain.s3, 3);
+
+    setSelectOptions(sel1, s1Choices);
+    setSelectOptions(sel2, s2Choices);
+    setSelectOptions(sel3, s3Choices);
+
+    sel1.value = '';
+    sel2.value = '';
+    sel3.value = '';
+
+    updateStats();
+    save();
+  }
+
+  function currentChain(){
+    return CHAINS[state.order[state.idx]];
+  }
+
+  function miss(){
+    state.attempts += 1;
+    updateStats();
+    save();
+  }
+  function hit(){
+    state.attempts += 1;
+    state.correct += 1;
+    updateStats();
+    save();
+  }
+
+  btnCheck1.addEventListener('click', () => {
+    const chain = currentChain();
+    const picked = (sel1.value || '').trim();
+    if(!picked){
+      setFeedback('bad', 'Select Step 1', 'Choose the initiating cause, then check it.');
+      return;
+    }
+    if(picked === chain.s1){
+      hit();
+      setFeedback('good', 'Step 1 correct ✅', 'Step 2 unlocked.');
+      stage = 2;
+      sel2.disabled = false;
+      lock2.style.display = 'none';
+      btnCheck2.disabled = false;
+      btnHint.disabled = true;
+    }else{
+      miss();
+      setFeedback('bad', 'Not yet ❌', 'Try again. Click “Hint” if you need help.');
+      btnHint.disabled = false;
+    }
+  });
+
+  btnCheck2.addEventListener('click', () => {
+    const chain = currentChain();
+    const picked = (sel2.value || '').trim();
+    if(stage < 2){
+      setFeedback('warn', 'Locked', 'Step 2 is locked until Step 1 is correct.');
+      return;
+    }
+    if(!picked){
+      setFeedback('bad', 'Select Step 2', 'Choose what happens next because of Step 1, then check it.');
+      return;
+    }
+    if(picked === chain.s2){
+      hit();
+      setFeedback('good', 'Step 2 correct ✅', 'Step 3 unlocked.');
+      stage = 3;
+      sel3.disabled = false;
+      lock3.style.display = 'none';
+      btnCheck3.disabled = false;
+      btnHint.disabled = true;
+    }else{
+      miss();
+      setFeedback('bad', 'Not yet ❌', 'Try again. Click “Hint” if you need help.');
+      btnHint.disabled = false;
+    }
+  });
+
+  btnCheck3.addEventListener('click', () => {
+    const chain = currentChain();
+    const picked = (sel3.value || '').trim();
+    if(stage < 3){
+      setFeedback('warn', 'Locked', 'Step 3 is locked until Step 2 is correct.');
+      return;
+    }
+    if(!picked){
+      setFeedback('bad', 'Select Step 3', 'Choose the final outcome because of Step 2, then check it.');
+      return;
+    }
+    if(picked === chain.s3){
+      hit();
+      setFeedback('good', 'Chain complete ✅', 'Click Next to continue.');
+      btnNext.disabled = false;
+      btnHint.disabled = true;
+    }else{
+      miss();
+      setFeedback('bad', 'Not yet ❌', 'Try again. Click “Hint” if you need help.');
+      btnHint.disabled = false;
+    }
+  });
+
+  btnHint.addEventListener('click', () => {
+    const chain = currentChain();
+    setFeedback('warn', 'Hint 💡', chain.hint || 'Think: policy/action → response → outcome.');
+    btnHint.disabled = true;
+    lastHintUsed = true;
+  });
+
+  btnResetChain.addEventListener('click', () => {
+    showChain();
+  });
+
+  btnNext.addEventListener('click', () => {
+    state.idx += 1;
+    if(state.idx >= CHAINS.length){
+      showFinish();
+      return;
+    }
+    showChain();
+  });
+
+  function showFinish(){
+    elNameBox.style.display = 'none';
+    elPlayBox.style.display = 'none';
+    elFinishBox.style.display = '';
+
+    const acc = state.attempts ? Math.round((state.correct/state.attempts)*100) : 0;
+    const ended = new Date();
+
+    // Minimum attempts if perfect = 3 checks per chain
+    const minAttempts = CHAINS.length * 3;
+
+    if(acc === 100 && state.attempts >= minAttempts){
+      elFinishTitle.textContent = 'Mastery achieved ✅';
+      elFinishBody.textContent = 'You finished with 100% accuracy. Screenshot the ticket (no cropping).';
+
+      const start = new Date(state.startedAtISO);
+      const runMS = Date.now() - state.startedAtMS;
+
+      elTName.textContent = state.name;
+      elTDate.textContent = fmtDate(ended);
+      elTStart.textContent = fmtTime(start);
+      elTEnd.textContent = fmtTime(ended);
+      elTRun.textContent = msToHMS(runMS);
+      elTAcc.textContent = `${acc}%`;
+
+      const raw = `${state.name}|${state.startedAtISO}|${ended.toISOString()}|${state.correct}|${state.attempts}|${CHAINS.length}`;
+      const code = `GOV-CE-${base36(hash32(raw))}-${base36(hash32(raw+'CE')).slice(0,4)}`;
+      elTCode.textContent = code;
+
+      elTicket.style.display = '';
+      clearSave();
+    }else{
+      elFinishTitle.textContent = 'Mastery NOT achieved ❌';
+      elFinishBody.textContent = `Accuracy: ${acc}%. You must replay for 100% (0 misses). Click “Play Again.”`;
+      elTicket.style.display = 'none';
+    }
+
+    updateStats();
+  }
+
+  btnCopy.addEventListener('click', async () => {
+    try{
+      await navigator.clipboard.writeText(elTCode.textContent.trim());
+      btnCopy.textContent = 'Copied ✅';
+      setTimeout(()=>btnCopy.textContent='Copy Ticket Code', 1100);
+    }catch{
+      btnCopy.textContent = 'Copy failed';
+      setTimeout(()=>btnCopy.textContent='Copy Ticket Code', 1100);
+    }
+  });
+
+  btnReset.addEventListener('click', () => { clearSave(); location.reload(); });
+  btnResetAll.addEventListener('click', () => { clearSave(); location.reload(); });
+
+  btnStart.addEventListener('click', () => {
+    const name = (elStudentName.value || '').trim();
+    if(name.length < 2){
+      setFeedback('bad', 'Name required', 'Enter your name to begin.');
+      elFeedback.style.display = 'block';
+      return;
+    }
+    state.name = name;
+    const start = new Date();
+    state.startedAtISO = start.toISOString();
+    state.startedAtMS = Date.now();
+    state.idx = 0;
+    state.attempts = 0;
+    state.correct = 0;
+    state.order = shuffle([...Array(CHAINS.length).keys()]);
+    save();
+
+    elNameBox.style.display = 'none';
+    elPlayBox.style.display = '';
+    showChain();
+  });
+
+  // Resume saved
+  if(load()){
+    elStudentName.value = state.name || '';
+    elNameBox.style.display = 'none';
+    elPlayBox.style.display = '';
+    showChain();
+  }
+})();
+</script>
+</body>
+</html>
