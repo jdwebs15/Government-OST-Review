@@ -130,15 +130,15 @@
         <div class="kicker">GOVERNMENT OST REVIEW</div>
         <h1>Civic Action Plan Sequence — From Issue to Policy</h1>
         <p class="sub">
-          Put steps in order, then pick the turning point. Wrong answers trigger a hint and retry, but mastery requires <b>100% accuracy</b>.
-          Ticket includes name + start/end times + runtime.
+          Put steps in order, then pick the turning point. Wrong answers trigger a hint and retry, but mastery requires <b>0 misses</b> (100% accuracy).
+          Finish screen shows name + start/end timestamps + runtime.
         </p>
       </div>
       <div class="pillrow">
-        <div class="pill">Mastery (100%) ✅</div>
-        <div class="pill">Name + timestamps ✅</div>
-        <div class="pill">Turning point ✅</div>
-        <div class="pill">Submission ticket ✅</div>
+        <div class="pill">0 misses mastery ✅</div>
+        <div class="pill">Name entry ✅</div>
+        <div class="pill">Running clock ✅</div>
+        <div class="pill">Timestamps ✅</div>
       </div>
     </div>
 
@@ -153,27 +153,36 @@
         <div class="row">
           <div class="label">QUESTION</div>
           <div class="statline">
-            <div class="stat"><div class="big" id="qpos">—</div><div class="small">Progress</div></div>
+            <div class="stat"><div class="big" id="qpos">0 / 0</div><div class="small">Progress</div></div>
             <div class="stat"><div class="big" id="acc">—</div><div class="small">Accuracy</div></div>
-            <div class="stat"><div class="big" id="runtime">—</div><div class="small">Runtime</div></div>
+            <div class="stat"><div class="big" id="runtime">00:00</div><div class="small">Runtime</div></div>
           </div>
         </div>
 
-        <h2 class="qtitle" id="qtitle">Enter your name to begin</h2>
-        <p class="qtext" id="qtext">Your teacher requires a submission ticket at the end (no cropping). Use your real name.</p>
+        <!-- START SCREEN -->
+        <div id="startScreen">
+          <h2 class="qtitle">Enter your name to begin</h2>
+          <p class="qtext">You must complete all items with <b>0 misses</b> to master. Use your real name.</p>
 
-        <div id="nameBox" class="field">
-          <label class="muted" for="studentName"><b>Student Name</b></label>
-          <input id="studentName" type="text" placeholder="e.g., Jordan Smith" autocomplete="name" />
-          <div class="actions">
-            <button class="btn primary" id="btnStart">Start</button>
-            <button class="btn" id="btnResetAll" title="Clears saved progress for this game only">Reset Game</button>
+          <div class="field">
+            <label class="muted" for="studentName"><b>Student Name</b></label>
+            <input id="studentName" type="text" placeholder="e.g., Jordan Smith" autocomplete="name" />
+            <div class="actions">
+              <button class="btn primary" id="btnStart">Start</button>
+              <button class="btn" id="btnResetAll" title="Hard reset (fresh attempt)">Reset Game</button>
+            </div>
+            <div class="muted" style="margin-top:6px;font-size:12px;">
+              This game does not resume. Back button also restarts clean.
+            </div>
           </div>
-          <div class="muted" style="margin-top:6px;font-size:12px;">
-            Progress saves in this browser until you finish or reset.
+
+          <div id="startMsg" class="msg" aria-live="polite">
+            <div class="t" id="startTitle"></div>
+            <div class="b" id="startBody"></div>
           </div>
         </div>
 
+        <!-- PLAY SCREEN -->
         <div id="playBox" style="display:none;">
           <h2 class="qtitle" id="scenarioTitle">—</h2>
           <p class="qtext" id="scenarioPrompt">—</p>
@@ -210,39 +219,35 @@
           <div class="actions">
             <button class="btn" id="btnHint" disabled>Hint</button>
             <button class="btn primary" id="btnNext" disabled>Next</button>
+            <button class="btn" id="btnRestart">Restart</button>
           </div>
         </div>
 
+        <!-- FINISH SCREEN -->
         <div id="finishBox" style="display:none;">
-          <h2 class="qtitle">Finish</h2>
-          <p class="qtext">
-            If you have <b>100% accuracy</b>, you’ll receive a submission ticket. If not, you must reset and replay for mastery.
-          </p>
+          <h2 class="qtitle">Attempt Summary</h2>
+          <p class="qtext" id="summaryLine">—</p>
 
-          <div id="finishMsg" class="msg warn" style="display:block;">
-            <div class="t" id="finishTitle">Checking mastery…</div>
-            <div class="b" id="finishBody">—</div>
-          </div>
-
-          <div id="ticket" class="ticket" style="display:none;">
-            <div><b>Submission Ticket</b> (screenshot this)</div>
-            <div class="muted" style="margin-top:6px;line-height:1.35">
+          <div class="ticket" style="display:block;">
+            <div><b>Submission Summary</b> (screenshot this)</div>
+            <div class="muted" style="margin-top:6px;line-height:1.45">
               Name: <span id="tName"></span><br/>
-              Date: <span id="tDate"></span><br/>
-              Start: <span id="tStart"></span><br/>
-              End: <span id="tEnd"></span><br/>
+              Date/Time Started: <span id="tStart"></span><br/>
+              Date/Time Completed: <span id="tEnd"></span><br/>
               Runtime: <span id="tRun"></span><br/>
-              Accuracy: <span id="tAcc"></span>
+              Scenarios: <span id="tQs"></span><br/>
+              Attempts: <span id="tAttempts"></span><br/>
+              Misses: <span id="tMisses"></span><br/>
+              Accuracy: <span id="tAcc"></span><br/>
+              Result: <span id="tResult"></span>
             </div>
             <div class="code" id="tCode">—</div>
-            <div class="actions" style="margin-top:10px;">
-              <button class="btn primary" id="btnCopy">Copy Ticket Code</button>
-              <button class="btn" id="btnReset">Play Again</button>
-            </div>
-          </div>
 
-          <div class="actions" style="margin-top:10px;">
-            <button class="btn" onclick="location.href='../index.html'">Back to Hub</button>
+            <div class="actions" style="margin-top:10px;">
+              <button class="btn primary" id="btnCopy">Copy Summary</button>
+              <button class="btn" id="btnPlayAgain">Play Again</button>
+              <button class="btn" onclick="location.href='../index.html'">Back to Hub</button>
+            </div>
           </div>
         </div>
       </section>
@@ -252,7 +257,7 @@
         <ul class="muted" style="margin:10px 0 0; line-height:1.45;">
           <li><b>Mastery</b> = finish all items with <b>0 misses</b> (100% accuracy).</li>
           <li>Wrong order / wrong turning point → hint appears → retry until correct, but accuracy keeps the miss.</li>
-          <li>Ticket at end includes name + timestamps + runtime.</li>
+          <li>Finish screen includes name + start/end timestamps + runtime.</li>
         </ul>
 
         <hr style="border:none;border-top:1px solid var(--line); margin:14px 0;">
@@ -267,7 +272,62 @@
 
 <script>
 (() => {
-  // ---------------- Hardened shell ----------------
+  /* =========================================================
+     HARD RESTART + BACK/FORWARD CACHE FIX (Fresh attempt)
+     ========================================================= */
+  const FORCE_FRESH_ATTEMPT = true;
+
+  function purgeGameState(){
+    const path = location.pathname;
+    const killIfMatch = (k) => {
+      if(!k) return false;
+      return (
+        k.includes(path) ||
+        k.startsWith("LEGEND_") ||
+        k.startsWith("LEGEND_STATE") ||
+        k.startsWith("GAME_STATE") ||
+        k.startsWith("STATE:") ||
+        k.includes("submission") ||
+        k.includes("attempt") ||
+        k.includes("progress") ||
+        k.includes("GOV_OST_") ||
+        k.includes("GOV_") ||
+        k.includes("SEQ")
+      );
+    };
+
+    try{
+      for(let i = sessionStorage.length - 1; i >= 0; i--){
+        const k = sessionStorage.key(i);
+        if(killIfMatch(k)) sessionStorage.removeItem(k);
+      }
+    }catch(e){}
+
+    try{
+      for(let i = localStorage.length - 1; i >= 0; i--){
+        const k = localStorage.key(i);
+        if(killIfMatch(k)) localStorage.removeItem(k);
+      }
+    }catch(e){}
+
+    try{ history.replaceState(null, "", location.pathname); }catch(e){}
+  }
+
+  function hardRestart(){
+    purgeGameState();
+    location.replace(location.pathname + "?r=" + Date.now());
+  }
+
+  window.addEventListener("pageshow", (e) => {
+    if (e.persisted) {
+      purgeGameState();
+      location.replace(location.pathname + "?r=" + Date.now());
+    }
+  });
+
+  if(FORCE_FRESH_ATTEMPT){ purgeGameState(); }
+
+  /* ---------------- Hardened shell ---------------- */
   const errbox = document.getElementById('errbox');
   const errtext = document.getElementById('errtext');
   window.addEventListener('error', (e) => {
@@ -279,15 +339,25 @@
     errtext.textContent = `Unhandled Promise Rejection:\n${(e.reason && e.reason.stack) ? e.reason.stack : e.reason}`;
   });
 
-  // ---------------- Utilities ----------------
+  /* ---------------- Utilities ---------------- */
   const pad2 = n => String(n).padStart(2,'0');
-  const fmtTime = (d) => {
-    const hr = d.getHours();
-    const ampm = hr >= 12 ? 'PM' : 'AM';
-    const h12 = hr % 12 || 12;
-    return `${h12}:${pad2(d.getMinutes())}:${pad2(d.getSeconds())} ${ampm}`;
+  const fmtStamp = (d) => {
+    const yy = d.getFullYear();
+    const mm = pad2(d.getMonth()+1);
+    const dd = pad2(d.getDate());
+    let hh = d.getHours();
+    const min = pad2(d.getMinutes());
+    const ss = pad2(d.getSeconds());
+    const ampm = hh >= 12 ? "PM" : "AM";
+    hh = hh % 12; if(hh === 0) hh = 12;
+    return `${mm}/${dd}/${yy} ${hh}:${min}:${ss} ${ampm}`;
   };
-  const fmtDate = (d) => `${d.getMonth()+1}/${d.getDate()}/${d.getFullYear()}`;
+  const msToMMSS = (ms) => {
+    const s = Math.max(0, Math.floor(ms/1000));
+    const m = Math.floor(s/60);
+    const r = s%60;
+    return `${pad2(m)}:${pad2(r)}`;
+  };
   const msToHMS = (ms) => {
     const s = Math.max(0, Math.floor(ms/1000));
     const hh = Math.floor(s/3600);
@@ -322,9 +392,7 @@
       .replaceAll("'","&#039;");
   }
 
-  // ---------------- QUESTIONS (25) ----------------
-  // Standards-supplemented sequence + turning-point items (CS 1 / civic & policy processes).
-  // You can swap in released items later if you want—this is built to meet the 25 minimum right now.
+  /* ---------------- QUESTIONS (25) ---------------- */
   const QUESTIONS = [
     {
       id:"SEQ01",
@@ -337,7 +405,7 @@
         "Attend the appropriate meeting (city council/traffic committee) and present the proposal during public comment"
       ],
       turningIndex:3,
-      hint:"The turning point is when it becomes an official decision point (agenda/hearing/public comment/vote)."
+      hint:"Turning point = the issue enters an official agenda/meeting where a decision can be made."
     },
     {
       id:"SEQ02",
@@ -350,7 +418,7 @@
         "Follow up with council members after the meeting to reinforce your position"
       ],
       turningIndex:2,
-      hint:"Public comment at the city council meeting is the decision-point step."
+      hint:"Turning point = public comment/hearing where officials consider the issue."
     },
     {
       id:"SEQ03",
@@ -363,7 +431,7 @@
         "Track committee hearings/votes and respond at the next decision point"
       ],
       turningIndex:3,
-      hint:"Committee hearings/votes are where the bill moves (official decision point)."
+      hint:"Turning point = committee hearing/vote where the bill can advance."
     },
     {
       id:"SEQ04",
@@ -376,7 +444,7 @@
         "Report outcomes to local officials to support future budgeting decisions"
       ],
       turningIndex:1,
-      hint:"The issue turns into action when you coordinate directly with the responsible local department."
+      hint:"Turning point = coordinating with the responsible government office to start official action."
     },
     {
       id:"SEQ05",
@@ -389,7 +457,7 @@
         "Propose a concrete next step (site study, budget line item, pilot project)"
       ],
       turningIndex:2,
-      hint:"City council public comment is the official decision-point step."
+      hint:"Turning point = the city council meeting/public comment (official decision space)."
     },
     {
       id:"SEQ06",
@@ -402,7 +470,7 @@
         "Follow up after the decision (implementation timeline, signage installation)"
       ],
       turningIndex:2,
-      hint:"The turning point is when the study/agenda item is discussed in an official meeting."
+      hint:"Turning point = the meeting/agenda item where officials consider the study."
     },
     {
       id:"SEQ07",
@@ -415,7 +483,7 @@
         "Adjust the proposal based on feedback and continue advocacy at the next meeting"
       ],
       turningIndex:2,
-      hint:"Turning point = presenting at the official decision-making body."
+      hint:"Turning point = presenting to the official decision-making body."
     },
     {
       id:"SEQ08",
@@ -428,7 +496,7 @@
         "Submit signatures by deadlines to place the issue on the ballot"
       ],
       turningIndex:3,
-      hint:"Turning point is the formal submission that triggers official ballot review."
+      hint:"Turning point = formal submission that triggers official review."
     },
     {
       id:"SEQ09",
@@ -441,7 +509,7 @@
         "Track committee action and respond at the next decision point (hearing/vote)"
       ],
       turningIndex:3,
-      hint:"Committee hearings/votes are the federal decision-point steps."
+      hint:"Turning point = committee action where the bill can move."
     },
     {
       id:"SEQ10",
@@ -454,7 +522,7 @@
         "Partner with civic organizations to support implementation and funding"
       ],
       turningIndex:1,
-      hint:"The turning point is bringing it into the official local process (public works/council)."
+      hint:"Turning point = bringing the issue into the official local process."
     },
     {
       id:"SEQ11",
@@ -467,7 +535,7 @@
         "Support candidates/platforms aligned with statewide emergency-service improvements"
       ],
       turningIndex:2,
-      hint:"Turning point = moving from local support to state-level engagement with state officials."
+      hint:"Turning point = shifting into state-level engagement with state officials."
     },
     {
       id:"SEQ12",
@@ -480,7 +548,7 @@
         "Follow up with decision-makers and track the vote"
       ],
       turningIndex:2,
-      hint:"Public comment is the decision-point step."
+      hint:"Turning point = public comment/hearing where officials decide."
     },
     {
       id:"SEQ13",
@@ -493,7 +561,7 @@
         "Advocate for the option that best matches community needs and evidence"
       ],
       turningIndex:2,
-      hint:"Turning point is when evidence is formally presented to influence the decision."
+      hint:"Turning point = presenting evidence to decision-makers."
     },
     {
       id:"SEQ14",
@@ -506,7 +574,7 @@
         "Engage respectfully in official meetings where decisions will be made"
       ],
       turningIndex:3,
-      hint:"Turning point = engaging at the official meeting where the decision occurs."
+      hint:"Turning point = the official meeting where action can be taken."
     },
     {
       id:"SEQ15",
@@ -519,7 +587,7 @@
         "If both chambers pass, it goes to the governor for signature or veto"
       ],
       turningIndex:1,
-      hint:"Committee action (hearings/amendments) is often the key turning point."
+      hint:"Turning point = committee hearings/amendments where the bill can advance or die."
     },
     {
       id:"SEQ16",
@@ -532,7 +600,7 @@
         "Appeal if necessary through higher courts"
       ],
       turningIndex:1,
-      hint:"Filing in the appropriate court moves it into the official legal process."
+      hint:"Turning point = filing in the proper court (official legal process begins)."
     },
     {
       id:"SEQ17",
@@ -545,7 +613,7 @@
         "If approved, the treaty is ratified"
       ],
       turningIndex:2,
-      hint:"The Senate 2/3 vote is the decisive turning point."
+      hint:"Turning point = Senate vote (2/3 required)."
     },
     {
       id:"SEQ18",
@@ -558,7 +626,7 @@
         "Hold a vote/decision once sufficient support exists"
       ],
       turningIndex:3,
-      hint:"The vote is the formal decision point where outcomes lock in."
+      hint:"Turning point = the vote/decision where the outcome becomes official."
     },
     {
       id:"SEQ19",
@@ -584,7 +652,7 @@
         "Deliver the petition to the correct local official/body and request action"
       ],
       turningIndex:3,
-      hint:"Delivery to the correct decision-maker is the official action point."
+      hint:"Turning point = delivering the petition to the decision-maker."
     },
     {
       id:"SEQ21",
@@ -597,7 +665,7 @@
         "Adjust based on feedback while keeping key shared goals"
       ],
       turningIndex:2,
-      hint:"Turning point = presenting a unified proposal to decision-makers."
+      hint:"Turning point = unified proposal presented to decision-makers."
     },
     {
       id:"SEQ22",
@@ -623,7 +691,7 @@
         "Track votes and continue advocacy through the decision"
       ],
       turningIndex:2,
-      hint:"Testimony/lobbying at hearings is the key influence decision-point."
+      hint:"Turning point = direct influence at hearings/lobbying where officials decide."
     },
     {
       id:"SEQ24",
@@ -636,7 +704,7 @@
         "A vote/decision occurs"
       ],
       turningIndex:2,
-      hint:"Turning point = the issue entering official agenda/hearing space."
+      hint:"Turning point = the issue enters official agenda/hearing space."
     },
     {
       id:"SEQ25",
@@ -649,25 +717,41 @@
         "Vote and encourage turnout"
       ],
       turningIndex:2,
-      hint:"Turning point = active campaign involvement that changes election dynamics."
+      hint:"Turning point = active campaign involvement that can change the outcome."
     }
   ];
 
-  // ---------------- State / DOM ----------------
-  const STORAGE_KEY = 'GOV_OST_GAME4_SEQUENCE_V1';
+  /* ---------------- State (NO persistence) ---------------- */
+  let studentName = "";
+  let idx = 0;
 
-  let state = { name:'', startedAtISO:'', startedAtMS:0, idx:0, attempts:0, correct:0 };
+  // We count EACH wrong check (order or turning point) as a miss via attempts/correct.
+  let attempts = 0;
+  let correct = 0;
+
+  let startTime = null;   // Date
+  let endTime = null;     // Date
+  let timerId = null;
+
+  let working = { pool:[], chosen:[], locked:false, orderOk:false, turningOk:false };
+
+  /* ---------------- DOM ---------------- */
+  const startScreen = document.getElementById('startScreen');
+  const playBox = document.getElementById('playBox');
+  const finishBox = document.getElementById('finishBox');
 
   const elQpos = document.getElementById('qpos');
   const elAcc = document.getElementById('acc');
   const elRuntime = document.getElementById('runtime');
 
-  const elNameBox = document.getElementById('nameBox');
   const elStudentName = document.getElementById('studentName');
   const btnStart = document.getElementById('btnStart');
   const btnResetAll = document.getElementById('btnResetAll');
 
-  const elPlayBox = document.getElementById('playBox');
+  const startMsg = document.getElementById('startMsg');
+  const startTitle = document.getElementById('startTitle');
+  const startBody = document.getElementById('startBody');
+
   const elScenarioTitle = document.getElementById('scenarioTitle');
   const elScenarioPrompt = document.getElementById('scenarioPrompt');
   const elPool = document.getElementById('pool');
@@ -682,51 +766,35 @@
   const elFbBody = document.getElementById('fbBody');
   const btnHint = document.getElementById('btnHint');
   const btnNext = document.getElementById('btnNext');
+  const btnRestart = document.getElementById('btnRestart');
 
   const elTurningBox = document.getElementById('turningBox');
   const elTurningOpts = document.getElementById('turningOpts');
 
-  const elFinishBox = document.getElementById('finishBox');
-  const elFinishTitle = document.getElementById('finishTitle');
-  const elFinishBody = document.getElementById('finishBody');
-  const elTicket = document.getElementById('ticket');
-
+  const elSummaryLine = document.getElementById('summaryLine');
   const elTName = document.getElementById('tName');
-  const elTDate = document.getElementById('tDate');
   const elTStart = document.getElementById('tStart');
   const elTEnd = document.getElementById('tEnd');
   const elTRun = document.getElementById('tRun');
+  const elTQs = document.getElementById('tQs');
+  const elTAttempts = document.getElementById('tAttempts');
+  const elTMisses = document.getElementById('tMisses');
   const elTAcc = document.getElementById('tAcc');
+  const elTResult = document.getElementById('tResult');
   const elTCode = document.getElementById('tCode');
   const btnCopy = document.getElementById('btnCopy');
-  const btnReset = document.getElementById('btnReset');
+  const btnPlayAgain = document.getElementById('btnPlayAgain');
 
-  // current item working state
-  let working = { pool:[], chosen:[], locked:false, orderOk:false, turningOk:false };
-
-  function save(){ localStorage.setItem(STORAGE_KEY, JSON.stringify(state)); }
-  function load(){
-    try{
-      const raw = localStorage.getItem(STORAGE_KEY);
-      if(!raw) return false;
-      const parsed = JSON.parse(raw);
-      if(!parsed || !parsed.startedAtISO || !parsed.name) return false;
-      state = parsed;
-      return true;
-    }catch{ return false; }
+  function showStartError(title, body){
+    startMsg.className = "msg bad";
+    startTitle.textContent = title;
+    startBody.textContent = body;
   }
-  function clearSave(){ localStorage.removeItem(STORAGE_KEY); }
-
-  function updateStats(){
-    const total = QUESTIONS.length;
-    const pos = Math.min(state.idx+1, total);
-    elQpos.textContent = `${pos} / ${total}`;
-    const acc = state.attempts ? Math.round((state.correct/state.attempts)*100) : 0;
-    elAcc.textContent = `${acc}%`;
-    const rt = state.startedAtMS ? (Date.now() - state.startedAtMS) : 0;
-    elRuntime.textContent = msToHMS(rt);
+  function clearStartError(){
+    startMsg.className = "msg";
+    startTitle.textContent = "";
+    startBody.textContent = "";
   }
-  setInterval(updateStats, 500);
 
   function setFeedback(kind, title, body){
     elFeedback.className = `msg ${kind}`;
@@ -739,8 +807,29 @@
     elFbBody.textContent = '';
   }
 
+  function accuracyPct(){
+    if(!attempts) return 100;
+    return Math.round((correct/attempts)*100);
+  }
+
+  function updateStats(){
+    elQpos.textContent = `${Math.min(idx+1, QUESTIONS.length)} / ${QUESTIONS.length}`;
+    elAcc.textContent = `${accuracyPct()}%`;
+    if(!startTime) elRuntime.textContent = "00:00";
+    else elRuntime.textContent = msToMMSS(Date.now() - startTime.getTime());
+  }
+
+  function startClock(){
+    if(timerId) clearInterval(timerId);
+    timerId = setInterval(updateStats, 250);
+  }
+  function stopClock(){
+    if(timerId) clearInterval(timerId);
+    timerId = null;
+  }
+
   function render(){
-    const q = QUESTIONS[state.idx];
+    const q = QUESTIONS[idx];
     elScenarioTitle.textContent = q.title;
     elScenarioPrompt.textContent = q.prompt;
 
@@ -769,15 +858,13 @@
     btnClear.disabled = working.locked || working.chosen.length === 0;
     btnCheck.disabled = working.locked || working.chosen.length !== q.steps.length;
 
-    // turning point visibility
     elTurningBox.style.display = working.orderOk ? 'block' : 'none';
 
     updateStats();
-    save();
   }
 
   function initItem(){
-    const q = QUESTIONS[state.idx];
+    const q = QUESTIONS[idx];
     working = {
       pool: shuffle(q.steps),
       chosen: [],
@@ -806,7 +893,7 @@
     if(working.locked || working.chosen.length === 0) return;
     const last = working.chosen.pop();
     working.pool.push(last);
-    working.pool = shuffle(working.pool); // keep it from being predictable
+    working.pool = shuffle(working.pool);
     btnHint.disabled = true;
     clearFeedback();
     render();
@@ -814,7 +901,7 @@
 
   btnClear.addEventListener('click', () => {
     if(working.locked) return;
-    const q = QUESTIONS[state.idx];
+    const q = QUESTIONS[idx];
     working.pool = shuffle(q.steps);
     working.chosen = [];
     btnHint.disabled = true;
@@ -823,16 +910,15 @@
   });
 
   btnCheck.addEventListener('click', () => {
-    const q = QUESTIONS[state.idx];
-    state.attempts += 1;
+    const q = QUESTIONS[idx];
+    attempts += 1;
 
     const chosen = working.chosen;
-    const correct = q.steps;
-
-    const ok = chosen.length === correct.length && chosen.every((s,i)=>s===correct[i]);
+    const correctSteps = q.steps;
+    const ok = chosen.length === correctSteps.length && chosen.every((s,i)=>s===correctSteps[i]);
 
     if(ok){
-      state.correct += 1;
+      correct += 1;
       working.orderOk = true;
       setFeedback('good', 'Order correct ✅', 'Now choose the turning point step.');
       buildTurningPointChoices();
@@ -844,161 +930,156 @@
       btnHint.disabled = false;
     }
 
-    save();
     render();
   });
 
   btnHint.addEventListener('click', () => {
-    const q = QUESTIONS[state.idx];
-    setFeedback('warn', 'Hint 💡', q.hint || 'Look for the step where the issue becomes an official decision point.');
+    const q = QUESTIONS[idx];
+    const h = q.hint || 'Look for the step where the issue becomes an official decision point.';
+    setFeedback('warn', 'Hint 💡', h);
     btnHint.disabled = true;
   });
 
   function buildTurningPointChoices(){
-    const q = QUESTIONS[state.idx];
+    const q = QUESTIONS[idx];
     elTurningOpts.innerHTML = '';
-    const choices = q.steps.map((s, idx) => ({ idx, text: s }));
-    // shuffle for unpredictability
+    const choices = q.steps.map((s, i) => ({ i, text:s }));
     const shuffled = shuffle(choices);
 
     shuffled.forEach((c) => {
       const b = document.createElement('button');
       b.className = 'optbtn';
       b.innerHTML = escapeHtml(c.text);
-      b.addEventListener('click', () => answerTurning(c.idx));
+      b.addEventListener('click', () => answerTurning(c.i));
       elTurningOpts.appendChild(b);
     });
   }
 
   function answerTurning(chosenIndex){
-    const q = QUESTIONS[state.idx];
-    state.attempts += 1;
+    const q = QUESTIONS[idx];
+    attempts += 1;
 
-    const correct = (chosenIndex === q.turningIndex);
-    if(correct){
-      state.correct += 1;
+    const ok = (chosenIndex === q.turningIndex);
+    if(ok){
+      correct += 1;
       working.turningOk = true;
       setFeedback('good', 'Turning point correct ✅', 'Click Next to continue.');
-      // lock turning choices
       Array.from(elTurningOpts.querySelectorAll('button')).forEach(b => b.disabled = true);
       btnNext.disabled = false;
       btnHint.disabled = true;
-      save();
     }else{
       working.turningOk = false;
       setFeedback('bad', 'Not yet ❌', 'Try again. Click “Hint” if you need help.');
       btnHint.disabled = false;
-      save();
     }
     updateStats();
   }
 
   btnNext.addEventListener('click', () => {
-    state.idx += 1;
-    if(state.idx >= QUESTIONS.length){
-      showFinish();
+    idx += 1;
+    if(idx >= QUESTIONS.length){
+      finish();
       return;
     }
     initItem();
   });
 
-  function showFinish(){
-    elNameBox.style.display = 'none';
-    elPlayBox.style.display = 'none';
-    elFinishBox.style.display = '';
-
-    const acc = state.attempts ? Math.round((state.correct/state.attempts)*100) : 0;
-    const ended = new Date();
-
-    if(acc === 100 && state.attempts >= QUESTIONS.length*2){ // sequence check + turning point each
-      elFinishTitle.textContent = 'Mastery achieved ✅';
-      elFinishBody.textContent = 'You finished with 100% accuracy. Screenshot the ticket (no cropping).';
-
-      const start = new Date(state.startedAtISO);
-      const runMS = Date.now() - state.startedAtMS;
-
-      elTName.textContent = state.name;
-      elTDate.textContent = fmtDate(ended);
-      elTStart.textContent = fmtTime(start);
-      elTEnd.textContent = fmtTime(ended);
-      elTRun.textContent = msToHMS(runMS);
-      elTAcc.textContent = `${acc}%`;
-
-      const raw = `${state.name}|${state.startedAtISO}|${ended.toISOString()}|${state.correct}|${state.attempts}|${QUESTIONS.length}`;
-      const code = `GOV-SEQ-${base36(hash32(raw))}-${base36(hash32(raw+'TP')).slice(0,4)}`;
-      elTCode.textContent = code;
-
-      elTicket.style.display = '';
-      clearSave();
-    }else{
-      elFinishTitle.textContent = 'Mastery NOT achieved ❌';
-      elFinishBody.textContent = `Accuracy: ${acc}%. You must replay for 100% (0 misses). Click “Play Again.”`;
-      elTicket.style.display = 'none';
-    }
-
+  function finish(){
+    endTime = new Date();
+    stopClock();
     updateStats();
+
+    const acc = accuracyPct();
+    const misses = attempts - correct;
+    const mastery = (misses === 0) && (attempts >= QUESTIONS.length * 2); // order + turning for each
+
+    startScreen.style.display = "none";
+    playBox.style.display = "none";
+    finishBox.style.display = "";
+
+    elSummaryLine.textContent = mastery
+      ? "✅ MASTERED — 100% accuracy (0 misses)"
+      : `❌ Not Mastered — ${acc}% accuracy (${misses} miss${misses===1?"":"es"})`;
+
+    elTName.textContent = studentName;
+    elTStart.textContent = fmtStamp(startTime);
+    elTEnd.textContent = fmtStamp(endTime);
+    elTRun.textContent = msToHMS(endTime.getTime() - startTime.getTime());
+
+    elTQs.textContent = String(QUESTIONS.length);
+    elTAttempts.textContent = String(attempts);
+    elTMisses.textContent = String(misses);
+    elTAcc.textContent = `${acc}%`;
+    elTResult.textContent = mastery ? "MASTERED (0 misses)" : "REPLAY for 0 misses";
+
+    const summary =
+`Student: ${studentName}
+Date/Time Started: ${fmtStamp(startTime)}
+Date/Time Completed: ${fmtStamp(endTime)}
+Runtime: ${msToHMS(endTime.getTime() - startTime.getTime())}
+
+Scenarios: ${QUESTIONS.length}
+Attempts: ${attempts}
+Correct: ${correct}
+Misses: ${misses}
+Accuracy: ${acc}%
+
+Result: ${mastery ? "MASTERED (0 misses)" : "REPLAY for 0 misses"}`;
+
+    const raw = `${studentName}|${startTime.toISOString()}|${endTime.toISOString()}|${correct}|${attempts}|${misses}|${QUESTIONS.length}`;
+    const code = `GOV-CIVICSEQ-${base36(hash32(raw))}-${base36(hash32(raw+"SUMMARY")).slice(0,4)}`;
+
+    elTCode.textContent = summary + `\n\nCode: ${code}`;
   }
 
   btnCopy.addEventListener('click', async () => {
     try{
-      await navigator.clipboard.writeText(elTCode.textContent.trim());
-      btnCopy.textContent = 'Copied ✅';
-      setTimeout(()=>btnCopy.textContent='Copy Ticket Code', 1100);
+      await navigator.clipboard.writeText(elTCode.textContent);
+      btnCopy.textContent = "Copied ✅";
+      setTimeout(()=>btnCopy.textContent="Copy Summary", 1100);
     }catch{
-      btnCopy.textContent = 'Copy failed';
-      setTimeout(()=>btnCopy.textContent='Copy Ticket Code', 1100);
+      btnCopy.textContent = "Copy failed";
+      setTimeout(()=>btnCopy.textContent="Copy Summary", 1100);
     }
   });
 
-  btnReset.addEventListener('click', () => { clearSave(); location.reload(); });
-  btnResetAll.addEventListener('click', () => { clearSave(); location.reload(); });
+  btnPlayAgain.addEventListener('click', hardRestart);
+  btnResetAll.addEventListener('click', hardRestart);
+  btnRestart.addEventListener('click', hardRestart);
 
   btnStart.addEventListener('click', () => {
+    clearStartError();
     const name = (elStudentName.value || '').trim();
     if(name.length < 2){
-      setFeedback('bad', 'Name required', 'Enter your name to begin.');
-      elFeedback.style.display = 'block';
+      showStartError("Name required", "Enter your name to begin.");
       return;
     }
-    state.name = name;
-    const start = new Date();
-    state.startedAtISO = start.toISOString();
-    state.startedAtMS = Date.now();
-    state.idx = 0;
-    state.attempts = 0;
-    state.correct = 0;
-    save();
+    studentName = name;
+    startTime = new Date();
 
-    elNameBox.style.display = 'none';
-    elPlayBox.style.display = '';
+    idx = 0;
+    attempts = 0;
+    correct = 0;
+
+    startClock();
+
+    startScreen.style.display = "none";
+    finishBox.style.display = "none";
+    playBox.style.display = "";
+
     initItem();
+    updateStats();
   });
 
-  // Resume saved
-  if(load()){
-    elStudentName.value = state.name || '';
-    elNameBox.style.display = 'none';
-    elPlayBox.style.display = '';
-    initItem();
-  }
+  elStudentName.addEventListener('keydown', (e)=>{
+    if(e.key === "Enter") btnStart.click();
+  });
 
+  // initial stats display
+  elQpos.textContent = `0 / ${QUESTIONS.length}`;
+  elAcc.textContent = "—";
+  elRuntime.textContent = "00:00";
 })();
-  // ===== Restart + Back/Forward Cache Fix =====
-// When a user returns to this page via the Back button,
-// Chrome may restore the old "finished" state from bfcache.
-// This forces a clean reload so the game starts fresh.
-window.addEventListener("pageshow", (e) => {
-  if (e.persisted) window.location.reload();
-});
-
-function restartGame(){
-  // If you ever add persistence later, clear it here:
-  // localStorage.removeItem("LEGEND_STATE:" + location.pathname);
-  // sessionStorage.removeItem("LEGEND_STATE:" + location.pathname);
-
-  window.location.reload();
-}
-
 </script>
 </body>
 </html>
