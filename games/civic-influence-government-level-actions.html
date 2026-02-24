@@ -79,7 +79,7 @@
     .stat .small{font-size:12px; color:var(--muted); margin-top:2px}
 
     .qtitle{margin:10px 0 6px; font-size:18px}
-    .qtext{color:var(--text); line-height:1.4; margin:0 0 12px}
+    .qtext{color:var(--text); line-height:1.4; margin:0 0 12px; white-space:pre-wrap}
 
     .opts{display:grid; gap:10px; margin-top:10px}
     .optbtn{
@@ -203,6 +203,14 @@
       margin-top:8px;
       word-break:break-word;
     }
+
+    .summary{
+      margin-top:12px;
+      border:1px solid var(--line);
+      background:rgba(255,255,255,.02);
+      border-radius:14px;
+      padding:12px;
+    }
   </style>
 </head>
 
@@ -292,8 +300,20 @@
         <div id="finishBox" style="display:none;">
           <h2 class="qtitle">Finish</h2>
           <p class="qtext">
-            If you have <b>100% accuracy</b>, you’ll receive a submission ticket. If not, you must reset and replay for mastery.
+            Finish screen always shows your name + date + start/end + runtime. Ticket appears only if you have <b>100% accuracy</b> (0 misses).
           </p>
+
+          <div id="finishSummary" class="summary">
+            <div><b>Attempt Summary</b></div>
+            <div class="muted" style="margin-top:6px;line-height:1.35">
+              Name: <span id="sName"></span><br/>
+              Date: <span id="sDate"></span><br/>
+              Start: <span id="sStart"></span><br/>
+              End: <span id="sEnd"></span><br/>
+              Runtime: <span id="sRun"></span><br/>
+              Accuracy: <span id="sAcc"></span>
+            </div>
+          </div>
 
           <div id="finishMsg" class="msg warn" style="display:block;">
             <div class="t" id="finishTitle">Checking mastery…</div>
@@ -391,6 +411,34 @@
   };
   const base36 = (n) => n.toString(36).toUpperCase();
 
+  function escapeHtml(s){
+    return String(s)
+      .replaceAll('&','&amp;')
+      .replaceAll('<','&lt;')
+      .replaceAll('>','&gt;')
+      .replaceAll('"','&quot;')
+      .replaceAll("'","&#039;");
+  }
+
+  // Deterministic-ish shuffle for MCQ option order (varies by question + run)
+  function mulberry32(seed){
+    return function(){
+      let t = seed += 0x6D2B79F5;
+      t = Math.imul(t ^ (t >>> 15), t | 1);
+      t ^= t + Math.imul(t ^ (t >>> 7), t | 61);
+      return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
+    };
+  }
+  function shuffledIndices(n, seed){
+    const idx = Array.from({length:n}, (_,i)=>i);
+    const rnd = mulberry32(seed >>> 0);
+    for(let i=n-1;i>0;i--){
+      const j = Math.floor(rnd()*(i+1));
+      [idx[i], idx[j]] = [idx[j], idx[i]];
+    }
+    return idx;
+  }
+
   // ---------- State ----------
   const STORAGE_KEY = 'GOV_OST_CIVIC_ACTIONS_V1';
   let state = {
@@ -400,473 +448,472 @@
     idx: 0,
     attempts: 0,
     correct: 0,
-    missed: 0
+    missed: 0,
+    // a run-seed so the same student doesn't always see the same correct letter per item
+    runSeed: 0
   };
 
   // ---------- Released items (verbatim) ----------
- const QUESTIONS = [
-  // =========================
-  // RELEASED (verbatim)
-  // =========================
-  {
-    id: 'Q9_GA_TEACHERS',
-    type: 'mcq',
-    title: 'Civic Influence — State Legislature (Released)',
-    prompt:
+  const QUESTIONS = [
+    // =========================
+    // RELEASED (verbatim)
+    // =========================
+    {
+      id: 'Q9_GA_TEACHERS',
+      type: 'mcq',
+      title: 'Civic Influence — State Legislature (Released)',
+      prompt:
 `The Ohio General Assembly is considering a bill that would reduce the amount of tax revenue allocated to local school systems. A group of teachers is opposed to the passage of this bill. What would be the MOST effective action that the teachers' group could take to influence the General Assembly's vote on this bill?`,
-    options: [
-      'Filing an appeal with the State Supreme Court',
-      'Starting a letter writing campaign to state legislators',
-      'Offering comments during local city council meetings',
-      'Holding public demonstrations in front of the White House'
-    ],
-    answerIndex: 1,
-    hint: 'State legislature → contact state legislators directly.',
-    explain: 'Correct: a letter writing campaign to state legislators directly targets the decision-makers.'
-  },
-  {
-    id: 'Q10_JEFF_LOCAL_STATE',
-    type: 'grid_single_per_row',
-    title: 'Government Level — Local vs State (Released)',
-    prompt:
+      options: [
+        'Filing an appeal with the State Supreme Court',
+        'Starting a letter writing campaign to state legislators',
+        'Offering comments during local city council meetings',
+        'Holding public demonstrations in front of the White House'
+      ],
+      answerIndex: 1,
+      hint: 'State legislature → contact state legislators directly.',
+      explain: 'Correct: a letter writing campaign to state legislators directly targets the decision-makers.'
+    },
+    {
+      id: 'Q10_JEFF_LOCAL_STATE',
+      type: 'grid_single_per_row',
+      title: 'Government Level — Local vs State (Released)',
+      prompt:
 `Jeff wants to make sure that emergency services are adequately supported in his town and across the state of Ohio. Select the boxes to identify whether Jeff would take the action at the local or state level.`,
-    grid: {
-      columns: ['Local', 'State'],
-      rows: [
-        { source: 'Serve in a volunteer fire department', correctCol: 0 },
-        { source: 'Organize a charity event to raise money for his town’s police force', correctCol: 0 },
-        { source: 'Meet with the town’s mayor to discuss the emergency services budget', correctCol: 0 },
-        { source: 'Run for the General Assembly on a platform of improved emergency services', correctCol: 1 },
-        { source: 'Sign a petition to bring the issue of emergency services to the governor’s attention', correctCol: 1 }
-      ]
+      grid: {
+        columns: ['Local', 'State'],
+        rows: [
+          { source: 'Serve in a volunteer fire department', correctCol: 0 },
+          { source: 'Organize a charity event to raise money for his town’s police force', correctCol: 0 },
+          { source: 'Meet with the town’s mayor to discuss the emergency services budget', correctCol: 0 },
+          { source: 'Run for the General Assembly on a platform of improved emergency services', correctCol: 1 },
+          { source: 'Sign a petition to bring the issue of emergency services to the governor’s attention', correctCol: 1 }
+        ]
+      },
+      hint: 'Mayor/town services = local. General Assembly/Governor = state.',
+      explain: 'Correct: local actions involve town officials/services; state actions involve the governor/General Assembly.'
     },
-    hint: 'Mayor/town services = local. General Assembly/Governor = state.',
-    explain: 'Correct: local actions involve town officials/services; state actions involve the governor/General Assembly.'
-  },
-  {
-    id: 'Q13_MATCH_SITUATION_STEP',
-    type: 'grid_single_per_row',
-    title: 'Match: Situation → Appropriate Civic Step (Released)',
-    prompt:
+    {
+      id: 'Q13_MATCH_SITUATION_STEP',
+      type: 'grid_single_per_row',
+      title: 'Match: Situation → Appropriate Civic Step (Released)',
+      prompt:
 `Several situations are described in which citizens are dissatisfied with public policy. Select the boxes to match the situation with the appropriate step for a citizen to take.`,
-    grid: {
-      columns: [
-        'Write letters to the governor and members of the General Assembly',
-        'Campaign for a challenger running against a current U.S. senator',
-        'Sign a petition that will be sent to the president',
-        'Speak at a city council meeting'
-      ],
-      rows: [
-        { source: 'A citizen disagrees with an executive order that impacts national foreign policy', correctCol: 2 },
-        { source: 'A citizen believes that a new playground should be built in a neighborhood park', correctCol: 3 },
-        { source: 'A citizen fears the environmental impact of a state road construction project', correctCol: 0 },
-        { source: 'A citizen believes that her views are being poorly represented at the congressional level', correctCol: 1 }
-      ]
+      grid: {
+        columns: [
+          'Write letters to the governor and members of the General Assembly',
+          'Campaign for a challenger running against a current U.S. senator',
+          'Sign a petition that will be sent to the president',
+          'Speak at a city council meeting'
+        ],
+        rows: [
+          { source: 'A citizen disagrees with an executive order that impacts national foreign policy', correctCol: 2 },
+          { source: 'A citizen believes that a new playground should be built in a neighborhood park', correctCol: 3 },
+          { source: 'A citizen fears the environmental impact of a state road construction project', correctCol: 0 },
+          { source: 'A citizen believes that her views are being poorly represented at the congressional level', correctCol: 1 }
+        ]
+      },
+      hint: 'Match by level: president/national, city/local, governor/GA state, Congress/campaign.',
+      explain: 'Correct: each scenario aligns with the official/government level most connected to the policy.'
     },
-    hint: 'Match by level: president/national, city/local, governor/GA state, Congress/campaign.',
-    explain: 'Correct: each scenario aligns with the official/government level most connected to the policy.'
-  },
-  {
-    id: 'Q23_PARK_MAINTENANCE',
-    type: 'mcq',
-    title: 'Community Action — Local Problem (Released)',
-    prompt:
+    {
+      id: 'Q23_PARK_MAINTENANCE',
+      type: 'mcq',
+      title: 'Community Action — Local Problem (Released)',
+      prompt:
 `A town council faces budget cuts and can no longer afford to pay for landscaping in town parks. How can a citizen work within his or her own communities or the local government address this problem?`,
-    options: [
-      'By emailing Ohio congressional delegation to inform them of the issue',
-      'By organizing a group of residents to volunteer for weekly park maintenance',
-      'By requesting that the governor supply the town with state funds for park maintenance',
-      'By running for a seat in the general assembly with a promise to increase funding for local parks'
-    ],
-    answerIndex: 1,
-    hint: 'Local problem → local volunteer/community action.',
-    explain: 'Correct: organizing residents to volunteer is the most direct community-level solution.'
-  },
-  {
-    id: 'Q49_PUBLIC_COMMENT_ORDINANCE',
-    type: 'mcq',
-    title: 'Public Meeting — Influence Local Policy (Released)',
-    prompt:
-`Marla’s local government is considering an ordinance that would require all residents to separate their trash into two containers before putting it out for collection. Marla thinks this is a good idea. Which action could Marla take to most effectively encourage the passage of this ordinance?`,
-    options: [
-      'Writing to her United States senators to express her opinion and urge them to vote',
-      'Attending a public comment session of the city council and giving reasons for her support',
-      'Volunteering to work on the campaign of a candidate for governor who supports recycling',
-      'Organizing people in her community to express their support to the Ohio General Assembly'
-    ],
-    answerIndex: 1,
-    hint: 'Local ordinance → city council public comment.',
-    explain: 'Correct: city council public comment directly targets the decision-makers.'
-  },
-  {
-    id: 'GOV17_NEW2025',
-    type: 'mcq',
-    title: 'GOV.17 — Civic Participation (Released)',
-    prompt:
-`How can citizens directly help local government authorities?`,
-    options: [
-      'paying federal taxes',
-      'enlisting in National Guard',
-      'joining neighborhood civic organizations',
-      'delivering a petition to state legislature'
-    ],
-    answerIndex: 2,
-    hint: 'Local authorities are helped most by local community organizations.',
-    explain: 'Correct: joining neighborhood civic organizations directly supports local government efforts.'
-  },
-  {
-    id: 'GOV19_NEW2025',
-    type: 'mcq',
-    title: 'GOV.19 — Public Policy Influence (Released)',
-    prompt:
-`Which action would effectively influence local officials?`,
-    options: [
-      'file brief at Ohio Supreme Court',
-      'testify before Congress',
-      'offer comments at city council public meeting',
-      'campaign for governor'
-    ],
-    answerIndex: 2,
-    hint: 'Direct, accessible influence → public comment at a meeting.',
-    explain: 'Correct: offering comments at a city council public meeting is an effective influence method.'
-  },
-  {
-    id: 'Q166_STATEWIDE_BALLOT',
-    type: 'mcq',
-    title: 'Statewide Action — Ballot Issues (Released)',
-    prompt:
-`How can a citizen become involved in addressing problems that affect the entire state?`,
-    options: [
-      'By joining a community watch group',
-      'By volunteering for the fire department',
-      'By signing petitions to place issues on the ballot',
-      'By attending a meeting of the local school board'
-    ],
-    answerIndex: 2,
-    hint: 'Entire state → ballot initiative/petition process.',
-    explain: 'Correct: petitions to place issues on the ballot address statewide issues.'
-  },
-  {
-    id: 'Q172_SKATEPARK_LOCAL',
-    type: 'mcq',
-    title: 'Local Decision — City-Owned Land (Released)',
-    prompt:
-`Your city is debating whether to install a skateboard park on city-owned land. You want to support the park. Which method would be effective in helping to determine public policy on this decision?`,
-    options: [
-      'Participate in the governor’s re-election campaign',
-      'Send an email to your U.S. senators expressing your point of view',
-      'Attend the meeting of the city council and present the benefits of a park',
-      'Organize a letter-writing campaign to members of the Ohio General Assembly'
-    ],
-    answerIndex: 2,
-    hint: 'City-owned land → city council.',
-    explain: 'Correct: attending city council and presenting benefits targets the local policymakers.'
-  },
-
-  // Extra RELEASED grid that fits this game’s theme
-  {
-    id: 'Q19_Q142_STATE_LOCAL_OPPORTUNITIES',
-    type: 'grid_single_per_row',
-    title: 'Participation Opportunities — State vs Local (Released)',
-    prompt:
-`Citizens of Ohio have a variety of options available to them for participation in state and local government. Select the proper box for each opportunity from the examples listed.`,
-    grid: {
-      columns: ['State Government', 'Local Government'],
-      rows: [
-        { source: 'Attend city and/or township trustee meetings', correctCol: 1 },
-        { source: 'Serve in the National Guard', correctCol: 0 },
-        { source: 'Organize a neighborhood watch', correctCol: 1 },
-        { source: 'Vote for Governor', correctCol: 0 }
-      ]
-    },
-    hint: 'City/township + neighborhood watch = local. National Guard + governor = state.',
-    explain: 'Correct: classify each civic opportunity by the level of government most connected to it.'
-  },
-
-  // =========================
-  // STANDARDS-SUPPLEMENTED (CS 1 / 17 / 19) to reach 25
-  // =========================
-  {
-    id: 'CS1_SUPP_01',
-    type: 'mcq',
-    title: 'Action Plan — Identify the Issue',
-    prompt:
-`A student group wants safer crosswalks near the high school. What should they do FIRST to begin a civic action plan?`,
-    options: [
-      'Start a protest without researching',
-      'Identify the problem clearly and gather information about where/when accidents occur',
-      'Skip local officials and contact the president',
-      'Demand an immediate vote in Congress'
-    ],
-    answerIndex: 1,
-    hint: 'CS1 starts with identifying and researching the issue.',
-    explain: 'Correct: a strong civic plan begins by clearly identifying the issue and collecting relevant information.'
-  },
-  {
-    id: 'CS1_SUPP_02',
-    type: 'mcq',
-    title: 'Public Policy Process vs Political Process',
-    prompt:
-`A resident wants a city to add a stop sign at a dangerous intersection. Which approach MOST directly uses the public policy process?`,
-    options: [
-      'Campaign for a candidate for Congress',
-      'Attend a city council meeting and request the traffic study be added to the agenda',
-      'Create a national political party',
-      'Run for president'
-    ],
-    answerIndex: 1,
-    hint: 'Public policy process = institutional procedures to address the issue.',
-    explain: 'Correct: working through city procedures (agenda/traffic study/council) is the public policy process.'
-  },
-  {
-    id: 'CS19_SUPP_01',
-    type: 'mcq',
-    title: 'Influence Through Testimony',
-    prompt:
-`A state committee is holding a hearing on a proposed education policy. Which action would MOST directly influence the policy decision?`,
-    options: [
-      'Submit testimony or speak at the committee hearing',
-      'Only post about it on social media',
-      'Complain to friends privately',
-      'Write a letter to a mayor in another state'
-    ],
-    answerIndex: 0,
-    hint: 'Direct influence happens during hearings/decision points.',
-    explain: 'Correct: testimony at a hearing directly reaches policymakers when decisions are being made.'
-  },
-  {
-    id: 'CS17_SUPP_01',
-    type: 'mcq',
-    title: 'Helping Local Government Solve Problems',
-    prompt:
-`A community has repeated flooding after heavy rains. Which citizen action BEST reflects helping local government address a community problem?`,
-    options: [
-      'Ignore the problem because it is controversial',
-      'Join a neighborhood civic organization working with the city on drainage solutions',
-      'Ask Congress to rewrite the U.S. Constitution',
-      'Vote in another state’s election'
-    ],
-    answerIndex: 1,
-    hint: 'CS17 emphasizes assisting state/local governments with community problems.',
-    explain: 'Correct: organized community involvement working with local authorities supports problem solving.'
-  },
-  {
-    id: 'CS19_SUPP_02',
-    type: 'mcq',
-    title: 'Best Target: Federal vs State vs Local',
-    prompt:
-`A resident wants the city to change bus routes to better serve neighborhoods. Which official or body is the BEST target?`,
-    options: [
-      'U.S. Supreme Court',
-      'City council or local transit authority',
-      'Governor of a different state',
-      'President of the United States'
-    ],
-    answerIndex: 1,
-    hint: 'Bus routes are typically managed locally.',
-    explain: 'Correct: local transit authorities/city government are most connected to route decisions.'
-  },
-  {
-    id: 'CS1_SUPP_03',
-    type: 'mcq',
-    title: 'Costs and Benefits',
-    prompt:
-`A town is choosing between building a new community center or renovating the old one. What action best matches “weighing costs and benefits” in a civic plan?`,
-    options: [
-      'Only consider which option is newer',
-      'Compare projected costs, long-term maintenance, and community needs for each option',
-      'Choose based on a rumor',
-      'Pick whichever idea has the loudest supporters'
-    ],
-    answerIndex: 1,
-    hint: 'Costs/benefits = compare data and consequences.',
-    explain: 'Correct: weighing costs/benefits requires comparing projected costs and consequences for each option.'
-  },
-  {
-    id: 'CS19_SUPP_03',
-    type: 'mcq',
-    title: 'Most Effective Advocacy Tool',
-    prompt:
-`A student wants a school board to consider a new policy. Which is MOST effective?`,
-    options: [
-      'Attend the school board meeting and present a clear, evidence-based proposal during public comment',
-      'Only complain on social media',
-      'Contact the Secretary of State for another state',
-      'File a lawsuit immediately with no attempt to engage'
-    ],
-    answerIndex: 0,
-    hint: 'Direct participation in the relevant meeting is strongest.',
-    explain: 'Correct: public comment + evidence-based proposal directly engages the decision-makers.'
-  },
-  {
-    id: 'CS17_SUPP_02',
-    type: 'mcq',
-    title: 'Local Volunteering and Services',
-    prompt:
-`A city struggles to keep a community park clean due to staffing shortages. Which action BEST supports local government services?`,
-    options: [
-      'Organize a volunteer cleanup group that coordinates with the parks department',
-      'Petition Congress to change foreign policy',
-      'Campaign for a U.S. senator',
-      'Ask the Supreme Court to create a new law'
-    ],
-    answerIndex: 0,
-    hint: 'Local service gap → coordinated local volunteer support.',
-    explain: 'Correct: coordinated volunteer support helps local government provide services.'
-  },
-  {
-    id: 'CS19_SUPP_04',
-    type: 'mcq',
-    title: 'Influence Through Elections',
-    prompt:
-`A citizen believes their state representative ignores community concerns. Which action is MOST connected to influencing policy through the political process?`,
-    options: [
-      'Campaign for a challenger in the next election',
-      'Only watch the news',
-      'Move to another city without contacting anyone',
-      'Write to the United Nations'
-    ],
-    answerIndex: 0,
-    hint: 'Political process = elections and gaining office.',
-    explain: 'Correct: campaigning for a challenger uses elections to influence who makes policy.'
-  },
-  {
-    id: 'CS1_SUPP_04',
-    type: 'mcq',
-    title: 'Choose the Correct Level of Government',
-    prompt:
-`A resident wants the state to change driver licensing requirements. Which action is MOST appropriate?`,
-    options: [
-      'Attend a city council meeting in a different town',
-      'Contact state legislators or the governor about changing state law',
-      'Ask a school principal to rewrite state law',
-      'Petition a foreign government'
-    ],
-    answerIndex: 1,
-    hint: 'State licensing rules → state government.',
-    explain: 'Correct: state legislators/governor are responsible for state laws and regulations.'
-  },
-  {
-    id: 'CS19_SUPP_05',
-    type: 'grid_single_per_row',
-    title: 'Match the Issue to the Best Action',
-    prompt:
-`Select the box that shows the BEST action to influence the policy decision in each situation.`,
-    grid: {
-      columns: [
-        'Speak at a city council meeting',
-        'Write to a state representative',
-        'Contact a member of Congress',
-        'File a lawsuit immediately'
+      options: [
+        'By emailing Ohio congressional delegation to inform them of the issue',
+        'By organizing a group of residents to volunteer for weekly park maintenance',
+        'By requesting that the governor supply the town with state funds for park maintenance',
+        'By running for a seat in the general assembly with a promise to increase funding for local parks'
       ],
-      rows: [
-        { source: 'Your city is deciding whether to add bike lanes on city streets', correctCol: 0 },
-        { source: 'Ohio is debating a statewide education funding change', correctCol: 1 },
-        { source: 'A federal law is proposed about national internet privacy rules', correctCol: 2 },
-        { source: 'A policy clearly violates constitutional rights and caused direct harm', correctCol: 3 }
-      ]
+      answerIndex: 1,
+      hint: 'Local problem → local volunteer/community action.',
+      explain: 'Correct: organizing residents to volunteer is the most direct community-level solution.'
     },
-    hint: 'Pick the level that controls the issue; lawsuits are for rights violations/harm.',
-    explain: 'Correct: match the action to the level and type of decision being made.'
-  },
-  {
-    id: 'CS1_SUPP_05',
-    type: 'mcq',
-    title: 'Implementing the Plan',
-    prompt:
-`After researching and proposing solutions, what step BEST represents “implementing” a civic plan?`,
-    options: [
-      'Doing nothing after creating a plan',
-      'Scheduling meetings, contacting officials, and carrying out the chosen action steps',
-      'Only debating the issue forever',
-      'Waiting for someone else to act'
-    ],
-    answerIndex: 1,
-    hint: 'Implementation = carry out steps.',
-    explain: 'Correct: implementation means taking the planned actions, not just planning them.'
-  },
-  {
-    id: 'CS17_SUPP_03',
-    type: 'mcq',
-    title: 'Controversial Local Issue',
-    prompt:
-`A town is debating where to locate a new homeless shelter. Which action BEST reflects responsible citizen assistance to local government?`,
-    options: [
-      'Spread rumors to increase tension',
-      'Attend meetings, use credible information, and propose workable solutions respectfully',
-      'Refuse to listen to other perspectives',
-      'Only post insults online'
-    ],
-    answerIndex: 1,
-    hint: 'Assist by engaging constructively with evidence and solutions.',
-    explain: 'Correct: constructive participation helps local officials address controversial problems.'
-  },
-  {
-    id: 'CS19_SUPP_06',
-    type: 'mcq',
-    title: 'Most Effective Message',
-    prompt:
-`A citizen wants to persuade a city council member to support a policy. Which message is MOST likely to be effective?`,
-    options: [
-      'A message with threats and no facts',
-      'A respectful message with specific evidence, local impacts, and a clear request',
-      'A message that avoids any details',
-      'A message that only uses name-calling'
-    ],
-    answerIndex: 1,
-    hint: 'Evidence + local impact + clear request.',
-    explain: 'Correct: respectful, evidence-based communication is most persuasive and useful to officials.'
-  },
-  {
-    id: 'CS1_SUPP_06',
-    type: 'mcq',
-    title: 'Consequences of Solutions',
-    prompt:
-`Students propose banning cars near the school to improve safety. Which step BEST fits “examine possible consequences”?`,
-    options: [
-      'Assume there are no downsides',
-      'Consider traffic reroutes, bus access, and impacts on nearby businesses and residents',
-      'Ignore how people will get to school',
-      'Only focus on one group’s opinion'
-    ],
-    answerIndex: 1,
-    hint: 'Consequences = who is affected and how.',
-    explain: 'Correct: examining consequences requires considering impacts on multiple groups and logistics.'
-  },
-  {
-    id: 'CS19_SUPP_07',
-    type: 'mcq',
-    title: 'Petitions as Influence',
-    prompt:
-`A group wants the state government to take action on a statewide issue. Which use of a petition is MOST appropriate?`,
-    options: [
-      'A petition delivered to the city dog warden',
-      'A petition sent to state officials or used to support a statewide ballot effort',
-      'A petition posted with no signatures',
-      'A petition sent to a foreign leader'
-    ],
-    answerIndex: 1,
-    hint: 'State issue → state officials/ballot process.',
-    explain: 'Correct: petitions can influence state officials or support statewide ballot efforts.'
-  },
-  {
-    id: 'CS17_SUPP_04',
-    type: 'mcq',
-    title: 'Local Emergency Preparedness',
-    prompt:
-`Which action BEST supports local government preparedness for emergencies?`,
-    options: [
-      'Volunteer with local emergency response training programs and share accurate preparedness information',
-      'Only criticize local officials without offering solutions',
-      'Ignore emergency alerts',
-      'Wait for federal officials to handle local emergencies'
-    ],
-    answerIndex: 0,
-    hint: 'Local preparedness improves with trained volunteers and accurate information.',
-    explain: 'Correct: trained volunteer support and community preparedness help local authorities respond effectively.'
-  }
-];
+    {
+      id: 'Q49_PUBLIC_COMMENT_ORDINANCE',
+      type: 'mcq',
+      title: 'Public Meeting — Influence Local Policy (Released)',
+      prompt:
+`Marla’s local government is considering an ordinance that would require all residents to separate their trash into two containers before putting it out for collection. Marla thinks this is a good idea. Which action could Marla take to most effectively encourage the passage of this ordinance?`,
+      options: [
+        'Writing to her United States senators to express her opinion and urge them to vote',
+        'Attending a public comment session of the city council and giving reasons for her support',
+        'Volunteering to work on the campaign of a candidate for governor who supports recycling',
+        'Organizing people in her community to express their support to the Ohio General Assembly'
+      ],
+      answerIndex: 1,
+      hint: 'Local ordinance → city council public comment.',
+      explain: 'Correct: city council public comment directly targets the decision-makers.'
+    },
+    {
+      id: 'GOV17_NEW2025',
+      type: 'mcq',
+      title: 'GOV.17 — Civic Participation (Released)',
+      prompt:
+`How can citizens directly help local government authorities?`,
+      options: [
+        'paying federal taxes',
+        'enlisting in National Guard',
+        'joining neighborhood civic organizations',
+        'delivering a petition to state legislature'
+      ],
+      answerIndex: 2,
+      hint: 'Local authorities are helped most by local community organizations.',
+      explain: 'Correct: joining neighborhood civic organizations directly supports local government efforts.'
+    },
+    {
+      id: 'GOV19_NEW2025',
+      type: 'mcq',
+      title: 'GOV.19 — Public Policy Influence (Released)',
+      prompt:
+`Which action would effectively influence local officials?`,
+      options: [
+        'file brief at Ohio Supreme Court',
+        'testify before Congress',
+        'offer comments at city council public meeting',
+        'campaign for governor'
+      ],
+      answerIndex: 2,
+      hint: 'Direct, accessible influence → public comment at a meeting.',
+      explain: 'Correct: offering comments at a city council public meeting is an effective influence method.'
+    },
+    {
+      id: 'Q166_STATEWIDE_BALLOT',
+      type: 'mcq',
+      title: 'Statewide Action — Ballot Issues (Released)',
+      prompt:
+`How can a citizen become involved in addressing problems that affect the entire state?`,
+      options: [
+        'By joining a community watch group',
+        'By volunteering for the fire department',
+        'By signing petitions to place issues on the ballot',
+        'By attending a meeting of the local school board'
+      ],
+      answerIndex: 2,
+      hint: 'Entire state → ballot initiative/petition process.',
+      explain: 'Correct: petitions to place issues on the ballot address statewide issues.'
+    },
+    {
+      id: 'Q172_SKATEPARK_LOCAL',
+      type: 'mcq',
+      title: 'Local Decision — City-Owned Land (Released)',
+      prompt:
+`Your city is debating whether to install a skateboard park on city-owned land. You want to support the park. Which method would be effective in helping to determine public policy on this decision?`,
+      options: [
+        'Participate in the governor’s re-election campaign',
+        'Send an email to your U.S. senators expressing your point of view',
+        'Attend the meeting of the city council and present the benefits of a park',
+        'Organize a letter-writing campaign to members of the Ohio General Assembly'
+      ],
+      answerIndex: 2,
+      hint: 'City-owned land → city council.',
+      explain: 'Correct: attending city council and presenting benefits targets the local policymakers.'
+    },
+    {
+      id: 'Q19_Q142_STATE_LOCAL_OPPORTUNITIES',
+      type: 'grid_single_per_row',
+      title: 'Participation Opportunities — State vs Local (Released)',
+      prompt:
+`Citizens of Ohio have a variety of options available to them for participation in state and local government. Select the proper box for each opportunity from the examples listed.`,
+      grid: {
+        columns: ['State Government', 'Local Government'],
+        rows: [
+          { source: 'Attend city and/or township trustee meetings', correctCol: 1 },
+          { source: 'Serve in the National Guard', correctCol: 0 },
+          { source: 'Organize a neighborhood watch', correctCol: 1 },
+          { source: 'Vote for Governor', correctCol: 0 }
+        ]
+      },
+      hint: 'City/township + neighborhood watch = local. National Guard + governor = state.',
+      explain: 'Correct: classify each civic opportunity by the level of government most connected to it.'
+    },
 
+    // =========================
+    // STANDARDS-SUPPLEMENTED (CS 1 / 17 / 19)
+    // =========================
+    {
+      id: 'CS1_SUPP_01',
+      type: 'mcq',
+      title: 'Action Plan — Identify the Issue',
+      prompt:
+`A student group wants safer crosswalks near the high school. What should they do FIRST to begin a civic action plan?`,
+      options: [
+        'Start a protest without researching',
+        'Identify the problem clearly and gather information about where/when accidents occur',
+        'Skip local officials and contact the president',
+        'Demand an immediate vote in Congress'
+      ],
+      answerIndex: 1,
+      hint: 'CS1 starts with identifying and researching the issue.',
+      explain: 'Correct: a strong civic plan begins by clearly identifying the issue and collecting relevant information.'
+    },
+    {
+      id: 'CS1_SUPP_02',
+      type: 'mcq',
+      title: 'Public Policy Process vs Political Process',
+      prompt:
+`A resident wants a city to add a stop sign at a dangerous intersection. Which approach MOST directly uses the public policy process?`,
+      options: [
+        'Campaign for a candidate for Congress',
+        'Attend a city council meeting and request the traffic study be added to the agenda',
+        'Create a national political party',
+        'Run for president'
+      ],
+      answerIndex: 1,
+      hint: 'Public policy process = institutional procedures to address the issue.',
+      explain: 'Correct: working through city procedures (agenda/traffic study/council) is the public policy process.'
+    },
+    {
+      id: 'CS19_SUPP_01',
+      type: 'mcq',
+      title: 'Influence Through Testimony',
+      prompt:
+`A state committee is holding a hearing on a proposed education policy. Which action would MOST directly influence the policy decision?`,
+      options: [
+        'Submit testimony or speak at the committee hearing',
+        'Only post about it on social media',
+        'Complain to friends privately',
+        'Write a letter to a mayor in another state'
+      ],
+      answerIndex: 0,
+      hint: 'Direct influence happens during hearings/decision points.',
+      explain: 'Correct: testimony at a hearing directly reaches policymakers when decisions are being made.'
+    },
+    {
+      id: 'CS17_SUPP_01',
+      type: 'mcq',
+      title: 'Helping Local Government Solve Problems',
+      prompt:
+`A community has repeated flooding after heavy rains. Which citizen action BEST reflects helping local government address a community problem?`,
+      options: [
+        'Ignore the problem because it is controversial',
+        'Join a neighborhood civic organization working with the city on drainage solutions',
+        'Ask Congress to rewrite the U.S. Constitution',
+        'Vote in another state’s election'
+      ],
+      answerIndex: 1,
+      hint: 'CS17 emphasizes assisting state/local governments with community problems.',
+      explain: 'Correct: organized community involvement working with local authorities supports problem solving.'
+    },
+    {
+      id: 'CS19_SUPP_02',
+      type: 'mcq',
+      title: 'Best Target: Federal vs State vs Local',
+      prompt:
+`A resident wants the city to change bus routes to better serve neighborhoods. Which official or body is the BEST target?`,
+      options: [
+        'U.S. Supreme Court',
+        'City council or local transit authority',
+        'Governor of a different state',
+        'President of the United States'
+      ],
+      answerIndex: 1,
+      hint: 'Bus routes are typically managed locally.',
+      explain: 'Correct: local transit authorities/city government are most connected to route decisions.'
+    },
+    {
+      id: 'CS1_SUPP_03',
+      type: 'mcq',
+      title: 'Costs and Benefits',
+      prompt:
+`A town is choosing between building a new community center or renovating the old one. What action best matches “weighing costs and benefits” in a civic plan?`,
+      options: [
+        'Only consider which option is newer',
+        'Compare projected costs, long-term maintenance, and community needs for each option',
+        'Choose based on a rumor',
+        'Pick whichever idea has the loudest supporters'
+      ],
+      answerIndex: 1,
+      hint: 'Costs/benefits = compare data and consequences.',
+      explain: 'Correct: weighing costs/benefits requires comparing projected costs and consequences for each option.'
+    },
+    {
+      id: 'CS19_SUPP_03',
+      type: 'mcq',
+      title: 'Most Effective Advocacy Tool',
+      prompt:
+`A student wants a school board to consider a new policy. Which is MOST effective?`,
+      options: [
+        'Attend the school board meeting and present a clear, evidence-based proposal during public comment',
+        'Only complain on social media',
+        'Contact the Secretary of State for another state',
+        'File a lawsuit immediately with no attempt to engage'
+      ],
+      answerIndex: 0,
+      hint: 'Direct participation in the relevant meeting is strongest.',
+      explain: 'Correct: public comment + evidence-based proposal directly engages the decision-makers.'
+    },
+    {
+      id: 'CS17_SUPP_02',
+      type: 'mcq',
+      title: 'Local Volunteering and Services',
+      prompt:
+`A city struggles to keep a community park clean due to staffing shortages. Which action BEST supports local government services?`,
+      options: [
+        'Organize a volunteer cleanup group that coordinates with the parks department',
+        'Petition Congress to change foreign policy',
+        'Campaign for a U.S. senator',
+        'Ask the Supreme Court to create a new law'
+      ],
+      answerIndex: 0,
+      hint: 'Local service gap → coordinated local volunteer support.',
+      explain: 'Correct: coordinated volunteer support helps local government provide services.'
+    },
+    {
+      id: 'CS19_SUPP_04',
+      type: 'mcq',
+      title: 'Influence Through Elections',
+      prompt:
+`A citizen believes their state representative ignores community concerns. Which action is MOST connected to influencing policy through the political process?`,
+      options: [
+        'Campaign for a challenger in the next election',
+        'Only watch the news',
+        'Move to another city without contacting anyone',
+        'Write to the United Nations'
+      ],
+      answerIndex: 0,
+      hint: 'Political process = elections and gaining office.',
+      explain: 'Correct: campaigning for a challenger uses elections to influence who makes policy.'
+    },
+    {
+      id: 'CS1_SUPP_04',
+      type: 'mcq',
+      title: 'Choose the Correct Level of Government',
+      prompt:
+`A resident wants the state to change driver licensing requirements. Which action is MOST appropriate?`,
+      options: [
+        'Attend a city council meeting in a different town',
+        'Contact state legislators or the governor about changing state law',
+        'Ask a school principal to rewrite state law',
+        'Petition a foreign government'
+      ],
+      answerIndex: 1,
+      hint: 'State licensing rules → state government.',
+      explain: 'Correct: state legislators/governor are responsible for state laws and regulations.'
+    },
+    {
+      id: 'CS19_SUPP_05',
+      type: 'grid_single_per_row',
+      title: 'Match the Issue to the Best Action',
+      prompt:
+`Select the box that shows the BEST action to influence the policy decision in each situation.`,
+      grid: {
+        columns: [
+          'Speak at a city council meeting',
+          'Write to a state representative',
+          'Contact a member of Congress',
+          'File a lawsuit immediately'
+        ],
+        rows: [
+          { source: 'Your city is deciding whether to add bike lanes on city streets', correctCol: 0 },
+          { source: 'Ohio is debating a statewide education funding change', correctCol: 1 },
+          { source: 'A federal law is proposed about national internet privacy rules', correctCol: 2 },
+          { source: 'A policy clearly violates constitutional rights and caused direct harm', correctCol: 3 }
+        ]
+      },
+      hint: 'Pick the level that controls the issue; lawsuits are for rights violations/harm.',
+      explain: 'Correct: match the action to the level and type of decision being made.'
+    },
+    {
+      id: 'CS1_SUPP_05',
+      type: 'mcq',
+      title: 'Implementing the Plan',
+      prompt:
+`After researching and proposing solutions, what step BEST represents “implementing” a civic plan?`,
+      options: [
+        'Doing nothing after creating a plan',
+        'Scheduling meetings, contacting officials, and carrying out the chosen action steps',
+        'Only debating the issue forever',
+        'Waiting for someone else to act'
+      ],
+      answerIndex: 1,
+      hint: 'Implementation = carry out steps.',
+      explain: 'Correct: implementation means taking the planned actions, not just planning them.'
+    },
+    {
+      id: 'CS17_SUPP_03',
+      type: 'mcq',
+      title: 'Controversial Local Issue',
+      prompt:
+`A town is debating where to locate a new homeless shelter. Which action BEST reflects responsible citizen assistance to local government?`,
+      options: [
+        'Spread rumors to increase tension',
+        'Attend meetings, use credible information, and propose workable solutions respectfully',
+        'Refuse to listen to other perspectives',
+        'Only post insults online'
+      ],
+      answerIndex: 1,
+      hint: 'Assist by engaging constructively with evidence and solutions.',
+      explain: 'Correct: constructive participation helps local officials address controversial problems.'
+    },
+    {
+      id: 'CS19_SUPP_06',
+      type: 'mcq',
+      title: 'Most Effective Message',
+      prompt:
+`A citizen wants to persuade a city council member to support a policy. Which message is MOST likely to be effective?`,
+      options: [
+        'A message with threats and no facts',
+        'A respectful message with specific evidence, local impacts, and a clear request',
+        'A message that avoids any details',
+        'A message that only uses name-calling'
+      ],
+      answerIndex: 1,
+      hint: 'Evidence + local impact + clear request.',
+      explain: 'Correct: respectful, evidence-based communication is most persuasive and useful to officials.'
+    },
+    {
+      id: 'CS1_SUPP_06',
+      type: 'mcq',
+      title: 'Consequences of Solutions',
+      prompt:
+`Students propose banning cars near the school to improve safety. Which step BEST fits “examine possible consequences”?`,
+      options: [
+        'Assume there are no downsides',
+        'Consider traffic reroutes, bus access, and impacts on nearby businesses and residents',
+        'Ignore how people will get to school',
+        'Only focus on one group’s opinion'
+      ],
+      answerIndex: 1,
+      hint: 'Consequences = who is affected and how.',
+      explain: 'Correct: examining consequences requires considering impacts on multiple groups and logistics.'
+    },
+    {
+      id: 'CS19_SUPP_07',
+      type: 'mcq',
+      title: 'Petitions as Influence',
+      prompt:
+`A group wants the state government to take action on a statewide issue. Which use of a petition is MOST appropriate?`,
+      options: [
+        'A petition delivered to the city dog warden',
+        'A petition sent to state officials or used to support a statewide ballot effort',
+        'A petition posted with no signatures',
+        'A petition sent to a foreign leader'
+      ],
+      answerIndex: 1,
+      hint: 'State issue → state officials/ballot process.',
+      explain: 'Correct: petitions can influence state officials or support statewide ballot efforts.'
+    },
+    {
+      id: 'CS17_SUPP_04',
+      type: 'mcq',
+      title: 'Local Emergency Preparedness',
+      prompt:
+`Which action BEST supports local government preparedness for emergencies?`,
+      options: [
+        'Volunteer with local emergency response training programs and share accurate preparedness information',
+        'Only criticize local officials without offering solutions',
+        'Ignore emergency alerts',
+        'Wait for federal officials to handle local emergencies'
+      ],
+      answerIndex: 0,
+      hint: 'Local preparedness improves with trained volunteers and accurate information.',
+      explain: 'Correct: trained volunteer support and community preparedness help local authorities respond effectively.'
+    }
+  ];
 
   // ---------- DOM ----------
   const elQpos = document.getElementById('qpos');
@@ -911,6 +958,14 @@
   const btnCopy = document.getElementById('btnCopy');
   const btnReset = document.getElementById('btnReset');
 
+  // finish summary (always shown)
+  const elSName = document.getElementById('sName');
+  const elSDate = document.getElementById('sDate');
+  const elSStart = document.getElementById('sStart');
+  const elSEnd = document.getElementById('sEnd');
+  const elSRun = document.getElementById('sRun');
+  const elSAcc = document.getElementById('sAcc');
+
   // ---------- Persistence ----------
   function save(){ localStorage.setItem(STORAGE_KEY, JSON.stringify(state)); }
   function load(){
@@ -926,18 +981,18 @@
   function clearSave(){ localStorage.removeItem(STORAGE_KEY); }
 
   // ---------- Stats ----------
+  function accuracyPct(){
+    return state.attempts ? Math.round((state.correct/state.attempts)*100) : 0;
+  }
   function updateStats(){
     const total = QUESTIONS.length;
     const pos = Math.min(state.idx+1, total);
     elQpos.textContent = `${pos} / ${total}`;
-
-    const acc = state.attempts ? Math.round((state.correct/state.attempts)*100) : 0;
-    elAcc.textContent = `${acc}%`;
-
+    elAcc.textContent = `${accuracyPct()}%`;
     const rt = state.startedAtMS ? (Date.now() - state.startedAtMS) : 0;
     elRuntime.textContent = msToHMS(rt);
   }
-  setInterval(() => updateStats(), 500);
+  setInterval(updateStats, 500);
 
   // ---------- UI helpers ----------
   function setFeedback(kind, title, body){
@@ -949,14 +1004,29 @@
     elFeedback.className = 'msg';
     elFbTitle.textContent = '';
     elFbBody.textContent = '';
-    elFeedback.style.display = 'none';
-    elFeedback.style.display = '';
   }
 
   function disableInputs(disabled){
     document.querySelectorAll('.optbtn').forEach(b => b.disabled = disabled);
     elGridQ.querySelectorAll('input[type="checkbox"]').forEach(cb => cb.disabled = disabled);
     btnSubmitGrid.disabled = disabled;
+  }
+
+  // ---------- Working (per-question) ----------
+  let working = {
+    mcqOrder: null,      // array of original option indices in display order
+    mcqCorrectShown: -1  // the displayed index that is correct (after shuffling)
+  };
+
+  function prepareMCQOrder(q){
+    // Keep the same order while the student retries the same question
+    // (don’t reshuffle on every click/submit).
+    const seed = hash32(`${q.id}|${state.runSeed}|${state.startedAtISO || ''}`) ^ 0xA53C9E21;
+    const order = shuffledIndices(q.options.length, seed);
+    working.mcqOrder = order;
+
+    // Convert original correct index -> displayed correct index
+    working.mcqCorrectShown = order.indexOf(q.answerIndex);
   }
 
   function showQuestion(){
@@ -972,15 +1042,22 @@
     elMcqBox.style.display = 'none';
     elGridBox.style.display = 'none';
 
+    // reset working for this item
+    working = { mcqOrder: null, mcqCorrectShown: -1 };
+
     if(q.type === 'mcq'){
       elMcqBox.style.display = '';
       elOpts.innerHTML = '';
+
+      prepareMCQOrder(q);
+
       const letters = ['A','B','C','D','E','F','G','H'];
-      q.options.forEach((text, i) => {
+      working.mcqOrder.forEach((origIdx, shownIdx) => {
+        const text = q.options[origIdx];
         const b = document.createElement('button');
         b.className = 'optbtn';
-        b.innerHTML = `<span class="ltr">${letters[i]}.</span>${escapeHtml(text)}`;
-        b.addEventListener('click', () => answerMCQ(i));
+        b.innerHTML = `<span class="ltr">${letters[shownIdx]}.</span>${escapeHtml(text)}`;
+        b.addEventListener('click', () => answerMCQ(shownIdx));
         elOpts.appendChild(b);
       });
     }
@@ -992,12 +1069,12 @@
       const cols = q.grid.columns;
       const rows = q.grid.rows;
 
-      // Grid template (1 prompt col + N choice cols)
       elGridQ.innerHTML = '';
 
       const hdr = document.createElement('div');
       hdr.className = 'hdr';
-      hdr.style.gridTemplateColumns = `${Math.max(280, Math.min(520, 0))}px repeat(${cols.length}, 1fr)`;
+      // 1 prompt col + N choice cols (simple, stable sizing)
+      hdr.style.gridTemplateColumns = `1.6fr repeat(${cols.length}, 1fr)`;
       hdr.innerHTML = `<div class="cell"></div>` + cols.map(c=>`<div class="cell">${escapeHtml(c)}</div>`).join('');
       elGridQ.appendChild(hdr);
 
@@ -1044,11 +1121,13 @@
   }
 
   // ---------- Answering ----------
-  function answerMCQ(choiceIdx){
+  function answerMCQ(shownChoiceIdx){
     const q = QUESTIONS[state.idx];
     state.attempts += 1;
 
-    const correct = (choiceIdx === q.answerIndex);
+    // compare against displayed-correct index (post-shuffle)
+    const correct = (shownChoiceIdx === working.mcqCorrectShown);
+
     if(correct){
       state.correct += 1;
       setFeedback('good', 'Correct ✅', q.explain);
@@ -1068,7 +1147,7 @@
 
   btnHint.addEventListener('click', () => {
     const q = QUESTIONS[state.idx];
-    setFeedback('warn', 'Hint 💡', q.hint);
+    setFeedback('warn', 'Hint 💡', q.hint || 'Look for the correct level of government and the most direct action.');
     btnHint.disabled = true;
   });
 
@@ -1122,15 +1201,27 @@
     elQuestionBox.style.display = 'none';
     elFinishBox.style.display = '';
 
-    const acc = state.attempts ? Math.round((state.correct/state.attempts)*100) : 0;
+    const acc = accuracyPct();
     const ended = now();
+    const start = new Date(state.startedAtISO);
+    const runMS = Date.now() - state.startedAtMS;
 
-    if(acc === 100 && state.attempts >= QUESTIONS.length){
+    // Always show summary timestamps (even if not mastery)
+    elSName.textContent = state.name;
+    elSDate.textContent = fmtDate(ended);
+    elSStart.textContent = fmtTime(start);
+    elSEnd.textContent = fmtTime(ended);
+    elSRun.textContent = msToHMS(runMS);
+    elSAcc.textContent = `${acc}%`;
+
+    // Mastery = 100% accuracy AND exactly one correct submission per item
+    // (i.e., no retries: attempts must equal total questions, and correct must equal total questions).
+    const total = QUESTIONS.length;
+    const mastery = (acc === 100 && state.attempts === total && state.correct === total);
+
+    if(mastery){
       elFinishTitle.textContent = 'Mastery achieved ✅';
-      elFinishBody.textContent = 'You finished with 100% accuracy. Screenshot the ticket (no cropping).';
-
-      const start = new Date(state.startedAtISO);
-      const runMS = Date.now() - state.startedAtMS;
+      elFinishBody.textContent = 'You finished with 100% accuracy (0 misses). Screenshot the ticket (no cropping).';
 
       elTName.textContent = state.name;
       elTDate.textContent = fmtDate(ended);
@@ -1139,7 +1230,7 @@
       elTRun.textContent = msToHMS(runMS);
       elTAcc.textContent = `${acc}%`;
 
-      const raw = `${state.name}|${state.startedAtISO}|${ended.toISOString()}|${state.correct}|${state.attempts}|${QUESTIONS.length}`;
+      const raw = `${state.name}|${state.startedAtISO}|${ended.toISOString()}|${state.correct}|${state.attempts}|${total}|${state.runSeed}`;
       const code = `GOV-CIVIC-${base36(hash32(raw))}-${base36(hash32(raw+'X')).slice(0,4)}`;
       elTCode.textContent = code;
 
@@ -1147,7 +1238,7 @@
       clearSave();
     } else {
       elFinishTitle.textContent = 'Mastery NOT achieved ❌';
-      elFinishBody.textContent = `Accuracy: ${acc}%. You must replay for 100% (0 misses). Click “Play Again.”`;
+      elFinishBody.textContent = `Accuracy: ${acc}%. Mastery requires 0 misses (100%). Click “Play Again” and run it clean.`;
       elTicket.style.display = 'none';
     }
 
@@ -1180,7 +1271,6 @@
     const name = (elStudentName.value || '').trim();
     if(name.length < 2){
       setFeedback('bad', 'Name required', 'Enter your name to begin.');
-      elFeedback.style.display = 'block';
       return;
     }
     state.name = name;
@@ -1191,6 +1281,7 @@
     state.attempts = 0;
     state.correct = 0;
     state.missed = 0;
+    state.runSeed = Math.floor(Math.random()*1e9) ^ hash32(name + '|' + state.startedAtISO);
     save();
 
     elNameBox.style.display = 'none';
@@ -1204,32 +1295,21 @@
     elQuestionBox.style.display = '';
     showQuestion();
   }
-
-  function escapeHtml(s){
-    return String(s)
-      .replaceAll('&','&amp;')
-      .replaceAll('<','&lt;')
-      .replaceAll('>','&gt;')
-      .replaceAll('"','&quot;')
-      .replaceAll("'","&#039;");
-  }
 })();
   // ===== Restart + Back/Forward Cache Fix =====
-// When a user returns to this page via the Back button,
-// Chrome may restore the old "finished" state from bfcache.
-// This forces a clean reload so the game starts fresh.
-window.addEventListener("pageshow", (e) => {
-  if (e.persisted) window.location.reload();
-});
+  // When a user returns to this page via the Back button,
+  // Chrome may restore the old "finished" state from bfcache.
+  // This forces a clean reload so the game starts fresh.
+  window.addEventListener("pageshow", (e) => {
+    if (e.persisted) window.location.reload();
+  });
 
-function restartGame(){
-  // If you ever add persistence later, clear it here:
-  // localStorage.removeItem("LEGEND_STATE:" + location.pathname);
-  // sessionStorage.removeItem("LEGEND_STATE:" + location.pathname);
-
-  window.location.reload();
-}
-
+  function restartGame(){
+    // If you ever add persistence later, clear it here:
+    // localStorage.removeItem("LEGEND_STATE:" + location.pathname);
+    // sessionStorage.removeItem("LEGEND_STATE:" + location.pathname);
+    window.location.reload();
+  }
 </script>
 </body>
 </html>
