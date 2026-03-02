@@ -27,7 +27,7 @@
   .panel{background:var(--card);border:1px solid rgba(255,255,255,.1);padding:20px;border-radius:var(--radius);box-shadow:var(--shadow);}
   h2{margin:0 0 6px 0}
   .sub{margin:0 0 14px 0;color:var(--muted)}
-  .metaRow{display:flex;flex-wrap:wrap;gap:10px;margin:10px 0 14px 0}
+  .metaRow{display:flex;flex-wrap:wrap;gap:10px;margin:10px 0 14px 0;align-items:center}
   .pill{border:1px solid var(--line);border-radius:999px;padding:8px 10px;font-family:var(--mono);font-size:12px;color:var(--muted)}
   .pill b{color:var(--text)}
   .grid{display:grid;gap:10px}
@@ -46,6 +46,8 @@
   }
   button:hover{border-color:var(--accent)}
   button:disabled{opacity:.5;cursor:not-allowed}
+  .btnGhost{background:transparent}
+  .btnWarn{border-color:rgba(255,209,102,.5)}
 
   .choice{
     border:1px solid var(--line);
@@ -94,7 +96,10 @@
 <div class="wrap">
   <div class="panel">
     <h2>Reconstruction, Suffrage & Structural Amendments — CS 9–11</h2>
-    <p class="sub">Mastery = <b>100% accuracy</b>. Auto-submit on click. Auto-advance on correct. Wrong answer shows an automatic hint.</p>
+    <p class="sub">
+      Mastery = <b>100% accuracy</b>. Auto-submit on click. Auto-advance on correct. Wrong answer shows an automatic hint.
+      <span class="small">(Refresh always restarts; Restart button also available.)</span>
+    </p>
 
     <!-- START / NAME GATE -->
     <div id="startGate" class="grid">
@@ -104,6 +109,7 @@
       <div class="row">
         <input id="studentName" type="text" autocomplete="name" placeholder="Type your first and last name"/>
         <button id="startBtn" disabled>Start</button>
+        <button id="restartFromGate" class="btnGhost btnWarn" title="Clears session and restarts">Restart</button>
       </div>
       <div class="small">
         Tip: If you close the laptop and come back, your name/time should still be here (same tab/device).
@@ -118,6 +124,9 @@
         <div class="pill">Started: <b id="metaStart">—</b></div>
         <div class="pill">Accuracy: <b id="metaAcc">100%</b></div>
         <div class="pill">Progress: <b id="metaProg">0/0</b></div>
+        <div style="margin-left:auto;display:flex;gap:10px;flex-wrap:wrap;">
+          <button id="restartBtnTop" class="btnGhost btnWarn" title="Restart game from the beginning">Restart</button>
+        </div>
       </div>
 
       <div id="question"></div>
@@ -132,7 +141,7 @@
         <div class="kv" id="ticketKV"></div>
         <div class="row" style="margin-top:12px">
           <button id="copyTicket">Copy ticket text</button>
-          <button id="restartBtn">Restart</button>
+          <button id="restartBtnEnd" class="btnWarn">Restart</button>
         </div>
         <div class="small" style="margin-top:10px">
           Screenshot this ticket if your teacher requests it. (<span class="kbd">Ctrl</span> + <span class="kbd">Shift</span> + <span class="kbd">S</span> on many Chromebooks/Windows tools vary.)
@@ -147,57 +156,94 @@
 const QUESTIONS = [
 
 /* ===== RECONSTRUCTION AMENDMENTS ===== */
+
 {prompt:"What did the 13th Amendment accomplish?",choices:["Ended slavery","Gave women the vote","Created Electoral College","Lowered voting age"],correct:0,hint:"Civil War outcome."},
+
 {prompt:"Why was the 13th Amendment necessary?",choices:["To legally end slavery nationwide","To expand westward","To limit immigration","To establish income tax"],correct:0,hint:"Emancipation Proclamation only applied to rebelling states."},
+
 {prompt:"What did the 14th Amendment guarantee?",choices:["Birthright citizenship and equal protection","Right to bear arms","Income tax authority","Women’s suffrage"],correct:0,hint:"Equal protection clause."},
+
 {prompt:"Why was the 14th Amendment needed after the Civil War?",choices:["Southern states passed Black Codes","Women demanded voting rights","Immigration increased","New territories formed"],correct:0,hint:"Black Codes restricted freedmen."},
+
 {prompt:"What did the 15th Amendment protect?",choices:["Voting rights regardless of race","Freedom of speech","Right to counsel","Protection from cruel punishment"],correct:0,hint:"Race-based suffrage."},
+
 {prompt:"Why was the 15th Amendment necessary?",choices:["States were denying Black men the vote","Women demanded suffrage","Poll taxes existed nationwide","Courts overturned slavery"],correct:0,hint:"Resistance to Reconstruction."},
 
 /* ===== JIM CROW & RESISTANCE ===== */
+
 {prompt:"What were Black Codes designed to do?",choices:["Restrict freedoms of freedmen","Expand voting rights","Improve labor conditions","Increase land ownership"],correct:0,hint:"Post-Civil War South."},
+
 {prompt:"What was the purpose of Jim Crow laws?",choices:["Enforce racial segregation","Protect equal rights","Expand suffrage","Encourage migration"],correct:0,hint:"Plessy v. Ferguson era."},
+
 {prompt:"Which Supreme Court case upheld segregation under 'separate but equal'?",choices:["Plessy v. Ferguson","Brown v. Board","Marbury v. Madison","McCulloch v. Maryland"],correct:0,hint:"1896 decision."},
+
 {prompt:"Why did literacy tests and poll taxes exist?",choices:["To prevent African Americans from voting","To fund schools","To register immigrants","To verify citizenship"],correct:0,hint:"Voting suppression."},
 
 /* ===== CIVIL RIGHTS MOVEMENT ===== */
+
 {prompt:"What did the Civil Rights Act of 1964 accomplish?",choices:["Outlawed discrimination in public accommodations","Ended slavery","Lowered voting age","Created Electoral College"],correct:0,hint:"Public places discrimination."},
+
 {prompt:"What problem led to the Voting Rights Act of 1965?",choices:["Discriminatory voting practices in the South","Immigration increases","Women's suffrage demands","Foreign policy conflicts"],correct:0,hint:"Selma + voting suppression."},
+
 {prompt:"What authority allows Congress to enforce the Reconstruction Amendments?",choices:["Enforcement Clause","Commerce Clause","Necessary Clause","Supremacy Clause"],correct:0,hint:"Section 5 language."},
+
 {prompt:"Brown v. Board of Education overturned which doctrine?",choices:["Separate but equal","Popular sovereignty","Judicial review","Federalism"],correct:0,hint:"Education segregation."},
 
 /* ===== SUFFRAGE EXPANSIONS ===== */
+
 {prompt:"What did the 19th Amendment accomplish?",choices:["Gave women the right to vote","Ended slavery","Created income tax","Lowered voting age to 18"],correct:0,hint:"1920 ratification."},
+
 {prompt:"What social movement led to the 19th Amendment?",choices:["Women’s suffrage movement","Civil Rights Movement","Temperance movement","Labor unions"],correct:0,hint:"Susan B. Anthony era."},
+
 {prompt:"What did the 24th Amendment prohibit?",choices:["Poll taxes in federal elections","Literacy tests","Segregation","Income taxes"],correct:0,hint:"Financial barrier to voting."},
+
 {prompt:"What did the 26th Amendment accomplish?",choices:["Lowered voting age to 18","Granted citizenship","Ended segregation","Created electoral votes for DC"],correct:0,hint:"Vietnam War era slogan."},
+
 {prompt:"Why was the 26th Amendment passed?",choices:["18-year-olds were drafted but couldn’t vote","Women protested","Poll taxes existed","Slavery returned"],correct:0,hint:"Old enough to fight."},
 
 /* ===== STRUCTURAL AMENDMENTS ===== */
+
 {prompt:"Why was the 12th Amendment necessary?",choices:["To fix problems from the Election of 1800","To expand voting rights","To end slavery","To regulate commerce"],correct:0,hint:"Jefferson vs Burr tie."},
+
 {prompt:"What did the 23rd Amendment accomplish?",choices:["Gave DC electoral votes","Ended slavery","Gave women the vote","Lowered voting age"],correct:0,hint:"Washington DC representation."},
+
 {prompt:"What does the 25th Amendment address?",choices:["Presidential succession and disability","Voting age","Electoral College reform","Income tax"],correct:0,hint:"Vice President replacement."},
+
 {prompt:"Why was the 25th Amendment clarified after JFK’s assassination?",choices:["Uncertainty over presidential disability","Voting disputes","Civil Rights protests","Election fraud"],correct:0,hint:"1963 concerns."},
 
 /* ===== CAUSATION & ANALYSIS QUESTIONS ===== */
+
 {prompt:"How did Reconstruction Amendments attempt to change Southern society?",choices:["Extend citizenship and political rights to freedmen","Increase tariffs","Limit federal power","Reduce immigration"],correct:0,hint:"Equal protection + suffrage."},
+
 {prompt:"Why did federal intervention become necessary during Civil Rights era?",choices:["States failed to protect constitutional rights","Immigration increased","Wars required change","Economic depression"],correct:0,hint:"State resistance."},
+
 {prompt:"Which amendment most directly supports incorporation of rights to states?",choices:["14th","10th","7th","3rd"],correct:0,hint:"Due process clause."},
+
 {prompt:"Which development demonstrates resistance to Reconstruction reforms?",choices:["Rise of the Ku Klux Klan","Ratification of 15th Amendment","Passage of Civil Rights Act","Election of African Americans to Congress"],correct:0,hint:"White supremacist violence."},
+
 {prompt:"Which law directly targeted discriminatory voting practices?",choices:["Voting Rights Act of 1965","Civil Rights Act 1964","Social Security Act","Sherman Antitrust Act"],correct:0,hint:"Federal oversight of elections."},
+
 {prompt:"What was the long-term effect of Jim Crow laws?",choices:["Institutionalized racial segregation","Expanded suffrage","Strengthened equal protection","Ended discrimination"],correct:0,hint:"Late 19th to mid-20th century."},
+
 {prompt:"Which amendment addressed discrimination in voting based on race?",choices:["15th","19th","24th","26th"],correct:0,hint:"Post-Civil War."},
+
 {prompt:"Which amendment addressed discrimination in voting based on sex?",choices:["19th","15th","24th","26th"],correct:0,hint:"Women’s suffrage."},
+
 {prompt:"Which amendment addressed discrimination in voting based on age?",choices:["26th","19th","15th","24th"],correct:0,hint:"18 years old."},
+
 {prompt:"Which amendment addressed discrimination in voting based on failure to pay a poll tax?",choices:["24th","15th","19th","26th"],correct:0,hint:"Financial barrier removed."},
+
 {prompt:"Which amendment provided equal protection of the laws?",choices:["14th","13th","15th","12th"],correct:0,hint:"Equal protection clause."},
+
 {prompt:"Which event directly led to greater federal enforcement of civil rights protections?",choices:["Violence against civil rights activists","Election of 1800","Civil War battles","Formation of political parties"],correct:0,hint:"Televised brutality."}
+
 ];
 
 // ---------- DOM ----------
 const startGate = document.getElementById("startGate");
 const studentNameInput = document.getElementById("studentName");
 const startBtn = document.getElementById("startBtn");
+const restartFromGate = document.getElementById("restartFromGate");
 
 const game = document.getElementById("game");
 const qDiv = document.getElementById("question");
@@ -208,10 +254,12 @@ const metaStart = document.getElementById("metaStart");
 const metaAcc = document.getElementById("metaAcc");
 const metaProg = document.getElementById("metaProg");
 
+const restartBtnTop = document.getElementById("restartBtnTop");
+
 const ticketView = document.getElementById("ticketView");
 const ticketKV = document.getElementById("ticketKV");
 const copyTicket = document.getElementById("copyTicket");
-const restartBtn = document.getElementById("restartBtn");
+const restartBtnEnd = document.getElementById("restartBtnEnd");
 
 // ---------- STATE ----------
 let index = 0;
@@ -221,20 +269,11 @@ let locked = false;
 
 const KEY = "LEGEND_STATE:" + location.pathname;
 
-function nowISO(){
-  const d = new Date();
-  // local, readable
-  return d.toLocaleString(undefined, {
-    year:"numeric", month:"2-digit", day:"2-digit",
-    hour:"2-digit", minute:"2-digit", second:"2-digit"
-  });
-}
-
+// ---------- HELPERS ----------
 function pct(n, d){
   if(d === 0) return "100%";
   return Math.round((n/d)*100) + "%";
 }
-
 function saveState(state){
   try { sessionStorage.setItem(KEY, JSON.stringify(state)); } catch(e){}
 }
@@ -248,6 +287,40 @@ function loadState(){
 function clearState(){
   try { sessionStorage.removeItem(KEY); } catch(e){}
 }
+function escapeHtml(s){
+  return String(s)
+    .replaceAll("&","&amp;")
+    .replaceAll("<","&lt;")
+    .replaceAll(">","&gt;")
+    .replaceAll('"',"&quot;")
+    .replaceAll("'","&#039;");
+}
+function setFeedback(kind, text){
+  feedback.className = "msg show " + kind;
+  feedback.textContent = text;
+}
+function hideFeedback(){
+  feedback.className = "msg";
+  feedback.textContent = "";
+}
+function updateMeta(){
+  metaAcc.textContent = pct(correct, attempts || 0);
+  metaProg.textContent = `${Math.min(index+1, QUESTIONS.length)}/${QUESTIONS.length}`;
+}
+
+// ---------- RESTART (BUTTON) ----------
+function restartGame(){
+  // Clear session so refresh or restart is a true restart.
+  clearState();
+  // Keep last name for convenience, but the student still must hit Start (new timestamps).
+  // If you want name cleared too, uncomment:
+  // try { localStorage.removeItem("LEGEND_NAME"); } catch(e){}
+  window.location.reload();
+}
+
+restartFromGate.addEventListener("click", restartGame);
+restartBtnTop.addEventListener("click", restartGame);
+restartBtnEnd.addEventListener("click", restartGame);
 
 // ---------- START GATE ----------
 function validateName(){
@@ -260,24 +333,24 @@ startBtn.addEventListener("click", () => {
   const name = (studentNameInput.value || "").trim();
   if(name.length < 2) return;
 
-  // store name in localStorage too (extra safety vs "name missing")
+  // store name (extra safety)
   try { localStorage.setItem("LEGEND_NAME", name); } catch(e){}
 
-  const startedAt = new Date().toISOString();
-  const state = { name, startedAt, index:0, attempts:0, correct:0, finishedAt:null };
+  const startedAtISO = new Date().toISOString();
+  const state = { name, startedAtISO, index:0, attempts:0, correct:0, finishedAtISO:null };
   saveState(state);
   beginGameFromState(state);
 });
 
 // ---------- GAME ----------
 function beginGameFromState(state){
-  // show game, hide gate
   startGate.style.display = "none";
   game.style.display = "block";
   ticketView.style.display = "none";
 
-  metaName.textContent = state.name;
-  metaStart.textContent = new Date(state.startedAt).toLocaleString();
+  metaName.textContent = state.name || "—";
+  metaStart.textContent = state.startedAtISO ? new Date(state.startedAtISO).toLocaleString() : "—";
+
   index = state.index || 0;
   attempts = state.attempts || 0;
   correct = state.correct || 0;
@@ -286,20 +359,9 @@ function beginGameFromState(state){
   renderQuestion();
 }
 
-function updateMeta(){
-  metaAcc.textContent = pct(correct, attempts || 0);
-  metaProg.textContent = `${Math.min(index+1, QUESTIONS.length)}/${QUESTIONS.length}`;
-}
-
-function setFeedback(kind, text){
-  feedback.className = "msg show " + kind;
-  feedback.textContent = text;
-}
-
 function renderQuestion(){
   locked = false;
-  feedback.className = "msg"; // hide
-  feedback.textContent = "";
+  hideFeedback();
 
   const q = QUESTIONS[index];
   qDiv.innerHTML = `
@@ -311,9 +373,7 @@ function renderQuestion(){
     const div = document.createElement("div");
     div.className = "choice";
     div.textContent = c;
-
     div.addEventListener("click", () => handleSelection(i, div));
-
     qDiv.appendChild(div);
   });
 
@@ -322,15 +382,21 @@ function renderQuestion(){
 
 function markSelected(selectedIdx){
   const nodes = [...qDiv.querySelectorAll(".choice")];
-  nodes.forEach((n, i) => {
-    n.classList.toggle("selected", i === selectedIdx);
-  });
+  nodes.forEach((n, i) => n.classList.toggle("selected", i === selectedIdx));
 }
 
 function lockChoices(lock=true){
   locked = lock;
   const nodes = [...qDiv.querySelectorAll(".choice")];
   nodes.forEach(n => n.classList.toggle("locked", lock));
+}
+
+function persistProgress(){
+  const state = loadState() || {};
+  state.index = index;
+  state.attempts = attempts;
+  state.correct = correct;
+  saveState(state);
 }
 
 function handleSelection(selectedIdx, selectedNode){
@@ -343,44 +409,26 @@ function handleSelection(selectedIdx, selectedNode){
   const q = QUESTIONS[index];
   if(selectedIdx === q.correct){
     correct++;
-    // visual mark
     selectedNode.classList.add("correct");
     lockChoices(true);
     setFeedback("good", "Correct. Auto-advancing…");
 
-    const state = loadState() || {};
-    state.index = index;
-    state.attempts = attempts;
-    state.correct = correct;
-    saveState(state);
+    persistProgress();
 
-    // auto-advance
     setTimeout(() => {
       index++;
       if(index >= QUESTIONS.length){
         finishGame();
       } else {
-        const st = loadState() || {};
-        st.index = index;
-        st.attempts = attempts;
-        st.correct = correct;
-        saveState(st);
+        persistProgress();
         renderQuestion();
       }
     }, 650);
-
   } else {
     // wrong -> keep selection highlighted + show auto-hint
     selectedNode.classList.add("wrong");
     setFeedback("bad", "Incorrect. Hint: " + q.hint);
-
-    // keep choices enabled so they can try again, but update saved attempts
-    const state = loadState() || {};
-    state.index = index;
-    state.attempts = attempts;
-    state.correct = correct;
-    saveState(state);
-
+    persistProgress();
     updateMeta();
   }
 }
@@ -388,20 +436,24 @@ function handleSelection(selectedIdx, selectedNode){
 // ---------- FINISH / TICKET ----------
 function finishGame(){
   const state = loadState() || {};
-  state.finishedAt = new Date().toISOString();
+  state.finishedAtISO = new Date().toISOString();
   state.index = QUESTIONS.length;
   state.attempts = attempts;
   state.correct = correct;
   saveState(state);
 
-  const passed = (correct === attempts) && (attempts > 0) && (correct === QUESTIONS.length);
-  const startedPretty = state.startedAt ? new Date(state.startedAt).toLocaleString() : "—";
-  const finishedPretty = state.finishedAt ? new Date(state.finishedAt).toLocaleString() : "—";
+  const passed = (attempts > 0) && (correct === attempts) && (correct === QUESTIONS.length);
 
   game.style.display = "none";
   ticketView.style.display = "block";
 
+  // Remove any prior status banners (if they exist after a resume)
+  [...ticketView.querySelectorAll(".msg.show")].forEach(n => n.remove());
+
+  const startedPretty = state.startedAtISO ? new Date(state.startedAtISO).toLocaleString() : "—";
+  const finishedPretty = state.finishedAtISO ? new Date(state.finishedAtISO).toLocaleString() : "—";
   const accStr = pct(correct, attempts || 0);
+
   const ticketLines = [
     ["Name", state.name || "—"],
     ["Date", new Date().toLocaleDateString()],
@@ -420,35 +472,20 @@ function finishGame(){
     ticketKV.appendChild(a); ticketKV.appendChild(b);
   });
 
-  // show a clear mastery message
-  if(passed){
-    // lightweight notice via alert-less UI
-    const extra = document.createElement("div");
-    extra.className = "msg show good";
-    extra.textContent = "Mastery achieved! (100% accuracy)";
-    ticketView.insertBefore(extra, ticketView.firstChild);
-  } else {
-    const extra = document.createElement("div");
-    extra.className = "msg show warn";
-    extra.textContent = "Not mastered yet. Restart and try again for 100% accuracy.";
-    ticketView.insertBefore(extra, ticketView.firstChild);
-  }
-}
-
-function escapeHtml(s){
-  return String(s)
-    .replaceAll("&","&amp;")
-    .replaceAll("<","&lt;")
-    .replaceAll(">","&gt;")
-    .replaceAll('"',"&quot;")
-    .replaceAll("'","&#039;");
+  const banner = document.createElement("div");
+  banner.className = "msg show " + (passed ? "good" : "warn");
+  banner.textContent = passed
+    ? "Mastery achieved! (100% accuracy)"
+    : "Not mastered yet. Restart and try again for 100% accuracy.";
+  ticketView.insertBefore(banner, ticketView.firstChild);
 }
 
 copyTicket.addEventListener("click", async () => {
   const state = loadState() || {};
-  const startedPretty = state.startedAt ? new Date(state.startedAt).toLocaleString() : "—";
-  const finishedPretty = state.finishedAt ? new Date(state.finishedAt).toLocaleString() : "—";
-  const passed = (correct === attempts) && (attempts > 0) && (correct === QUESTIONS.length);
+  const startedPretty = state.startedAtISO ? new Date(state.startedAtISO).toLocaleString() : "—";
+  const finishedPretty = state.finishedAtISO ? new Date(state.finishedAtISO).toLocaleString() : "—";
+  const passed = (attempts > 0) && (correct === attempts) && (correct === QUESTIONS.length);
+
   const text =
 `Reconstruction, Suffrage & Structural Amendments — CS 9–11
 Name: ${state.name || "—"}
@@ -467,37 +504,31 @@ Passed (100%): ${passed ? "YES" : "NO"}`;
   }
 });
 
-restartBtn.addEventListener("click", () => {
-  clearState();
-  // also keep last name in localStorage for convenience
-  // (students still must confirm/start to record a new start time)
-  location.reload();
-});
-
-// ---------- RESTORE SESSION (fix “name missing after lunch”) ----------
+// ---------- BOOT / RESUME / REFRESH BEHAVIOR ----------
 (function boot(){
-  // back/forward cache: force clean state
+  // If students refresh, they restart anyway (browser reload).
+  // But to prevent bfcache restoring a "finished" state:
   window.addEventListener("pageshow", (e) => {
     if (e.persisted) window.location.reload();
   });
 
-  // prefill name from localStorage if present
+  // Prefill name from localStorage if available
   try{
     const n = localStorage.getItem("LEGEND_NAME");
     if(n && !studentNameInput.value) studentNameInput.value = n;
   }catch(e){}
   validateName();
 
+  // Resume session if already started (e.g., close lid, come back)
   const state = loadState();
-  if(state && state.name && state.startedAt){
-    // if finished, show ticket immediately
-    if(state.finishedAt){
+  if(state && state.name && state.startedAtISO){
+    if(state.finishedAtISO){
+      // show ticket immediately
       index = QUESTIONS.length;
       attempts = state.attempts || 0;
       correct = state.correct || 0;
       finishGame();
     } else {
-      // resume game mid-session
       beginGameFromState(state);
     }
   }
