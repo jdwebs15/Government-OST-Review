@@ -202,7 +202,9 @@
     errorBox.textContent = `[PROMISE ERROR] ${String(e.reason || e)}`;
   });
 
+  // ===== Questions (FULL LIST) =====
   const QUESTIONS = [
+    // --- Released: Fiscal policy (checkbox item converted into MCQs while keeping the item text verbatim in stem/options)
     { released:true, stem:`Encourage Growth: ☑ cut income tax rates`, choices:[
       "Encourage economic growth (expansionary fiscal policy)",
       "Slow economic growth (contractionary fiscal policy)",
@@ -245,6 +247,7 @@
       "d) To enhance consumer protections"
     ], correct:3, hint:"Safety rules protect consumers." },
 
+    // Released matching item converted into 4 MCQs (keeping scenario text verbatim)
     { released:true, stem:`Q15, Q34, Q92, Q137: The government decides to begin a massive effort to rebuild the nation’s highways. Is this related to taxes or spending?`, choices:[
       "Spending Policy",
       "Taxing Policy",
@@ -294,6 +297,9 @@
       "d) Sudden inflation causes the prices of goods and services to go up"
     ], correct:0, hint:"Higher rates make borrowing more expensive." },
 
+    // ===== Supplemental (high-rep tool manipulation + cause/effect) =====
+
+    // Fiscal: identify tool + intended direction
     { stem:`The economy is in a recession and unemployment is rising. Which fiscal policy is MOST likely intended to encourage economic growth?`, choices:[
       "Increase government spending on infrastructure",
       "Increase income tax rates",
@@ -322,6 +328,7 @@
       "Reducing deductions for households"
     ], correct:0, hint:"Spending = direct outlays." },
 
+    // Regulation: costs/benefits
     { stem:`A new regulation requires factories to install expensive filters to reduce air pollution. Which is the MOST likely economic cost?`, choices:[
       "Lower corporate profits due to higher operating costs",
       "Higher money supply due to bond purchases",
@@ -343,6 +350,7 @@
       "They automatically lower taxes"
     ], correct:0, hint:"Higher costs can reduce hiring and expansion." },
 
+    // Monetary tools: open market operations, reserve requirement, discount rate
     { stem:`The Federal Reserve wants to encourage economic growth. Which open market action best matches that goal?`, choices:[
       "Buy government securities",
       "Sell government securities",
@@ -420,6 +428,7 @@
       "Raise the discount rate"
     ], correct:0, hint:"Expansionary monetary increases loans/spending." },
 
+    // Tool-identification (students confuse fiscal vs monetary vs regulation)
     { stem:`Which is an example of MONETARY policy (Fed action), not fiscal policy?`, choices:[
       "Buying government securities",
       "Cutting income tax rates",
@@ -441,6 +450,7 @@
       "Lowering the discount rate"
     ], correct:0, hint:"Fiscal = taxes/spending by government." },
 
+    // Multi-step reasoning (cause → effect)
     { stem:`The Fed buys government securities. Which chain best explains the likely result?`, choices:[
       "Reserves increase → banks lend more → money supply rises → growth encouraged",
       "Reserves decrease → banks lend more → money supply falls → growth encouraged",
@@ -455,6 +465,7 @@
       "Reserves rise → banks lend less → money supply falls → growth slows"
     ], correct:0, hint:"Selling securities reduces reserves." },
 
+    // Fiscal side chains
     { stem:`Government increases spending during a recession. Which is the MOST likely goal?`, choices:[
       "Increase demand and encourage growth",
       "Reduce demand and slow growth",
@@ -469,6 +480,7 @@
       "Increase bank reserves"
     ], correct:0, hint:"Contractionary fiscal cools the economy." },
 
+    // Regulation: balancing common good vs profit (application)
     { stem:`A regulation requires child-safety locks on medicine bottles. Which pair best matches the tradeoff?`, choices:[
       "Benefit: consumer protection; Cost: higher production costs",
       "Benefit: more money supply; Cost: higher reserve requirements",
@@ -476,6 +488,7 @@
       "Benefit: lower interest rates; Cost: fewer loans"
     ], correct:0, hint:"Safety benefits can cost firms more." },
 
+    // More Fed tool recognition practice
     { stem:`Which Fed tool directly changes how much money banks must keep and not lend out?`, choices:[
       "Reserve requirement",
       "Capital gains tax",
@@ -504,6 +517,7 @@
       "Inflation always becomes zero immediately"
     ], correct:0, hint:"Higher rates reduce spending demand." },
 
+    // Application: picking best tool for scenario
     { stem:`Unemployment is high and inflation is low. Which Fed action is MOST appropriate to encourage expansion?`, choices:[
       "Buy government securities and lower interest rates",
       "Sell government securities and raise interest rates",
@@ -518,6 +532,7 @@
       "Lower the discount rate"
     ], correct:0, hint:"Contractionary monetary." },
 
+    // Mixed confusion checks
     { stem:`Which is the BEST example of a regulation that “prohibits unfair business practices”?`, choices:[
       "A law against deceptive advertising claims",
       "The Fed buying securities",
@@ -532,6 +547,7 @@
       "Both work only through court decisions"
     ], correct:0, hint:"Different levers, same macro targets." },
 
+    // Extra reps (students need them)
     { stem:`If banks have MORE reserves available, they can generally…`, choices:[
       "Make more loans, increasing money creation",
       "Make fewer loans, decreasing money creation",
@@ -574,6 +590,7 @@
       "Increasing reserve requirements"
     ], correct:0, hint:"Expansionary fiscal." },
 
+    // Final tool differentiation capstone
     { stem:`A policy maker says: “We need the Fed to cool inflation without Congress changing taxes.” Which tool set best matches?`, choices:[
       "Sell government securities + raise interest rates",
       "Cut income taxes + increase spending",
@@ -610,6 +627,7 @@
   };
 
   const hashCode = (str) => {
+    // simple deterministic hash for ticket
     let h = 2166136261;
     for (let i=0;i<str.length;i++){
       h ^= str.charCodeAt(i);
@@ -627,14 +645,20 @@
       .replaceAll("'","&#039;");
   }
 
-  // IMPORTANT CHANGE:
-  // Turn hint into an INCORRECT answer choice (replaces the first wrong option),
-  // so the hint is no longer part of the question UI.
+  // ===== FIX #1: Remove giveaway labels from what students see =====
+  function displayStem(stem){
+    return String(stem)
+      .replace(/^Encourage Growth:\s*/i, "")
+      .replace(/^Slow Growth:\s*/i, "")
+      .trim();
+  }
+
+  // ===== FIX #2: Make the hint an incorrect answer choice (not displayed as a separate hint button) =====
   function choicesWithHintAsWrong(q){
-    const c = q.choices.slice(0);
+    const c = q.choices.slice();
     if(!q.hint) return c;
 
-    // Replace the first incorrect choice with the hint text (keeps 4 options total).
+    // Replace the first incorrect choice with the hint text (keeps 4 choices).
     for(let i=0;i<c.length;i++){
       if(i !== q.correct){
         c[i] = `Hint: ${q.hint}`;
@@ -678,6 +702,7 @@
   function renderGame(){
     const q = QUESTIONS[idx];
     const acc = attempts ? Math.round((correct/attempts)*100) : 100;
+
     const renderedChoices = choicesWithHintAsWrong(q);
 
     panel.innerHTML = `
@@ -707,7 +732,7 @@
         <div class="tag ${q.released ? "released" : ""}">${q.released ? "RELEASED (verbatim)" : "SUPPLEMENTAL (CS-aligned)"}</div>
       </div>
 
-      <div class="prompt">${escapeHtml(q.stem)}</div>
+      <div class="prompt">${escapeHtml(displayStem(q.stem))}</div>
 
       <div id="choices"></div>
 
@@ -761,7 +786,7 @@
       }
     }
 
-    // CHANGE: No Next button. Auto-advance on correct.
+    // ===== FIX #3: Auto-advance on correct (no Next button) =====
     submitBtn.onclick = () => {
       if(locked) return;
       if(selected === null) return alert("Select an answer.");
@@ -772,10 +797,8 @@
         locked = true;
         submitBtn.disabled = true;
         setMsg("good", "Correct.");
-        // quick auto-advance so they feel momentum
         setTimeout(advance, 450);
       } else {
-        // mastery rule: any miss means no mastery; allow retry on same item, but accuracy stays impacted
         setMsg("bad", "Incorrect. Try again (accuracy will reflect the miss).");
       }
     };
