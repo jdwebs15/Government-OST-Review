@@ -1,3 +1,4 @@
+```html
 <!doctype html>
 <html lang="en">
 <head>
@@ -65,10 +66,6 @@ h2{margin:0 0 6px 0}
   user-select:none;
 }
 .choice:hover{border-color:var(--accent);}
-.choice.selected{
-  border-color:var(--accent);
-  outline:2px solid rgba(122,162,255,.25);
-}
 .choice.locked{cursor:default;opacity:.95}
 .choice.correct{
   border-color:rgba(43,213,118,.7);
@@ -127,13 +124,15 @@ input{
     <div class="topbar">
       <div>
         <h2>Bill of Rights & Incorporation — CS 8</h2>
-        <p class="sub">Mastery = 100% accuracy (0 misses). Released items first, supplemented to 25+.</p>
+        <p class="sub">Mastery = 100% accuracy (0 misses). Click an answer to submit instantly.</p>
       </div>
       <div class="pills">
         <div class="pill"><small>Student</small> <span id="studentName">—</span></div>
         <div class="pill"><small>Q</small> <span id="qNum">0</span>/<span id="qTotal">0</span></div>
         <div class="pill"><small>Accuracy</small> <span id="acc">—</span></div>
-        <div class="pill"><small>Time</small> <span id="clock">00:00</span></div>
+        <div class="pill"><small>Elapsed</small> <span id="clock">00:00</span></div>
+        <div class="pill"><small>Started</small> <span id="startedAt">—</span></div>
+        <div class="pill"><small>Now</small> <span id="nowAt">—</span></div>
       </div>
     </div>
 
@@ -149,7 +148,7 @@ input{
         <button id="startBtn">Start</button>
       </div>
       <p class="small" style="margin-top:10px;">
-        Tip: If you miss any question, you can still correct it to move on, but your accuracy will drop and you’ll need to replay for mastery.
+        Tip: A wrong click records a miss immediately. You can still keep trying to move on, but you’ll need to replay for mastery.
       </p>
     </div>
 
@@ -159,9 +158,6 @@ input{
       <div id="feedback" class="msg"></div>
 
       <div class="controls">
-        <button id="submitBtn">Submit</button>
-        <button id="hintBtn" disabled>Hint</button>
-        <button id="nextBtn" disabled>Next</button>
         <button id="restartBtn" title="Hard restart (fresh attempt)">Restart</button>
       </div>
     </div>
@@ -337,12 +333,11 @@ const qNumEl      = document.getElementById("qNum");
 const qTotalEl    = document.getElementById("qTotal");
 const accEl       = document.getElementById("acc");
 const clockEl     = document.getElementById("clock");
+const startedAtEl = document.getElementById("startedAt");
+const nowAtEl     = document.getElementById("nowAt");
 
 const game        = document.getElementById("game");
 const feedback    = document.getElementById("feedback");
-const submitBtn   = document.getElementById("submitBtn");
-const hintBtn     = document.getElementById("hintBtn");
-const nextBtn     = document.getElementById("nextBtn");
 const restartBtn  = document.getElementById("restartBtn");
 
 const summaryLine = document.getElementById("summaryLine");
@@ -355,17 +350,17 @@ const playAgainBtn= document.getElementById("playAgainBtn");
 let studentName = "";
 let index = 0;
 
-let attempts = 0;   // every submit counts as an attempt
-let correct  = 0;   // number of correct submits
-let misses   = 0;   // number of incorrect submits (what mastery cares about)
+let attempts = 0;   // every click submission counts
+let correct  = 0;
+let misses   = 0;   // mastery cares about misses
 
-let selected = null;
-let locked = false;           // lock after correct until Next
+let locked = false;           // lock only after correct (briefly) before auto-advance
 let missedThisQuestion = false;
 
 let startTime = null;         // Date object
 let endTime = null;           // Date object
 let timerId = null;
+let nowId = null;
 
 /* ===============================
    HELPERS
@@ -375,7 +370,6 @@ qTotalEl.textContent = QUESTIONS.length;
 function pad2(n){ return String(n).padStart(2,"0"); }
 
 function formatTime(d){
-  // local machine time (student device)
   const yy = d.getFullYear();
   const mm = pad2(d.getMonth()+1);
   const dd = pad2(d.getDate());
@@ -417,9 +411,81 @@ function startClock(){
   timerId = setInterval(()=>{ clockEl.textContent = elapsedString(); }, 250);
 }
 
-function stopClock(){
+function startNowClock(){
+  if(nowId) clearInterval(nowId);
+  nowId = setInterval(()=>{ nowAtEl.textContent = formatTime(new Date()); }, 500);
+  nowAtEl.textContent = formatTime(new Date());
+}
+
+function stopClocks(){
   if(timerId) clearInterval(timerId);
+  if(nowId) clearInterval(nowId);
   timerId = null;
+  nowId = null;
+}
+
+function clearChoiceMarks(){
+  [...game.querySelectorAll(".choice")].forEach(el=>{
+    el.classList.remove("wrong","correct","locked");
+  });
+}
+
+function markWrong(i){
+  const nodes = [...game.querySelectorAll(".choice")];
+  nodes.forEach(n=>n.classList.remove("wrong"));
+  if(nodes[i]) nodes[i].classList.add("wrong");
+}
+
+function lockChoicesShowCorrect(){
+  const q = QUESTIONS[index];
+  const nodes = [...game.querySelectorAll(".choice")];
+  nodes.forEach((node, i)=>{
+    node.classList.add("locked");
+    if(i === q.correct) node.classList.add("correct");
+  });
+}
+
+function advance(){
+  index++;
+  if(index >= QUESTIONS.length){
+    finish();
+    return;
+  }
+  loadQuestion();
+}
+
+function handleAnswerClick(choiceIndex){
+  if(locked) return;
+
+  const q = QUESTIONS[index];
+  attempts++;
+
+  if(choiceIndex === q.correct){
+    correct++;
+    locked = true;
+
+    // show correct briefly, then auto-advance
+    clearFeedback();
+    setFeedback("good", missedThisQuestion ? "Correct (but your earlier miss still counts)." : "Correct.");
+    clearChoiceMarks();
+    lockChoicesShowCorrect();
+    updateHUD();
+
+    setTimeout(()=>{
+      locked = false;
+      advance();
+    }, 650);
+
+  } else {
+    misses++;
+    missedThisQuestion = true;
+
+    // show hint immediately (no hint button)
+    const hintText = q.hint || "Think about the right being tested.";
+    setFeedback("bad", `Incorrect. Hint: ${hintText} (Miss recorded.)`);
+    markWrong(choiceIndex);
+    updateHUD();
+  }
 }
 
 function renderChoices(q){
@@ -428,69 +494,45 @@ function renderChoices(q){
     const div = document.createElement("div");
     div.className = "choice";
     div.textContent = c;
-
-    div.addEventListener("click", ()=>{
-      if(locked) return;
-      selected = i;
-      [...wrap.querySelectorAll(".choice")].forEach(el=>el.classList.remove("selected"));
-      div.classList.add("selected");
-    });
-
+    div.addEventListener("click", ()=> handleAnswerClick(i));
     wrap.appendChild(div);
   });
   return wrap;
 }
 
-function lockChoices(showCorrect){
-  const q = QUESTIONS[index];
-  const nodes = [...game.querySelectorAll(".choice")];
-  nodes.forEach((node, i)=>{
-    node.classList.add("locked");
-    node.classList.remove("selected");
-    if(showCorrect){
-      if(i === q.correct) node.classList.add("correct");
-      if(selected !== null && selected !== q.correct && i === selected) node.classList.add("wrong");
-    }
-  });
-}
-
 function loadQuestion(){
   locked = false;
   missedThisQuestion = false;
-  selected = null;
-
   clearFeedback();
-  hintBtn.disabled = true;
-  nextBtn.disabled = true;
-  submitBtn.disabled = false;
-
   updateHUD();
 
   const q = QUESTIONS[index];
   game.innerHTML = "";
+
   const p = document.createElement("p");
   p.style.marginTop = "0";
   p.textContent = q.prompt;
   game.appendChild(p);
+
   game.appendChild(renderChoices(q));
 }
 
 function finish(){
   endTime = new Date();
-  stopClock();
+  stopClocks();
   updateHUD();
 
   const acc = attempts ? Math.round((correct/attempts)*100) : 0;
   const mastery = (misses === 0) && (index >= QUESTIONS.length);
+  const passed = mastery ? "Yes" : "No";
 
-  const line = mastery
+  summaryLine.textContent = mastery
     ? `✅ MASTERED — 100% accuracy (0 misses)`
     : `❌ Not Mastered — ${acc}% accuracy (${misses} miss${misses===1?"":"es"})`;
 
-  summaryLine.textContent = line;
-
   const summary =
 `Student: ${studentName}
+
 Date/Time Started: ${formatTime(startTime)}
 Date/Time Completed: ${formatTime(endTime)}
 Time Elapsed: ${elapsedString()}
@@ -500,6 +542,7 @@ Attempts: ${attempts}
 Correct: ${correct}
 Misses: ${misses}
 Accuracy: ${acc}%
+Passed: ${passed}
 
 Result: ${mastery ? "MASTERED (0 misses)" : "REPLAY for 0 misses"}`;
 
@@ -523,7 +566,9 @@ function begin(){
   studentNameEl.textContent = studentName;
 
   startTime = new Date();
+  startedAtEl.textContent = formatTime(startTime);
   startClock();
+  startNowClock();
 
   // reset state
   index = 0;
@@ -547,54 +592,6 @@ nameInput.addEventListener("keydown", (e)=>{
 /* ===============================
    BUTTONS
    =============================== */
-submitBtn.addEventListener("click", ()=>{
-  if(locked) return;
-  if(selected === null){
-    alert("Select an answer.");
-    return;
-  }
-
-  attempts++;
-  const q = QUESTIONS[index];
-
-  if(selected === q.correct){
-    correct++;
-    locked = true;
-    submitBtn.disabled = true;
-    hintBtn.disabled = true;
-    nextBtn.disabled = false;
-
-    setFeedback("good", missedThisQuestion ? "Correct (but your earlier miss still counts)." : "Correct.");
-    lockChoices(true);
-  } else {
-    // miss counts every time they submit wrong
-    misses++;
-    missedThisQuestion = true;
-
-    setFeedback("bad", "Incorrect. Click Hint, then try again. (Miss recorded.)");
-    hintBtn.disabled = false;
-  }
-
-  updateHUD();
-});
-
-hintBtn.addEventListener("click", ()=>{
-  const q = QUESTIONS[index];
-  setFeedback("warn", "Hint: " + (q.hint || "Think about the right being tested."));
-  hintBtn.disabled = true;
-});
-
-nextBtn.addEventListener("click", ()=>{
-  index++;
-
-  if(index >= QUESTIONS.length){
-    finish();
-    return;
-  }
-
-  loadQuestion();
-});
-
 restartBtn.addEventListener("click", hardRestart);
 playAgainBtn.addEventListener("click", hardRestart);
 
@@ -604,136 +601,9 @@ playAgainBtn.addEventListener("click", hardRestart);
 qNumEl.textContent = "0";
 accEl.textContent = "—";
 clockEl.textContent = "00:00";
+startedAtEl.textContent = "—";
+nowAtEl.textContent = "—";
 </script>
 </body>
 </html>
-<!doctype html>
-<html lang="en">
-<head>
-<meta charset="utf-8"/>
-<meta name="viewport" content="width=device-width,initial-scale=1"/>
-<title>Bill of Rights & Incorporation — CS 8 (OST Review)</title>
-<link rel="stylesheet" href="../styles.css"/>
-
-<style>
-:root{
-  --bg:#0b1220;
-  --text:#e7eefc;
-  --muted:#a8b4cf;
-  --line:rgba(255,255,255,.12);
-  --good:#2bd576;
-  --bad:#ff5c7a;
-  --warn:#ffd166;
-  --accent:#7aa2ff;
-  --panel:rgba(255,255,255,.03);
-}
-*{box-sizing:border-box}
-body{
-  margin:0;
-  background:linear-gradient(180deg,#0b1220,#070b14);
-  color:var(--text);
-  font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial;
-}
-.wrap{width:min(1000px,92vw);margin:30px auto;}
-.panel{
-  background:var(--panel);
-  border:1px solid var(--line);
-  border-radius:16px;
-  padding:20px;
-}
-h2{margin:0 0 6px 0}
-.sub{color:var(--muted);margin:0 0 12px 0}
-
-.topbar{
-  display:flex;
-  justify-content:space-between;
-  align-items:flex-start;
-  gap:12px;
-  flex-wrap:wrap;
-  margin-bottom:10px;
-}
-.pills{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
-.pill{
-  border:1px solid var(--line);
-  background:rgba(255,255,255,.02);
-  padding:6px 10px;
-  border-radius:999px;
-  font-weight:800;
-}
-.pill small{color:var(--muted);font-weight:700}
-.hr{height:1px;background:var(--line);margin:14px 0;}
-
-.choice{
-  display:block;
-  border:1px solid var(--line);
-  padding:10px;
-  border-radius:12px;
-  margin-bottom:8px;
-  cursor:pointer;
-  background:rgba(255,255,255,.02);
-  user-select:none;
-}
-.choice:hover{border-color:var(--accent);}
-.choice.selected{
-  border-color:var(--accent);
-  outline:2px solid rgba(122,162,255,.25);
-}
-.choice.locked{cursor:default;opacity:.95}
-.choice.correct{
-  border-color:rgba(43,213,118,.7);
-  background:rgba(43,213,118,.08);
-}
-.choice.wrong{
-  border-color:rgba(255,92,122,.7);
-  background:rgba(255,92,122,.08);
-}
-
-.msg{margin-top:10px;padding:10px;border-radius:12px;display:none;}
-.msg.good{background:rgba(43,213,118,.08);border:1px solid rgba(43,213,118,.4);display:block;}
-.msg.bad{background:rgba(255,92,122,.08);border:1px solid rgba(255,92,122,.4);display:block;}
-.msg.warn{background:rgba(255,209,102,.08);border:1px solid rgba(255,209,102,.4);display:block;}
-
-.controls{display:flex;gap:10px;flex-wrap:wrap;margin-top:14px;}
-button{
-  padding:10px 14px;
-  border-radius:12px;
-  border:1px solid var(--line);
-  background:rgba(255,255,255,.03);
-  color:var(--text);
-  cursor:pointer;
-  font-weight:900;
-}
-button:hover{border-color:var(--accent);}
-button:disabled{opacity:.45;cursor:not-allowed}
-
-input{
-  padding:10px 12px;
-  border-radius:12px;
-  border:1px solid var(--line);
-  background:rgba(255,255,255,.03);
-  color:var(--text);
-  font-weight:800;
-  width:min(420px,100%);
-}
-
-.small{color:var(--muted);font-size:.95rem}
-.codebox{
-  border:1px solid var(--line);
-  border-radius:14px;
-  padding:12px;
-  background:rgba(255,255,255,.02);
-  overflow:auto;
-  font-family:ui-monospace,SFMono-Regular,Menlo,Monaco,Consolas,"Liberation Mono","Courier New",monospace;
-  white-space:pre-wrap;
-}
-</style>
-</head>
-
-<body>
-<div class="wrap">
-  <div class="panel">
-
-    <div class="topbar">
-      <div>
-        <h2>Bill of Rights & Incorporation — CS 8</h2>
-        <p class="sub">Mastery = 100% accuracy (0 misses). Released items first, supplemen
+```
