@@ -1,3 +1,4 @@
+```html
 <!doctype html>
 <html lang="en">
 <head>
@@ -98,7 +99,7 @@
     <h2>Reconstruction, Suffrage & Structural Amendments — CS 9–11</h2>
     <p class="sub">
       Mastery = <b>100% accuracy</b>. Auto-submit on click. Auto-advance on correct. Wrong answer shows an automatic hint.
-      <span class="small">(Refresh always restarts; Restart button also available.)</span>
+      <span class="small">(Answers are randomized each question; refresh restarts; Restart button available.)</span>
     </p>
 
     <!-- START / NAME GATE -->
@@ -156,87 +157,51 @@
 const QUESTIONS = [
 
 /* ===== RECONSTRUCTION AMENDMENTS ===== */
-
 {prompt:"What did the 13th Amendment accomplish?",choices:["Ended slavery","Gave women the vote","Created Electoral College","Lowered voting age"],correct:0,hint:"Civil War outcome."},
-
 {prompt:"Why was the 13th Amendment necessary?",choices:["To legally end slavery nationwide","To expand westward","To limit immigration","To establish income tax"],correct:0,hint:"Emancipation Proclamation only applied to rebelling states."},
-
 {prompt:"What did the 14th Amendment guarantee?",choices:["Birthright citizenship and equal protection","Right to bear arms","Income tax authority","Women’s suffrage"],correct:0,hint:"Equal protection clause."},
-
 {prompt:"Why was the 14th Amendment needed after the Civil War?",choices:["Southern states passed Black Codes","Women demanded voting rights","Immigration increased","New territories formed"],correct:0,hint:"Black Codes restricted freedmen."},
-
 {prompt:"What did the 15th Amendment protect?",choices:["Voting rights regardless of race","Freedom of speech","Right to counsel","Protection from cruel punishment"],correct:0,hint:"Race-based suffrage."},
-
 {prompt:"Why was the 15th Amendment necessary?",choices:["States were denying Black men the vote","Women demanded suffrage","Poll taxes existed nationwide","Courts overturned slavery"],correct:0,hint:"Resistance to Reconstruction."},
 
 /* ===== JIM CROW & RESISTANCE ===== */
-
 {prompt:"What were Black Codes designed to do?",choices:["Restrict freedoms of freedmen","Expand voting rights","Improve labor conditions","Increase land ownership"],correct:0,hint:"Post-Civil War South."},
-
 {prompt:"What was the purpose of Jim Crow laws?",choices:["Enforce racial segregation","Protect equal rights","Expand suffrage","Encourage migration"],correct:0,hint:"Plessy v. Ferguson era."},
-
 {prompt:"Which Supreme Court case upheld segregation under 'separate but equal'?",choices:["Plessy v. Ferguson","Brown v. Board","Marbury v. Madison","McCulloch v. Maryland"],correct:0,hint:"1896 decision."},
-
 {prompt:"Why did literacy tests and poll taxes exist?",choices:["To prevent African Americans from voting","To fund schools","To register immigrants","To verify citizenship"],correct:0,hint:"Voting suppression."},
 
 /* ===== CIVIL RIGHTS MOVEMENT ===== */
-
 {prompt:"What did the Civil Rights Act of 1964 accomplish?",choices:["Outlawed discrimination in public accommodations","Ended slavery","Lowered voting age","Created Electoral College"],correct:0,hint:"Public places discrimination."},
-
 {prompt:"What problem led to the Voting Rights Act of 1965?",choices:["Discriminatory voting practices in the South","Immigration increases","Women's suffrage demands","Foreign policy conflicts"],correct:0,hint:"Selma + voting suppression."},
-
 {prompt:"What authority allows Congress to enforce the Reconstruction Amendments?",choices:["Enforcement Clause","Commerce Clause","Necessary Clause","Supremacy Clause"],correct:0,hint:"Section 5 language."},
-
 {prompt:"Brown v. Board of Education overturned which doctrine?",choices:["Separate but equal","Popular sovereignty","Judicial review","Federalism"],correct:0,hint:"Education segregation."},
 
 /* ===== SUFFRAGE EXPANSIONS ===== */
-
 {prompt:"What did the 19th Amendment accomplish?",choices:["Gave women the right to vote","Ended slavery","Created income tax","Lowered voting age to 18"],correct:0,hint:"1920 ratification."},
-
 {prompt:"What social movement led to the 19th Amendment?",choices:["Women’s suffrage movement","Civil Rights Movement","Temperance movement","Labor unions"],correct:0,hint:"Susan B. Anthony era."},
-
 {prompt:"What did the 24th Amendment prohibit?",choices:["Poll taxes in federal elections","Literacy tests","Segregation","Income taxes"],correct:0,hint:"Financial barrier to voting."},
-
 {prompt:"What did the 26th Amendment accomplish?",choices:["Lowered voting age to 18","Granted citizenship","Ended segregation","Created electoral votes for DC"],correct:0,hint:"Vietnam War era slogan."},
-
 {prompt:"Why was the 26th Amendment passed?",choices:["18-year-olds were drafted but couldn’t vote","Women protested","Poll taxes existed","Slavery returned"],correct:0,hint:"Old enough to fight."},
 
 /* ===== STRUCTURAL AMENDMENTS ===== */
-
 {prompt:"Why was the 12th Amendment necessary?",choices:["To fix problems from the Election of 1800","To expand voting rights","To end slavery","To regulate commerce"],correct:0,hint:"Jefferson vs Burr tie."},
-
 {prompt:"What did the 23rd Amendment accomplish?",choices:["Gave DC electoral votes","Ended slavery","Gave women the vote","Lowered voting age"],correct:0,hint:"Washington DC representation."},
-
 {prompt:"What does the 25th Amendment address?",choices:["Presidential succession and disability","Voting age","Electoral College reform","Income tax"],correct:0,hint:"Vice President replacement."},
-
 {prompt:"Why was the 25th Amendment clarified after JFK’s assassination?",choices:["Uncertainty over presidential disability","Voting disputes","Civil Rights protests","Election fraud"],correct:0,hint:"1963 concerns."},
 
 /* ===== CAUSATION & ANALYSIS QUESTIONS ===== */
-
 {prompt:"How did Reconstruction Amendments attempt to change Southern society?",choices:["Extend citizenship and political rights to freedmen","Increase tariffs","Limit federal power","Reduce immigration"],correct:0,hint:"Equal protection + suffrage."},
-
 {prompt:"Why did federal intervention become necessary during Civil Rights era?",choices:["States failed to protect constitutional rights","Immigration increased","Wars required change","Economic depression"],correct:0,hint:"State resistance."},
-
 {prompt:"Which amendment most directly supports incorporation of rights to states?",choices:["14th","10th","7th","3rd"],correct:0,hint:"Due process clause."},
-
 {prompt:"Which development demonstrates resistance to Reconstruction reforms?",choices:["Rise of the Ku Klux Klan","Ratification of 15th Amendment","Passage of Civil Rights Act","Election of African Americans to Congress"],correct:0,hint:"White supremacist violence."},
-
 {prompt:"Which law directly targeted discriminatory voting practices?",choices:["Voting Rights Act of 1965","Civil Rights Act 1964","Social Security Act","Sherman Antitrust Act"],correct:0,hint:"Federal oversight of elections."},
-
 {prompt:"What was the long-term effect of Jim Crow laws?",choices:["Institutionalized racial segregation","Expanded suffrage","Strengthened equal protection","Ended discrimination"],correct:0,hint:"Late 19th to mid-20th century."},
-
 {prompt:"Which amendment addressed discrimination in voting based on race?",choices:["15th","19th","24th","26th"],correct:0,hint:"Post-Civil War."},
-
 {prompt:"Which amendment addressed discrimination in voting based on sex?",choices:["19th","15th","24th","26th"],correct:0,hint:"Women’s suffrage."},
-
 {prompt:"Which amendment addressed discrimination in voting based on age?",choices:["26th","19th","15th","24th"],correct:0,hint:"18 years old."},
-
 {prompt:"Which amendment addressed discrimination in voting based on failure to pay a poll tax?",choices:["24th","15th","19th","26th"],correct:0,hint:"Financial barrier removed."},
-
 {prompt:"Which amendment provided equal protection of the laws?",choices:["14th","13th","15th","12th"],correct:0,hint:"Equal protection clause."},
-
 {prompt:"Which event directly led to greater federal enforcement of civil rights protections?",choices:["Violence against civil rights activists","Election of 1800","Civil War battles","Formation of political parties"],correct:0,hint:"Televised brutality."}
-
 ];
 
 // ---------- DOM ----------
@@ -266,6 +231,10 @@ let index = 0;
 let attempts = 0;
 let correct = 0;
 let locked = false;
+
+// For the currently displayed question:
+let currentOrder = null;      // array of original indices, length 4
+let currentCorrectPos = null; // position in displayed choices (0..3)
 
 const KEY = "LEGEND_STATE:" + location.pathname;
 
@@ -308,16 +277,50 @@ function updateMeta(){
   metaProg.textContent = `${Math.min(index+1, QUESTIONS.length)}/${QUESTIONS.length}`;
 }
 
-// ---------- RESTART (BUTTON) ----------
-function restartGame(){
-  // Clear session so refresh or restart is a true restart.
-  clearState();
-  // Keep last name for convenience, but the student still must hit Start (new timestamps).
-  // If you want name cleared too, uncomment:
-  // try { localStorage.removeItem("LEGEND_NAME"); } catch(e){}
-  window.location.reload();
+// Fisher–Yates shuffle (in-place)
+function shuffle(arr){
+  for(let i=arr.length-1;i>0;i--){
+    const j = Math.floor(Math.random()*(i+1));
+    [arr[i], arr[j]] = [arr[j], arr[i]];
+  }
+  return arr;
 }
 
+// Get (or create) a stable randomized choice order for a given question index.
+// Stored in session state so it DOES NOT reshuffle after each wrong click or after lid-close resume.
+function getOrderForQuestion(qIndex, state){
+  state.orderByIndex = state.orderByIndex || {};
+  if(Array.isArray(state.orderByIndex[qIndex]) && state.orderByIndex[qIndex].length === 4){
+    return state.orderByIndex[qIndex];
+  }
+  const order = shuffle([0,1,2,3]);
+  state.orderByIndex[qIndex] = order;
+  saveState(state);
+  return order;
+}
+
+function persistProgress(extra={}){
+  const state = loadState() || {};
+  state.index = index;
+  state.attempts = attempts;
+  state.correct = correct;
+
+  // persist current order for current question so it stays stable on resume
+  state.orderByIndex = state.orderByIndex || {};
+  if(currentOrder && Array.isArray(currentOrder)){
+    state.orderByIndex[index] = currentOrder.slice();
+  }
+
+  Object.assign(state, extra);
+  saveState(state);
+}
+
+// ---------- RESTART (BUTTON) ----------
+function restartGame(){
+  clearState();
+  // Keep last name for convenience; they still must hit Start (new timestamps).
+  window.location.reload();
+}
 restartFromGate.addEventListener("click", restartGame);
 restartBtnTop.addEventListener("click", restartGame);
 restartBtnEnd.addEventListener("click", restartGame);
@@ -333,11 +336,18 @@ startBtn.addEventListener("click", () => {
   const name = (studentNameInput.value || "").trim();
   if(name.length < 2) return;
 
-  // store name (extra safety)
   try { localStorage.setItem("LEGEND_NAME", name); } catch(e){}
 
   const startedAtISO = new Date().toISOString();
-  const state = { name, startedAtISO, index:0, attempts:0, correct:0, finishedAtISO:null };
+  const state = {
+    name,
+    startedAtISO,
+    index:0,
+    attempts:0,
+    correct:0,
+    finishedAtISO:null,
+    orderByIndex:{} // store answer randomization per question
+  };
   saveState(state);
   beginGameFromState(state);
 });
@@ -363,26 +373,34 @@ function renderQuestion(){
   locked = false;
   hideFeedback();
 
+  const state = loadState() || {};
   const q = QUESTIONS[index];
+
+  // Build stable randomized order for THIS question
+  currentOrder = getOrderForQuestion(index, state);
+  currentCorrectPos = currentOrder.indexOf(q.correct);
+
   qDiv.innerHTML = `
     <p style="margin:0 0 6px 0;"><b>Question ${index+1} of ${QUESTIONS.length}</b></p>
     <p style="margin:0 0 10px 0;">${q.prompt}</p>
   `;
 
-  q.choices.forEach((c, i) => {
+  // Render in randomized order
+  currentOrder.forEach((origIdx, displayedPos) => {
     const div = document.createElement("div");
     div.className = "choice";
-    div.textContent = c;
-    div.addEventListener("click", () => handleSelection(i, div));
+    div.textContent = q.choices[origIdx];
+    div.addEventListener("click", () => handleSelection(displayedPos, div));
     qDiv.appendChild(div);
   });
 
   updateMeta();
+  persistProgress(); // keep order stable in storage
 }
 
-function markSelected(selectedIdx){
+function markSelected(displayedPos){
   const nodes = [...qDiv.querySelectorAll(".choice")];
-  nodes.forEach((n, i) => n.classList.toggle("selected", i === selectedIdx));
+  nodes.forEach((n, i) => n.classList.toggle("selected", i === displayedPos));
 }
 
 function lockChoices(lock=true){
@@ -391,23 +409,16 @@ function lockChoices(lock=true){
   nodes.forEach(n => n.classList.toggle("locked", lock));
 }
 
-function persistProgress(){
-  const state = loadState() || {};
-  state.index = index;
-  state.attempts = attempts;
-  state.correct = correct;
-  saveState(state);
-}
-
-function handleSelection(selectedIdx, selectedNode){
+function handleSelection(displayedPos, selectedNode){
   if(locked) return;
 
-  // auto-submit on click
   attempts++;
-  markSelected(selectedIdx);
+  markSelected(displayedPos);
 
   const q = QUESTIONS[index];
-  if(selectedIdx === q.correct){
+  const isCorrect = (displayedPos === currentCorrectPos);
+
+  if(isCorrect){
     correct++;
     selectedNode.classList.add("correct");
     lockChoices(true);
@@ -417,6 +428,9 @@ function handleSelection(selectedIdx, selectedNode){
 
     setTimeout(() => {
       index++;
+      currentOrder = null;
+      currentCorrectPos = null;
+
       if(index >= QUESTIONS.length){
         finishGame();
       } else {
@@ -424,6 +438,7 @@ function handleSelection(selectedIdx, selectedNode){
         renderQuestion();
       }
     }, 650);
+
   } else {
     // wrong -> keep selection highlighted + show auto-hint
     selectedNode.classList.add("wrong");
@@ -506,8 +521,7 @@ Passed (100%): ${passed ? "YES" : "NO"}`;
 
 // ---------- BOOT / RESUME / REFRESH BEHAVIOR ----------
 (function boot(){
-  // If students refresh, they restart anyway (browser reload).
-  // But to prevent bfcache restoring a "finished" state:
+  // prevent Back/Forward cache restoring old state visually
   window.addEventListener("pageshow", (e) => {
     if (e.persisted) window.location.reload();
   });
@@ -536,3 +550,4 @@ Passed (100%): ${passed ? "YES" : "NO"}`;
 </script>
 </body>
 </html>
+```
