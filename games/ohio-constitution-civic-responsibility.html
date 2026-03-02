@@ -1,3 +1,4 @@
+```html
 <!doctype html>
 <html lang="en">
 <head>
@@ -37,7 +38,7 @@
   .mono{font-family:var(--mono)}
   .hr{height:1px;background:var(--line);margin:12px 0}
 
-  .choice{border:1px solid var(--line);padding:12px;border-radius:12px;margin:8px 0;cursor:pointer;background:rgba(255,255,255,.02)}
+  .choice{border:1px solid var(--line);padding:12px;border-radius:12px;margin:8px 0;cursor:pointer;background:rgba(255,255,255,.02);user-select:none}
   .choice:hover{border-color:rgba(122,162,255,.55)}
   .choice.sel{outline:2px solid rgba(122,162,255,.55);border-color:rgba(122,162,255,.65)}
   .choice.disabled{opacity:.65;cursor:not-allowed}
@@ -86,11 +87,17 @@
     <div>
       <div class="kicker">LEGEND — GOVERNMENT OST REVIEW</div>
       <h1>Ohio Constitution &amp; Civic Responsibility — CS 16–17</h1>
-      <p class="sub">Mastery = finish all questions with <b>100% accuracy</b>. Wrong answer → hint + retry; accuracy reflects the miss. Ticket at end includes name + start/end + runtime.</p>
+      <p class="sub">
+        Mastery = finish all questions with <b>100% accuracy</b>. Click an answer to submit.
+        Wrong answer → hint appears → retry; accuracy reflects the miss. Auto-advance on correct.
+        Ticket at end includes name + start/end + runtime + accuracy.
+      </p>
     </div>
     <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:flex-start;justify-content:flex-end">
       <div class="pill">A–D mixed ✅</div>
-      <div class="pill">Hint + retry ✅</div>
+      <div class="pill">Auto-submit ✅</div>
+      <div class="pill">Auto-advance ✅</div>
+      <div class="pill">Hint on miss ✅</div>
       <div class="pill">Ticket ✅</div>
     </div>
   </div>
@@ -201,8 +208,10 @@
   ];
 
   // --- State ---
-  let idx = 0, attempts = 0, correct = 0, selected = null, locked = false;
+  let idx = 0, attempts = 0, correct = 0;
   let startedAt = null, endedAt = null, studentName = "";
+  let locked = false;
+
   const panel = document.getElementById("panel");
 
   // --- Helpers ---
@@ -227,7 +236,7 @@
     .replaceAll("&","&amp;").replaceAll("<","&lt;").replaceAll(">","&gt;")
     .replaceAll('"',"&quot;").replaceAll("'","&#039;");
 
-  // Seeded RNG + shuffle to distribute A/B/C/D (and avoid patterns)
+  // Seeded RNG + shuffle to distribute A/B/C/D
   function rngFromSeed(seed){
     let t = seed >>> 0;
     return function(){
@@ -274,10 +283,10 @@
         <input id="n" placeholder="Type first + last name"/>
         <div class="label" style="margin-top:10px">Rules</div>
         <div class="value" style="font-weight:700;color:var(--muted);line-height:1.45">
-          • You must finish with <b>100% accuracy</b> (0 misses).<br/>
-          • If you miss any question, you can still finish, but you must <b>restart</b> to earn mastery.<br/>
-          • Wrong answer → hint → retry (accuracy keeps the miss).<br/>
-          • Ticket appears only at the end if mastery is achieved.
+          • Click an answer to submit it (no Submit button).<br/>
+          • Wrong answer → hint appears → try again (accuracy keeps the miss).<br/>
+          • Correct answer → auto-advance to next question.<br/>
+          • Mastery ticket appears only if you finish with <b>100% accuracy</b>.
         </div>
       </div>
       <div class="controls">
@@ -289,7 +298,8 @@
       if(!v) return alert("Enter name");
       studentName = v;
       startedAt = new Date();
-      idx = 0; attempts = 0; correct = 0; selected = null; locked = false;
+      endedAt = null;
+      idx = 0; attempts = 0; correct = 0; locked = false;
       buildOrderMap();
       renderGame();
     };
@@ -318,32 +328,13 @@
       <div id="msg" class="msg"></div>
 
       <div class="controls">
-        <button id="submitBtn">Submit</button>
-        <button id="hintBtn" disabled>Hint</button>
-        <button id="nextBtn" disabled>Next</button>
         <button id="restartBtn">Restart</button>
       </div>
     `;
 
     const letters = ["A","B","C","D","E","F"];
     const cdiv = document.getElementById("choices");
-    map.order.forEach((origIdx, displayIdx) => {
-      const d = document.createElement("div");
-      d.className = "choice";
-      d.innerHTML = `<span class="mono" style="font-weight:900;color:var(--accent)">${letters[displayIdx]}.</span> ${escapeHtml(q.choices[origIdx])}`;
-      d.onclick = () => {
-        if(locked) return;
-        selected = displayIdx;
-        document.querySelectorAll('.choice').forEach(x=>x.classList.remove('sel'));
-        d.classList.add('sel');
-      };
-      cdiv.appendChild(d);
-    });
-
     const msg = document.getElementById("msg");
-    const submitBtn = document.getElementById("submitBtn");
-    const hintBtn = document.getElementById("hintBtn");
-    const nextBtn = document.getElementById("nextBtn");
     const restartBtn = document.getElementById("restartBtn");
 
     function setMsg(kind, text){
@@ -351,54 +342,71 @@
       msg.textContent = text;
     }
 
-    submitBtn.onclick = () => {
-      if(locked) return;
-      if(selected === null) return alert("Select answer");
-      attempts++;
+    function finishIfDone(){
+      if(idx < QUESTIONS.length) return;
+      endedAt = new Date();
+      const finalAcc = attempts ? Math.round((correct/attempts)*100) : 0;
 
-      if(selected === map.correctPos){
-        correct++;
-        locked = true;
-        setMsg("good","Correct. Click Next.");
-        nextBtn.disabled = false;
-        hintBtn.disabled = true;
-        // lock choices
-        document.querySelectorAll(".choice").forEach(x=>x.classList.add("disabled"));
+      if(finalAcc === 100 && attempts === QUESTIONS.length){
+        renderTicket();
       } else {
-        setMsg("bad","Incorrect. Use the hint, then try again (accuracy will reflect the miss).");
-        hintBtn.disabled = false;
+        alert("No mastery yet (100% required). Restart and try again.");
+        renderStart();
       }
-    };
+    }
 
-    hintBtn.onclick = () => {
-      setMsg("warn","Hint: " + (q.hint || "Think about which constitutional feature or civic action is being described."));
-      hintBtn.disabled = true;
-    };
-
-    nextBtn.onclick = () => {
+    function advance(){
       idx++;
-      selected = null;
       locked = false;
-
       if(idx >= QUESTIONS.length){
-        endedAt = new Date();
-        const finalAcc = attempts ? Math.round((correct/attempts)*100) : 0;
-
-        if(finalAcc === 100 && attempts === QUESTIONS.length){
-          renderTicket();
-        } else {
-          alert("No mastery yet (100% required). Restart and try again.");
-          renderStart();
-        }
+        finishIfDone();
       } else {
         renderGame();
       }
-    };
+    }
+
+    // Build choices (click = auto-submit)
+    map.order.forEach((origIdx, displayIdx) => {
+      const d = document.createElement("div");
+      d.className = "choice";
+      d.innerHTML = `<span class="mono" style="font-weight:900;color:var(--accent)">${letters[displayIdx]}.</span> ${escapeHtml(q.choices[origIdx])}`;
+
+      d.onclick = () => {
+        if(locked) return;
+
+        // Visual select
+        document.querySelectorAll('.choice').forEach(x=>x.classList.remove('sel'));
+        d.classList.add('sel');
+
+        // Auto-submit
+        attempts++;
+
+        if(displayIdx === map.correctPos){
+          correct++;
+          locked = true;
+          setMsg("good","Correct.");
+          document.querySelectorAll(".choice").forEach(x=>x.classList.add("disabled"));
+
+          // Auto-advance shortly (so they see feedback)
+          setTimeout(() => advance(), 550);
+        } else {
+          // Wrong: show hint immediately, allow retry (keep question live)
+          setMsg("warn","Hint: " + (q.hint || "Think about which constitutional feature or civic action is being described."));
+          // brief "incorrect" cue without requiring a button
+          msg.className = "msg bad";
+          msg.textContent = "Incorrect. " + "Hint: " + (q.hint || "Think about which constitutional feature or civic action is being described.");
+          // keep unlocked so they can click again
+        }
+      };
+
+      cdiv.appendChild(d);
+    });
 
     restartBtn.onclick = () => {
       if(!confirm("Restart the game? This will reset progress.")) return;
       startedAt = new Date();
-      idx = 0; attempts = 0; correct = 0; selected = null; locked = false;
+      endedAt = null;
+      idx = 0; attempts = 0; correct = 0; locked = false;
       buildOrderMap();
       renderGame();
     };
@@ -408,6 +416,7 @@
     const runtimeMs = endedAt - startedAt;
     const runtime = msToHMS(runtimeMs);
     const dateStr = fmt(new Date()).slice(0,10);
+    const acc = attempts ? Math.round((correct/attempts)*100) : 0;
 
     const payload = [
       "GOV-OST-CS16-17",
@@ -415,7 +424,8 @@
       fmt(startedAt),
       fmt(endedAt),
       runtime,
-      `Score:${correct}/${attempts}`
+      `Score:${correct}/${attempts}`,
+      `Acc:${acc}%`
     ].join("|");
 
     const code = hashCode(payload);
@@ -432,7 +442,10 @@ DATE: ${dateStr}
 START: ${fmt(startedAt)}
 END:   ${fmt(endedAt)}
 RUNTIME: ${runtime}
-SCORE: ${correct}/${attempts} (100%)
+ACCURACY: ${acc}%
+SCORE: ${correct}/${attempts}
+
+PASSED: YES (100%)
 
 SUBMISSION CODE: ${code}
         </pre>
@@ -456,3 +469,4 @@ SUBMISSION CODE: ${code}
 </script>
 </body>
 </html>
+```
