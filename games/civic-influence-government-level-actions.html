@@ -5,7 +5,6 @@
   <meta name="viewport" content="width=device-width,initial-scale=1" />
   <title>Civic Influence: Actions & Government Levels (CS 1/17/19) — Government OST Review</title>
 
-  <!-- Uses your shared hub stylesheet if present -->
   <link rel="stylesheet" href="../styles.css" />
 
   <style>
@@ -131,6 +130,10 @@
       border-color: rgba(122,162,255,.45);
       background: rgba(122,162,255,.10);
     }
+    .btn.danger{
+      border-color: rgba(255,92,122,.45);
+      background: rgba(255,92,122,.10);
+    }
     .btn[disabled]{opacity:.6; cursor:not-allowed}
 
     .field{display:grid; gap:6px; margin-top:10px;}
@@ -145,7 +148,6 @@
     }
     input[type="text"]:focus{border-color:rgba(122,162,255,.55)}
 
-    /* Grid questions */
     .gridq{margin-top:12px; border:1px solid var(--line); border-radius:14px; overflow:hidden}
     .gridq .hdr{
       display:grid;
@@ -170,7 +172,6 @@
     .gridq label{display:flex; align-items:center; gap:8px; color:var(--muted); font-size:13px}
     .gridq input{transform: translateY(1px);}
 
-    /* Error box */
     .errbox{
       display:none;
       margin-top:14px;
@@ -238,7 +239,6 @@
     </div>
 
     <div class="grid">
-      <!-- MAIN -->
       <section class="panel">
         <div class="row">
           <div class="label">QUESTION</div>
@@ -266,7 +266,7 @@
           <input id="studentName" type="text" placeholder="e.g., Jordan Smith" autocomplete="name" />
           <div class="actions">
             <button class="btn primary" id="btnStart">Start</button>
-            <button class="btn" id="btnResetAll" title="Clears saved progress for this game only">Reset Game</button>
+            <button class="btn danger" id="btnResetAll" title="Clears saved progress for this game only">Reset Game</button>
           </div>
           <div class="muted" style="margin-top:6px;font-size:12px;">
             Note: progress is saved in this browser (localStorage) until you finish or reset.
@@ -294,6 +294,7 @@
           <div class="actions">
             <button class="btn" id="btnHint" disabled>Hint</button>
             <button class="btn primary" id="btnNext" disabled>Next</button>
+            <button class="btn danger" id="btnRestartGame" title="Clears saved progress and restarts from the beginning">Restart Game</button>
           </div>
         </div>
 
@@ -333,17 +334,17 @@
             <div class="code" id="tCode">—</div>
             <div class="actions" style="margin-top:10px;">
               <button class="btn primary" id="btnCopy">Copy Ticket Code</button>
-              <button class="btn" id="btnReset">Play Again</button>
+              <button class="btn danger" id="btnReset">Play Again</button>
             </div>
           </div>
 
           <div class="actions" style="margin-top:10px;">
+            <button class="btn danger" id="btnRestartFromFinish">Restart Game</button>
             <button class="btn" id="btnBackHome" onclick="location.href='../index.html'">Back to Hub</button>
           </div>
         </div>
       </section>
 
-      <!-- SIDE INFO -->
       <aside class="panel">
         <div class="label">RULES</div>
         <ul class="muted" style="margin:10px 0 0; line-height:1.45;">
@@ -363,7 +364,7 @@
 
         <div class="label">SAVED PROGRESS</div>
         <p class="muted" style="margin:10px 0 0; line-height:1.45;">
-          Progress saves automatically for this game in this browser. Reset removes saved data for this game only.
+          Progress saves automatically for this game in this browser. Restart removes saved data for this game only and begins from the start.
         </p>
       </aside>
     </div>
@@ -371,7 +372,6 @@
 
 <script>
 (() => {
-  // ---------- Hardened shell + on-page error box ----------
   const errbox = document.getElementById('errbox');
   const errtext = document.getElementById('errtext');
   window.addEventListener('error', (e) => {
@@ -383,7 +383,6 @@
     errtext.textContent = `Unhandled Promise Rejection:\n${(e.reason && e.reason.stack) ? e.reason.stack : e.reason}`;
   });
 
-  // ---------- Utilities ----------
   const pad2 = n => String(n).padStart(2,'0');
   const fmtTime = (d) => {
     const hr = d.getHours();
@@ -420,7 +419,6 @@
       .replaceAll("'","&#039;");
   }
 
-  // Deterministic-ish shuffle for MCQ option order (varies by question + run)
   function mulberry32(seed){
     return function(){
       let t = seed += 0x6D2B79F5;
@@ -439,8 +437,8 @@
     return idx;
   }
 
-  // ---------- State ----------
   const STORAGE_KEY = 'GOV_OST_CIVIC_ACTIONS_V1';
+
   let state = {
     name: '',
     startedAtISO: '',
@@ -449,15 +447,10 @@
     attempts: 0,
     correct: 0,
     missed: 0,
-    // a run-seed so the same student doesn't always see the same correct letter per item
     runSeed: 0
   };
 
-  // ---------- Released items (verbatim) ----------
   const QUESTIONS = [
-    // =========================
-    // RELEASED (verbatim)
-    // =========================
     {
       id: 'Q9_GA_TEACHERS',
       type: 'mcq',
@@ -630,10 +623,6 @@
       hint: 'City/township + neighborhood watch = local. National Guard + governor = state.',
       explain: 'Correct: classify each civic opportunity by the level of government most connected to it.'
     },
-
-    // =========================
-    // STANDARDS-SUPPLEMENTED (CS 1 / 17 / 19)
-    // =========================
     {
       id: 'CS1_SUPP_01',
       type: 'mcq',
@@ -915,7 +904,6 @@
     }
   ];
 
-  // ---------- DOM ----------
   const elQpos = document.getElementById('qpos');
   const elAcc = document.getElementById('acc');
   const elRuntime = document.getElementById('runtime');
@@ -942,6 +930,7 @@
   const elFbBody = document.getElementById('fbBody');
   const btnHint = document.getElementById('btnHint');
   const btnNext = document.getElementById('btnNext');
+  const btnRestartGame = document.getElementById('btnRestartGame');
 
   const elFinishBox = document.getElementById('finishBox');
   const elFinishTitle = document.getElementById('finishTitle');
@@ -957,8 +946,8 @@
   const elTCode = document.getElementById('tCode');
   const btnCopy = document.getElementById('btnCopy');
   const btnReset = document.getElementById('btnReset');
+  const btnRestartFromFinish = document.getElementById('btnRestartFromFinish');
 
-  // finish summary (always shown)
   const elSName = document.getElementById('sName');
   const elSDate = document.getElementById('sDate');
   const elSStart = document.getElementById('sStart');
@@ -966,7 +955,6 @@
   const elSRun = document.getElementById('sRun');
   const elSAcc = document.getElementById('sAcc');
 
-  // ---------- Persistence ----------
   function save(){ localStorage.setItem(STORAGE_KEY, JSON.stringify(state)); }
   function load(){
     try{
@@ -976,25 +964,31 @@
       if(!parsed || !parsed.startedAtISO || !parsed.name) return false;
       state = parsed;
       return true;
-    }catch{ return false; }
+    }catch{
+      return false;
+    }
   }
   function clearSave(){ localStorage.removeItem(STORAGE_KEY); }
 
-  // ---------- Stats ----------
-  function accuracyPct(){
-    return state.attempts ? Math.round((state.correct/state.attempts)*100) : 0;
+  function hardRestart(){
+    clearSave();
+    window.location.href = window.location.pathname + window.location.search + window.location.hash;
   }
+
+  function accuracyPct(){
+    return state.attempts ? Math.round((state.correct / state.attempts) * 100) : 0;
+  }
+
   function updateStats(){
     const total = QUESTIONS.length;
-    const pos = Math.min(state.idx+1, total);
-    elQpos.textContent = `${pos} / ${total}`;
+    const pos = state.startedAtMS ? Math.min(state.idx + 1, total) : 0;
+    elQpos.textContent = state.startedAtMS ? `${pos} / ${total}` : `0 / ${total}`;
     elAcc.textContent = `${accuracyPct()}%`;
     const rt = state.startedAtMS ? (Date.now() - state.startedAtMS) : 0;
     elRuntime.textContent = msToHMS(rt);
   }
   setInterval(updateStats, 500);
 
-  // ---------- UI helpers ----------
   function setFeedback(kind, title, body){
     elFeedback.className = `msg ${kind}`;
     elFbTitle.textContent = title;
@@ -1012,20 +1006,15 @@
     btnSubmitGrid.disabled = disabled;
   }
 
-  // ---------- Working (per-question) ----------
   let working = {
-    mcqOrder: null,      // array of original option indices in display order
-    mcqCorrectShown: -1  // the displayed index that is correct (after shuffling)
+    mcqOrder: null,
+    mcqCorrectShown: -1
   };
 
   function prepareMCQOrder(q){
-    // Keep the same order while the student retries the same question
-    // (don’t reshuffle on every click/submit).
     const seed = hash32(`${q.id}|${state.runSeed}|${state.startedAtISO || ''}`) ^ 0xA53C9E21;
     const order = shuffledIndices(q.options.length, seed);
     working.mcqOrder = order;
-
-    // Convert original correct index -> displayed correct index
     working.mcqCorrectShown = order.indexOf(q.answerIndex);
   }
 
@@ -1042,13 +1031,11 @@
     elMcqBox.style.display = 'none';
     elGridBox.style.display = 'none';
 
-    // reset working for this item
     working = { mcqOrder: null, mcqCorrectShown: -1 };
 
     if(q.type === 'mcq'){
       elMcqBox.style.display = '';
       elOpts.innerHTML = '';
-
       prepareMCQOrder(q);
 
       const letters = ['A','B','C','D','E','F','G','H'];
@@ -1065,7 +1052,6 @@
     if(q.type === 'grid_single_per_row'){
       elGridBox.style.display = '';
       elGridPrompt.textContent = q.prompt;
-
       const cols = q.grid.columns;
       const rows = q.grid.rows;
 
@@ -1073,9 +1059,8 @@
 
       const hdr = document.createElement('div');
       hdr.className = 'hdr';
-      // 1 prompt col + N choice cols (simple, stable sizing)
       hdr.style.gridTemplateColumns = `1.6fr repeat(${cols.length}, 1fr)`;
-      hdr.innerHTML = `<div class="cell"></div>` + cols.map(c=>`<div class="cell">${escapeHtml(c)}</div>`).join('');
+      hdr.innerHTML = `<div class="cell"></div>` + cols.map(c => `<div class="cell">${escapeHtml(c)}</div>`).join('');
       elGridQ.appendChild(hdr);
 
       rows.forEach((r, rowIdx) => {
@@ -1095,7 +1080,7 @@
           cell.innerHTML = `
             <label>
               <input type="checkbox" id="${id}" data-row="${rowIdx}" data-col="${colIdx}">
-              <span class="mono">${String.fromCharCode(65+colIdx)}</span>
+              <span class="mono">${String.fromCharCode(65 + colIdx)}</span>
             </label>
           `;
           row.appendChild(cell);
@@ -1104,12 +1089,11 @@
         elGridQ.appendChild(row);
       });
 
-      // one check per row
-      elGridQ.querySelectorAll('input[type="checkbox"]').forEach(cb=>{
+      elGridQ.querySelectorAll('input[type="checkbox"]').forEach(cb => {
         cb.addEventListener('change', () => {
           if(!cb.checked) return;
           const row = cb.dataset.row;
-          elGridQ.querySelectorAll(`input[data-row="${row}"]`).forEach(other=>{
+          elGridQ.querySelectorAll(`input[data-row="${row}"]`).forEach(other => {
             if(other !== cb) other.checked = false;
           });
         });
@@ -1120,12 +1104,10 @@
     save();
   }
 
-  // ---------- Answering ----------
   function answerMCQ(shownChoiceIdx){
     const q = QUESTIONS[state.idx];
     state.attempts += 1;
 
-    // compare against displayed-correct index (post-shuffle)
     const correct = (shownChoiceIdx === working.mcqCorrectShown);
 
     if(correct){
@@ -1195,7 +1177,6 @@
     updateStats();
   });
 
-  // ---------- Finish / Ticket ----------
   function showFinish(){
     elNameBox.style.display = 'none';
     elQuestionBox.style.display = 'none';
@@ -1206,7 +1187,6 @@
     const start = new Date(state.startedAtISO);
     const runMS = Date.now() - state.startedAtMS;
 
-    // Always show summary timestamps (even if not mastery)
     elSName.textContent = state.name;
     elSDate.textContent = fmtDate(ended);
     elSStart.textContent = fmtTime(start);
@@ -1214,8 +1194,6 @@
     elSRun.textContent = msToHMS(runMS);
     elSAcc.textContent = `${acc}%`;
 
-    // Mastery = 100% accuracy AND exactly one correct submission per item
-    // (i.e., no retries: attempts must equal total questions, and correct must equal total questions).
     const total = QUESTIONS.length;
     const mastery = (acc === 100 && state.attempts === total && state.correct === total);
 
@@ -1238,7 +1216,7 @@
       clearSave();
     } else {
       elFinishTitle.textContent = 'Mastery NOT achieved ❌';
-      elFinishBody.textContent = `Accuracy: ${acc}%. Mastery requires 0 misses (100%). Click “Play Again” and run it clean.`;
+      elFinishBody.textContent = `Accuracy: ${acc}%. Mastery requires 0 misses (100%). Click “Restart Game” and run it clean.`;
       elTicket.style.display = 'none';
     }
 
@@ -1249,24 +1227,18 @@
     try{
       await navigator.clipboard.writeText(elTCode.textContent.trim());
       btnCopy.textContent = 'Copied ✅';
-      setTimeout(()=>btnCopy.textContent='Copy Ticket Code', 1100);
+      setTimeout(() => btnCopy.textContent = 'Copy Ticket Code', 1100);
     }catch{
       btnCopy.textContent = 'Copy failed';
-      setTimeout(()=>btnCopy.textContent='Copy Ticket Code', 1100);
+      setTimeout(() => btnCopy.textContent = 'Copy Ticket Code', 1100);
     }
   });
 
-  btnReset.addEventListener('click', () => {
-    clearSave();
-    location.reload();
-  });
+  btnReset.addEventListener('click', hardRestart);
+  btnResetAll.addEventListener('click', hardRestart);
+  btnRestartGame.addEventListener('click', hardRestart);
+  btnRestartFromFinish.addEventListener('click', hardRestart);
 
-  btnResetAll.addEventListener('click', () => {
-    clearSave();
-    location.reload();
-  });
-
-  // ---------- Start ----------
   btnStart.addEventListener('click', () => {
     const name = (elStudentName.value || '').trim();
     if(name.length < 2){
@@ -1294,22 +1266,14 @@
     elNameBox.style.display = 'none';
     elQuestionBox.style.display = '';
     showQuestion();
+  } else {
+    updateStats();
   }
 })();
-  // ===== Restart + Back/Forward Cache Fix =====
-  // When a user returns to this page via the Back button,
-  // Chrome may restore the old "finished" state from bfcache.
-  // This forces a clean reload so the game starts fresh.
-  window.addEventListener("pageshow", (e) => {
-    if (e.persisted) window.location.reload();
-  });
 
-  function restartGame(){
-    // If you ever add persistence later, clear it here:
-    // localStorage.removeItem("LEGEND_STATE:" + location.pathname);
-    // sessionStorage.removeItem("LEGEND_STATE:" + location.pathname);
-    window.location.reload();
-  }
+window.addEventListener("pageshow", (e) => {
+  if (e.persisted) window.location.reload();
+});
 </script>
 </body>
 </html>
