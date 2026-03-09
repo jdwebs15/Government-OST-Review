@@ -5,7 +5,6 @@
   <meta name="viewport" content="width=device-width,initial-scale=1" />
   <title>Credible Sources & Evidence Types (CS 3) — Government OST Review</title>
 
-  <!-- Use your hub stylesheet for consistent look -->
   <link rel="stylesheet" href="../styles.css" />
 
   <style>
@@ -144,7 +143,6 @@
     }
     input[type="text"]:focus{border-color:rgba(122,162,255,.55)}
 
-    /* Grid question */
     .gridq{margin-top:12px; border:1px solid var(--line); border-radius:14px; overflow:hidden}
     .gridq .hdr{
       display:grid;
@@ -169,7 +167,6 @@
     .gridq label{display:flex; align-items:center; gap:8px; color:var(--muted); font-size:13px}
     .gridq input{transform: translateY(1px);}
 
-    /* Error box */
     .errbox{
       display:none;
       margin-top:14px;
@@ -237,7 +234,6 @@
     </div>
 
     <div class="grid">
-      <!-- MAIN -->
       <section class="panel">
         <div class="row">
           <div class="label">QUESTION</div>
@@ -293,6 +289,7 @@
           <div class="actions">
             <button class="btn" id="btnHint" disabled>Hint</button>
             <button class="btn primary" id="btnNext" disabled>Next</button>
+            <button class="btn" id="btnRestartMid">Restart Game</button>
           </div>
         </div>
 
@@ -337,12 +334,12 @@
           </div>
 
           <div class="actions" style="margin-top:10px;">
+            <button class="btn" id="btnRestartGame" onclick="restartGame()">Restart Game</button>
             <button class="btn" id="btnBackHome" onclick="location.href='../index.html'">Back to Hub</button>
           </div>
         </div>
       </section>
 
-      <!-- SIDE INFO -->
       <aside class="panel">
         <div class="label">RULES</div>
         <ul class="muted" style="margin:10px 0 0; line-height:1.45;">
@@ -370,7 +367,6 @@
 
 <script>
 (() => {
-  // ---------- Hardened shell + on-page error box ----------
   const errbox = document.getElementById('errbox');
   const errtext = document.getElementById('errtext');
   window.addEventListener('error', (e) => {
@@ -382,7 +378,6 @@
     errtext.textContent = `Unhandled Promise Rejection:\n${(e.reason && e.reason.stack) ? e.reason.stack : e.reason}`;
   });
 
-  // ---------- Utilities ----------
   const pad2 = n => String(n).padStart(2,'0');
   const fmtTime = (d) => {
     const hr = d.getHours();
@@ -409,7 +404,6 @@
       .replaceAll("'","&#039;");
   }
 
-  // small deterministic hash for ticket + shuffle seeds
   const hash32 = (str) => {
     let h = 2166136261 >>> 0;
     for (let i=0;i<str.length;i++){
@@ -420,7 +414,6 @@
   };
   const base36 = (n) => n.toString(36).toUpperCase();
 
-  // deterministic PRNG
   function mulberry32(seed){
     return function(){
       let t = seed += 0x6D2B79F5;
@@ -439,9 +432,7 @@
     return idx;
   }
 
-  // ---------- Released items (verbatim) + CS3 supplements ----------
   const QUESTIONS = [
-    // RELEASED (verbatim)
     {
       id: 'GOV3_NEW_2025_VERIFY_SOCIAL',
       type: 'mcq',
@@ -497,7 +488,6 @@
       explain: 'Correct: projected cost data from architects/accountants is the most relevant and credible evidence.'
     },
 
-    // CS3 SUPPLEMENTED
     { id:'CS3_SUPP_01', type:'mcq', title:'Author Qualifications', prompt:
 `A news article about a new city budget is written by someone with no stated experience, no sources cited, and no links to official documents. Which factor MOST weakens the credibility of this source?`,
       options:[
@@ -751,7 +741,6 @@
     }
   ];
 
-  // ---------- DOM ----------
   const elQpos = document.getElementById('qpos');
   const elAcc = document.getElementById('acc');
   const elRuntime = document.getElementById('runtime');
@@ -778,6 +767,7 @@
   const elFbBody = document.getElementById('fbBody');
   const btnHint = document.getElementById('btnHint');
   const btnNext = document.getElementById('btnNext');
+  const btnRestartMid = document.getElementById('btnRestartMid');
 
   const elFinishBox = document.getElementById('finishBox');
   const elFinishTitle = document.getElementById('finishTitle');
@@ -801,18 +791,15 @@
   const btnCopy = document.getElementById('btnCopy');
   const btnReset = document.getElementById('btnReset');
 
-  // ---------- State ----------
   const STORAGE_KEY = 'GOV_OST_CS3_V2';
 
-  // meta: per-question:
-  // { done:boolean, missed:boolean, order:number[] | null, correctShown:number | null }
   let state = {
     name: '',
     startedAtISO: '',
     startedAtMS: 0,
     idx: 0,
     runSeed: 0,
-    qmeta: [] // length = QUESTIONS.length
+    qmeta: []
   };
 
   function freshMeta(){
@@ -824,7 +811,6 @@
     }));
   }
 
-  // ---------- Persistence ----------
   function save(){ localStorage.setItem(STORAGE_KEY, JSON.stringify(state)); }
   function load(){
     try{
@@ -835,11 +821,12 @@
       if(!Array.isArray(parsed.qmeta) || parsed.qmeta.length !== QUESTIONS.length) return false;
       state = parsed;
       return true;
-    }catch{ return false; }
+    }catch{
+      return false;
+    }
   }
   function clearSave(){ localStorage.removeItem(STORAGE_KEY); }
 
-  // ---------- Stats ----------
   function counts(){
     const done = state.qmeta.filter(m => m.done).length;
     const perfect = state.qmeta.filter(m => m.done && !m.missed).length;
@@ -860,7 +847,6 @@
   }
   setInterval(updateStats, 500);
 
-  // ---------- UI helpers ----------
   function setFeedback(kind, title, body){
     elFeedback.className = `msg ${kind}`;
     elFbTitle.textContent = title;
@@ -878,7 +864,6 @@
     btnSubmitGrid.disabled = disabled;
   }
 
-  // ---------- Option mixing (so answers don't sit in A/B) ----------
   function ensureMCQOrder(qIndex){
     const q = QUESTIONS[qIndex];
     const meta = state.qmeta[qIndex];
@@ -895,7 +880,6 @@
     meta.correctShown = order.indexOf(q.answerIndex);
   }
 
-  // ---------- Question render ----------
   function showQuestion(){
     const q = QUESTIONS[state.idx];
     const meta = state.qmeta[state.idx];
@@ -966,7 +950,6 @@
         elGridQ.appendChild(row);
       });
 
-      // enforce one selection per row
       elGridQ.querySelectorAll('input[type="checkbox"]').forEach(cb=>{
         cb.addEventListener('change', () => {
           if(!cb.checked) return;
@@ -978,7 +961,6 @@
       });
     }
 
-    // If already done (rare unless you add back-nav later), lock it
     if(meta.done){
       disableInputs(true);
       btnNext.disabled = false;
@@ -992,11 +974,9 @@
     save();
   }
 
-  // ---------- Answering rules ----------
-  // Wrong = mark missed for THIS item, show hint, allow retry, no Next until correct.
   function markMiss(){
     const meta = state.qmeta[state.idx];
-    meta.missed = true; // stays true even after they fix it
+    meta.missed = true;
   }
   function markDone(){
     const meta = state.qmeta[state.idx];
@@ -1004,7 +984,6 @@
   }
 
   function showAutoHint(q){
-    // Auto-hint on wrong (per your rule)
     setFeedback('warn', 'Hint 💡', q.hint || 'Use credible sources, relevant evidence, and logical conclusions.');
     btnHint.disabled = true;
   }
@@ -1029,8 +1008,6 @@
       setFeedback('bad', 'Not yet ❌', 'Try again. A hint is shown to help you correct it (accuracy keeps the miss).');
       btnNext.disabled = true;
       btnHint.disabled = false;
-
-      // show hint automatically
       showAutoHint(q);
       save();
       updateStats();
@@ -1074,8 +1051,6 @@
       }
       btnNext.disabled = true;
       btnHint.disabled = false;
-
-      // show hint automatically
       showAutoHint(q);
       save();
       updateStats();
@@ -1094,7 +1069,6 @@
     showQuestion();
   });
 
-  // ---------- Finish / Ticket ----------
   function showFinish(){
     elNameBox.style.display = 'none';
     elQuestionBox.style.display = 'none';
@@ -1109,7 +1083,6 @@
     const perfect = state.qmeta.filter(m => m.done && !m.missed).length;
     const acc = total ? Math.round((perfect / total) * 100) : 0;
 
-    // Always show summary
     elSName.textContent = state.name;
     elSDate.textContent = fmtDate(ended);
     elSStart.textContent = fmtTime(start);
@@ -1138,7 +1111,7 @@
       clearSave();
     } else {
       elFinishTitle.textContent = 'Mastery NOT achieved ❌';
-      elFinishBody.textContent = `Accuracy: ${acc}%. Mastery requires 0 misses (100%). Click “Play Again” and run it clean.`;
+      elFinishBody.textContent = `Accuracy: ${acc}%. Mastery requires 0 misses (100%). Click “Play Again” or “Restart Game” and run it clean.`;
       elTicket.style.display = 'none';
     }
 
@@ -1164,8 +1137,10 @@
     clearSave();
     location.reload();
   });
+  btnRestartMid.addEventListener('click', () => {
+    restartGame();
+  });
 
-  // ---------- Start ----------
   btnStart.addEventListener('click', () => {
     const name = (elStudentName.value || '').trim();
     if(name.length < 2){
@@ -1180,7 +1155,6 @@
     state.runSeed = (Math.floor(Math.random()*1e9) ^ hash32(name + '|' + state.startedAtISO)) >>> 0;
     state.qmeta = freshMeta();
 
-    // precompute MCQ orders so they persist across refresh/resume
     for(let i=0;i<QUESTIONS.length;i++){
       if(QUESTIONS[i].type === 'mcq') ensureMCQOrder(i);
     }
@@ -1192,7 +1166,6 @@
     showQuestion();
   });
 
-  // resume if saved
   if(load()){
     elStudentName.value = state.name || '';
     elNameBox.style.display = 'none';
@@ -1200,22 +1173,17 @@
     showQuestion();
   }
 
-  // initial stats render
   updateStats();
 })();
 </script>
 
 <script>
-  // ===== Restart + Back/Forward Cache Fix =====
-  // When a user returns to this page via the Back button,
-  // Chrome may restore the old "finished" state from bfcache.
-  // This forces a clean reload so the game starts fresh.
   window.addEventListener("pageshow", (e) => {
     if (e.persisted) window.location.reload();
   });
 
   function restartGame(){
-    // localStorage.removeItem('GOV_OST_CS3_V2');
+    localStorage.removeItem('GOV_OST_CS3_V2');
     window.location.reload();
   }
 </script>
