@@ -1,0 +1,401 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>SCOTUS Detective — Constitutional Case Files</title>
+
+<link rel="stylesheet" href="../styles.css"/>
+
+<style>
+
+:root{
+--bg:#0b1220;
+--panel:#111a2f;
+--text:#e7eefc;
+--muted:#a8b4cf;
+--line:rgba(255,255,255,.12);
+--good:#2bd576;
+--bad:#ff5c7a;
+--warn:#ffd166;
+--accent:#7aa2ff;
+--radius:18px;
+--shadow:0 18px 55px rgba(0,0,0,.40);
+}
+
+*{box-sizing:border-box}
+
+body{
+margin:0;
+background:linear-gradient(180deg,#0b1220,#070b14);
+color:var(--text);
+font-family:system-ui,Segoe UI,Roboto,Helvetica;
+}
+
+.wrap{
+width:min(1000px,92vw);
+margin:40px auto;
+}
+
+.card{
+background:var(--panel);
+border-radius:var(--radius);
+padding:28px;
+border:1px solid var(--line);
+box-shadow:var(--shadow);
+}
+
+.answers{
+display:grid;
+gap:10px;
+margin-top:18px;
+}
+
+.answer{
+padding:14px;
+border-radius:10px;
+border:1px solid var(--line);
+cursor:pointer;
+}
+
+.answer:hover{
+background:#162042;
+}
+
+.good{
+background:rgba(43,213,118,.2);
+border-color:var(--good);
+}
+
+.bad{
+background:rgba(255,92,122,.2);
+border-color:var(--bad);
+}
+
+.hint{
+margin-top:10px;
+color:var(--warn);
+}
+
+.topbar{
+display:flex;
+justify-content:space-between;
+margin-bottom:16px;
+}
+
+button{
+padding:10px 16px;
+border:none;
+border-radius:10px;
+background:var(--accent);
+cursor:pointer;
+font-weight:600;
+}
+
+.ticket{
+white-space:pre-wrap;
+background:#0e162e;
+padding:20px;
+border-radius:10px;
+margin-top:20px;
+}
+
+</style>
+</head>
+
+<body>
+
+<div class="wrap">
+
+<div id="startCard" class="card">
+
+<h2>SCOTUS Detective</h2>
+
+<p class="muted">
+Investigate Supreme Court cases and determine the constitutional
+right or principle involved.
+</p>
+
+<input id="name" placeholder="Enter your name">
+
+<br><br>
+
+<button onclick="startGame()">Start Investigation</button>
+
+</div>
+
+
+<div id="gameCard" class="card" style="display:none">
+
+<div class="topbar">
+<div id="progress"></div>
+<div>Accuracy: <span id="accuracy">100%</span></div>
+</div>
+
+<div id="passage"></div>
+
+<h3 id="question"></h3>
+
+<div id="answers" class="answers"></div>
+
+<div id="hint" class="hint"></div>
+
+<br>
+
+<button onclick="restart()">Restart</button>
+
+</div>
+
+
+<div id="endCard" class="card" style="display:none">
+
+<h2>Investigation Complete</h2>
+
+<div id="ticket" class="ticket"></div>
+
+<button onclick="restart()">Play Again</button>
+
+</div>
+
+</div>
+
+<script>
+
+const questions=[
+
+{
+passage:`Police entered Dollree Mapp’s home without a valid search warrant and found illegal materials.`,
+q:"Which constitutional amendment protects against this action?",
+a:["1st Amendment","4th Amendment","5th Amendment","8th Amendment"],
+c:1,
+h:"Searches and warrants involve the Fourth Amendment."
+},
+
+{
+passage:`Clarence Gideon requested an attorney but was denied because he could not afford one.`,
+q:"Which amendment guarantees the right to legal counsel?",
+a:["4th Amendment","5th Amendment","6th Amendment","10th Amendment"],
+c:2,
+h:"Criminal defendants have the right to an attorney."
+},
+
+{
+passage:`A suspect confessed during police interrogation without being informed of their rights.`,
+q:"Which amendment protects against self-incrimination?",
+a:["4th Amendment","5th Amendment","6th Amendment","8th Amendment"],
+c:1,
+h:"This amendment includes the right to remain silent."
+},
+
+{
+passage:`William Marbury asked the Supreme Court to force the government to deliver his judicial commission.`,
+q:"Which power did this case establish?",
+a:["Judicial Review","Executive Privilege","Federalism","Nullification"],
+c:0,
+h:"The Court gained the power to declare laws unconstitutional."
+},
+
+{
+passage:`Maryland attempted to tax the national bank.`,
+q:"Which clause justified Congress creating the bank?",
+a:["Commerce Clause","Necessary and Proper Clause","Establishment Clause","Full Faith Clause"],
+c:1,
+h:"This clause allows Congress to pass laws needed to carry out powers."
+},
+
+{
+passage:`The state of New York tried to regulate steamboat trade between states.`,
+q:"Which clause gave the national government authority?",
+a:["Commerce Clause","Supremacy Clause","Elastic Clause","Equal Protection Clause"],
+c:0,
+h:"Interstate trade is controlled by Congress."
+},
+
+{
+passage:`A student wore a black armband protesting the Vietnam War and was suspended.`,
+q:"Which constitutional freedom was involved?",
+a:["Freedom of Speech","Freedom of Religion","Right to Privacy","Right to Bear Arms"],
+c:0,
+h:"Symbolic protest is protected speech."
+},
+
+{
+passage:`Segregated schools were challenged because they treated students differently based on race.`,
+q:"Which amendment's Equal Protection Clause was used?",
+a:["10th Amendment","13th Amendment","14th Amendment","19th Amendment"],
+c:2,
+h:"This amendment requires equal protection of the law."
+},
+
+{
+passage:`Police seized evidence illegally but attempted to use it in court.`,
+q:"Which rule prevents illegally obtained evidence from being used?",
+a:["Stare Decisis","Exclusionary Rule","Executive Privilege","Nullification"],
+c:1,
+h:"Evidence obtained illegally cannot be used in trial."
+},
+
+{
+passage:`A president attempted to seize steel mills without Congressional approval.`,
+q:"Which principle limits presidential power here?",
+a:["Popular Sovereignty","Separation of Powers","Federalism","Reserved Powers"],
+c:1,
+h:"Each branch has separate powers."
+},
+
+{
+passage:`A state law attempted to limit free speech during a political protest.`,
+q:"Which amendment protects political speech?",
+a:["1st Amendment","2nd Amendment","4th Amendment","6th Amendment"],
+c:0,
+h:"Speech, press, religion, assembly."
+},
+
+{
+passage:`The Court applied freedom of speech protections to the states.`,
+q:"Which doctrine allowed this?",
+a:["Judicial Review","Doctrine of Incorporation","Elastic Clause","Federal Supremacy"],
+c:1,
+h:"The 14th Amendment applies rights to states."
+},
+
+{
+passage:`A suspect was forced to testify against themselves in court.`,
+q:"Which amendment protects against this?",
+a:["4th Amendment","5th Amendment","6th Amendment","7th Amendment"],
+c:1,
+h:"Self-incrimination is prohibited."
+},
+
+{
+passage:`A criminal defendant demanded a speedy public trial.`,
+q:"Which amendment guarantees this right?",
+a:["5th Amendment","6th Amendment","8th Amendment","10th Amendment"],
+c:1,
+h:"Trial rights are in the Sixth Amendment."
+},
+
+{
+passage:`Congress passed a law and the Supreme Court declared it unconstitutional.`,
+q:"Which constitutional principle is demonstrated?",
+a:["Checks and Balances","Popular Sovereignty","Reserved Powers","Direct Democracy"],
+c:0,
+h:"One branch checking another."
+}
+
+];
+
+let current=0;
+let correct=0;
+let attempts=0;
+let startTime;
+
+function startGame(){
+
+const name=document.getElementById("name").value;
+
+if(!name){alert("Enter your name");return;}
+
+startTime=new Date();
+
+document.getElementById("startCard").style.display="none";
+document.getElementById("gameCard").style.display="block";
+
+loadQuestion();
+}
+
+function loadQuestion(){
+
+if(current>=questions.length){finish();return;}
+
+const q=questions[current];
+
+document.getElementById("progress").innerText=`Case ${current+1} / ${questions.length}`;
+
+document.getElementById("passage").innerHTML="<p>"+q.passage+"</p>";
+
+document.getElementById("question").innerText=q.q;
+
+const answers=document.getElementById("answers");
+
+answers.innerHTML="";
+
+q.a.forEach((text,i)=>{
+
+const div=document.createElement("div");
+div.className="answer";
+div.innerText=text;
+
+div.onclick=()=>choose(div,i);
+
+answers.appendChild(div);
+
+});
+
+document.getElementById("hint").innerText="";
+
+}
+
+function choose(el,i){
+
+attempts++;
+
+const q=questions[current];
+
+if(i===q.c){
+
+correct++;
+
+el.classList.add("good");
+
+setTimeout(()=>{
+current++;
+updateAccuracy();
+loadQuestion();
+},400);
+
+}else{
+
+el.classList.add("bad");
+document.getElementById("hint").innerText=q.h;
+updateAccuracy();
+
+}
+
+}
+
+function updateAccuracy(){
+
+const acc=Math.round((correct/attempts)*100)||0;
+document.getElementById("accuracy").innerText=acc+"%";
+
+}
+
+function finish(){
+
+document.getElementById("gameCard").style.display="none";
+document.getElementById("endCard").style.display="block";
+
+const endTime=new Date();
+
+const ticket=`
+Student: ${document.getElementById("name").value}
+
+Correct: ${correct}
+Attempts: ${attempts}
+Accuracy: ${Math.round((correct/attempts)*100)}%
+
+Start Time: ${startTime.toLocaleString()}
+End Time: ${endTime.toLocaleString()}
+`;
+
+document.getElementById("ticket").innerText=ticket;
+
+}
+
+function restart(){location.reload();}
+
+</script>
+
+</body>
+</html>
