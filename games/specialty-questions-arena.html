@@ -1,470 +1,287 @@
 <!doctype html>
 <html lang="en">
 <head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
 <title>Specialty Questions Arena — American Government OST Review</title>
-
 <style>
-
-:root{
---bg:#0b1220;
---panel:#111a2f;
---text:#e7eefc;
---muted:#a8b4cf;
---accent:#7aa2ff;
---good:#2bd576;
---bad:#ff5c7a;
---warn:#ffd166;
---line:rgba(255,255,255,.12);
-}
-
-*{box-sizing:border-box}
-
-body{
-margin:0;
-background:linear-gradient(180deg,#0b1220,#070b14);
-color:var(--text);
-font-family:system-ui;
-}
-
-.wrap{
-width:min(1000px,92vw);
-margin:30px auto;
-}
-
-.panel{
-background:var(--panel);
-border:1px solid var(--line);
-padding:20px;
-border-radius:18px;
-margin-bottom:20px;
-}
-
-h1{margin-top:0}
-
-.choice{
-border:1px solid var(--line);
-padding:12px;
-border-radius:12px;
-margin:10px 0;
-cursor:pointer;
-color:#ffffff;
-}
-
-.choice:hover{
-border-color:var(--accent);
-background:rgba(255,255,255,.05);
-}
-
-.good{background:rgba(43,213,118,.2)}
-.bad{background:rgba(255,92,122,.2)}
-
-.progress{
-height:12px;
-background:#222;
-border-radius:10px;
-overflow:hidden;
-margin:10px 0;
-}
-
-.bar{
-height:100%;
-background:var(--accent);
-width:0%;
-}
-
-.hint{
-margin-top:10px;
-color:var(--warn);
-}
-
-.ticket{
-background:#0e172c;
-padding:20px;
-border-radius:16px;
-margin-top:20px;
-}
-
-input{
-padding:10px;
-border-radius:10px;
-border:none;
-font-size:16px;
-}
-
-button{
-padding:10px 16px;
-border-radius:10px;
-border:none;
-background:var(--accent);
-color:white;
-cursor:pointer;
-}
-
-button:hover{opacity:.9}
-
+:root{--bg:#0b1220;--panel:#111a2f;--panel2:#0f1730;--text:#e7eefc;--muted:#a8b4cf;--line:rgba(255,255,255,.12);--good:#2bd576;--bad:#ff5c7a;--warn:#ffd166;--accent:#7aa2ff;--shadow:0 18px 55px rgba(0,0,0,.40);--radius:18px}
+*{box-sizing:border-box}html,body{margin:0;padding:0;background:linear-gradient(180deg,#0b1220,#070b14);color:var(--text);font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif}body{min-height:100vh}
+.wrap{width:min(1120px,94vw);margin:28px auto 48px}.panel{background:var(--panel);border:1px solid var(--line);border-radius:var(--radius);box-shadow:var(--shadow)}
+.hero{padding:24px}.grid2{display:grid;grid-template-columns:1.05fr .95fr;gap:18px}@media(max-width:900px){.grid2{grid-template-columns:1fr}}
+h1{margin:.1rem 0 .6rem;font-size:clamp(1.5rem,2.2vw,2.2rem)}p,li{line-height:1.45}.muted{color:var(--muted)}
+.chips{display:flex;gap:8px;flex-wrap:wrap;margin:14px 0 0}.chip{display:inline-flex;align-items:center;padding:6px 10px;border-radius:999px;background:rgba(122,162,255,.14);border:1px solid rgba(122,162,255,.28);font-size:.86rem;color:#dce7ff}
+.status{display:inline-flex;padding:6px 10px;border-radius:999px;font-weight:700;background:rgba(43,213,118,.15);border:1px solid rgba(43,213,118,.35);color:#aef1c6}
+.row{display:flex;gap:14px;align-items:center;justify-content:space-between;flex-wrap:wrap}
+label{display:block;margin:0 0 8px;font-weight:700}input[type=text],select,button{font:inherit}
+input[type=text]{width:min(440px,100%);background:#0b1328;color:var(--text);border:1px solid var(--line);border-radius:14px;padding:14px 16px}
+button{appearance:none;border:none;border-radius:14px;padding:12px 16px;font-weight:800;cursor:pointer}.button{background:var(--accent);color:#fff}
+.feedback{margin-top:14px;padding:12px 14px;border-radius:14px;border:1px solid var(--line);background:#0d162b}.badBox{border-color:rgba(255,92,122,.35);background:rgba(255,92,122,.08)}.goodBox{border-color:rgba(43,213,118,.35);background:rgba(43,213,118,.08)}
+.toolbar{padding:18px 20px;position:sticky;top:0;z-index:5;background:rgba(11,18,32,.92);backdrop-filter:blur(8px);margin-bottom:14px}
+.stats{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:10px}@media(max-width:900px){.stats{grid-template-columns:repeat(2,minmax(0,1fr))}}
+.stat{background:var(--panel2);border:1px solid var(--line);padding:12px;border-radius:14px}.stat .k{font-size:.77rem;color:var(--muted);text-transform:uppercase;letter-spacing:.08em}.stat .v{font-weight:800;font-size:1.02rem;margin-top:3px}
+.progress{height:14px;background:#0a1122;border:1px solid var(--line);border-radius:999px;overflow:hidden}.bar{height:100%;width:0%;background:linear-gradient(90deg,#5f8fff,#8cb5ff)}
+.question{padding:22px}.q-type{display:inline-flex;padding:4px 9px;border-radius:999px;background:rgba(255,255,255,.06);border:1px solid var(--line);font-size:.78rem;color:#dbe6ff;margin-bottom:10px}.q-title{font-size:1.18rem;font-weight:800;margin:8px 0 14px}
+.stimulus{background:#0d162b;border:1px solid var(--line);border-radius:16px;padding:16px;margin:12px 0 16px}.stimulus h3{margin:.15rem 0 .5rem;font-size:1rem}.stimulus blockquote{margin:10px 0 0;padding:12px 14px;border-left:4px solid var(--accent);background:rgba(255,255,255,.03);border-radius:0 12px 12px 0;color:#edf3ff}
+.choice-list{display:grid;gap:10px;margin-top:10px}.choice{width:100%;text-align:left;padding:14px 16px;border-radius:14px;background:#121d34;color:#fff;border:1px solid var(--line);cursor:pointer}.choice:hover{border-color:rgba(122,162,255,.7);background:#162340}.choice.good{background:rgba(43,213,118,.14);border-color:rgba(43,213,118,.58)}.choice.bad{background:rgba(255,92,122,.14);border-color:rgba(255,92,122,.55)}
+.check-row{display:flex;gap:10px;align-items:flex-start;padding:12px;border:1px solid var(--line);background:#0d162b;border-radius:14px;margin:10px 0}.check-row input{margin-top:3px;transform:scale(1.2)}.check-row.selected{border-color:rgba(122,162,255,.65);background:#13203a}
+.select-row{display:grid;grid-template-columns:minmax(0,1fr) 240px;gap:12px;align-items:center;background:#0d162b;border:1px solid var(--line);padding:12px;border-radius:14px;margin:10px 0}@media(max-width:820px){.select-row{grid-template-columns:1fr}}
+select{background:#121d34;color:#fff;border:1px solid var(--line);border-radius:12px;padding:12px 14px;width:100%}
+.drag-bank{display:flex;gap:10px;flex-wrap:wrap;padding:12px;border:1px dashed rgba(255,255,255,.25);border-radius:14px;background:#0d162b;min-height:66px}
+.drag-token{padding:10px 12px;border-radius:999px;background:#1a2747;border:1px solid rgba(122,162,255,.35);cursor:grab;color:#fff}
+.bucket-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-top:12px}@media(max-width:820px){.bucket-grid{grid-template-columns:1fr}}
+.bucket{background:#0d162b;border:1px solid var(--line);border-radius:16px;padding:14px}.dropzone{min-height:70px;border:1px dashed rgba(255,255,255,.2);border-radius:14px;padding:10px;display:flex;gap:10px;flex-wrap:wrap;align-content:flex-start}.over{border-color:rgba(122,162,255,.7)!important;background:#13203a!important}
+.part-box{background:#0d162b;border:1px solid var(--line);border-radius:16px;padding:14px}.two-col{display:grid;grid-template-columns:1fr 1fr;gap:14px}@media(max-width:820px){.two-col{grid-template-columns:1fr}}
+.hidden{display:none!important}.footer-btns{display:flex;gap:10px;flex-wrap:wrap;margin-top:16px}hr.sep{border:none;border-top:1px solid var(--line);margin:16px 0}
 </style>
 </head>
-
 <body>
-
 <div class="wrap">
-
-<div class="panel" id="startPanel">
-
-<h1>Specialty Questions Arena</h1>
-
-<p>American Government OST Review</p>
-
-<p>Enter your name to begin:</p>
-
-<input id="studentName" placeholder="Student Name">
-
-<button onclick="startGame()">Start Game</button>
-
+<section class="hero panel" id="startScreen">
+  <div class="grid2">
+    <div>
+      <div class="status">LIVE</div>
+      <h1>Specialty Questions Arena</h1>
+      <p class="muted">American Government OST review using passage-based items, two-part reasoning, dropdowns, drag-and-drop, classification grids, and advanced prompts.</p>
+      <div class="chips"><span class="chip">Passages intact</span><span class="chip">Specialty formats</span><span class="chip">40 questions</span><span class="chip">100% required</span><span class="chip">Ticket + timestamps</span></div>
+      <hr class="sep">
+      <label for="studentName">Enter student name to begin</label>
+      <input id="studentName" type="text" maxlength="60" placeholder="Student Name" autocomplete="name">
+      <div class="footer-btns"><button class="button" id="startBtn">Start Game</button></div>
+      <div id="startError" class="feedback badBox hidden"><strong>Name required.</strong> Enter your name before starting.</div>
+    </div>
+    <div>
+      <div class="stimulus">
+        <h3>Mastery Rules</h3>
+        <ul class="muted">
+          <li>Running clock starts when the game begins.</li>
+          <li>Question counter, progress bar, and accuracy update live.</li>
+          <li>Correct answers auto-advance after a brief confirmation.</li>
+          <li>Wrong answers trigger a hint and reduce accuracy permanently for that run.</li>
+          <li>You earn the completion ticket only with a <strong>100% run</strong>.</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</section>
+<section id="gameShell" class="hidden">
+  <div class="toolbar panel">
+    <div class="stats">
+      <div class="stat"><div class="k">Student</div><div class="v" id="studentLabel">—</div></div>
+      <div class="stat"><div class="k">Start Time</div><div class="v" id="startTimeLabel">—</div></div>
+      <div class="stat"><div class="k">Running Clock</div><div class="v" id="clockLabel">00:00</div></div>
+      <div class="stat"><div class="k">Accuracy</div><div class="v" id="accuracyLabel">100%</div></div>
+      <div class="stat"><div class="k">Question</div><div class="v"><span id="qIndexLabel">1</span>/<span id="qTotalLabel">40</span></div></div>
+    </div>
+    <div style="margin-top:14px"><div class="row" style="margin-bottom:8px"><div class="muted">Progress</div><div class="muted" id="progressPctLabel">0%</div></div><div class="progress"><div class="bar" id="progressBar"></div></div></div>
+  </div>
+  <section id="questionHost" class="panel question"></section>
+</section>
+<section id="resultHost" class="hidden"></section>
 </div>
-
-<div class="panel" id="gamePanel" style="display:none">
-
-<div>
-
-<strong id="player"></strong>
-
-</div>
-
-<div>
-
-Time: <span id="timer">00:00</span>
-
-</div>
-
-<div>
-
-Accuracy: <span id="accuracy">100%</span>
-
-</div>
-
-<div>
-
-Question <span id="qNum"></span> / <span id="qTotal"></span>
-
-</div>
-
-<div class="progress">
-<div class="bar" id="bar"></div>
-</div>
-
-<div id="questionArea"></div>
-
-<div id="choices"></div>
-
-<div id="hint" class="hint"></div>
-
-</div>
-
-<div id="ticketArea"></div>
-
-</div>
-
 <script>
+const PASS_DELAY = 700;
+const QUESTIONS = [{"type": "classify", "label": "Specialty Grid", "prompt": "Select the correct category for each presidential action.", "stimulus": {"title": "Treaty Approval Scenario", "body": "The president wants to sign a treaty that will lower trade barriers and increase free trade between the United States and other countries. The U.S. Senate must approve the treaty by a two-thirds vote. Several senators are concerned that the treaty will hurt American workers by increasing unemployment."}, "columns": ["Compromise", "Consensus Building", "Persuasion"], "rows": [{"text": "The president modifies the treaty to address the concerns of the senators.", "correct": "Compromise"}, {"text": "The president meets with individual senators to explain the potential economic benefits of the treaty.", "correct": "Persuasion"}, {"text": "The president meets with a group of senators to discuss aspects of the treaty on which they all agree.", "correct": "Consensus Building"}], "hint": "Compromise changes the proposal, persuasion tries to convince, and consensus building focuses on shared ground."}, {"type": "dragSort", "label": "Drag & Drop", "prompt": "Drag each action into the correct box.", "stimulus": {"title": "Rights and Responsibilities", "body": "The U.S. Constitution guarantees many rights to people, but certain responsibilities go along with those rights."}, "categories": ["Constitutional Rights", "Responsibilities"], "items": [{"text": "Speak freely", "category": "Constitutional Rights"}, {"text": "Gather together peacefully", "category": "Constitutional Rights"}, {"text": "Bear arms", "category": "Constitutional Rights"}, {"text": "Pay taxes", "category": "Responsibilities"}, {"text": "Serve on juries", "category": "Responsibilities"}, {"text": "Become informed on issues", "category": "Responsibilities"}], "hint": "Protected freedoms belong under rights. Civic duties belong under responsibilities."}, {"type": "twoPart", "label": "Two-Part", "prompt": "Answer Part A, then Part B.", "partA": {"prompt": "Select two ways constitutional amendments have altered the procedures of the Electoral College.", "select": 2, "choices": [{"text": "by requiring separate balloting for president and vice president", "correct": true}, {"text": "by awarding the election to the winner of the national popular vote", "correct": false}, {"text": "by granting electoral votes to the residents of the District of Columbia", "correct": true}, {"text": "by determining each state's number of electors based on its population", "correct": false}, {"text": "by allowing electors to choose whether a candidate should be elected president or vice president", "correct": false}]}, "partB": {"prompt": "Why were the amendments in Part A important?", "choices": [{"text": "They made it easier for presidents to nominate their successors after leaving office.", "correct": false}, {"text": "They addressed changing circumstances and problems from prior presidential elections.", "correct": true}, {"text": "They ensured that all states were given equal say in the outcome of the presidential election.", "correct": false}]}, "hint": "Think 12th Amendment and 23rd Amendment."}, {"type": "multiSelect", "label": "Passage / Multi-Select", "prompt": "Read the excerpt, then select the two statements best supported by it.", "stimulus": {"title": "Schenck v. United States (1919)", "body": "The most stringent protection of free speech would not protect a man in falsely shouting fire in a theatre and causing a panic. The question in every case is whether the words used are of such a nature as to create a clear and present danger that they will bring about evils Congress has a right to prevent."}, "select": 2, "choices": [{"text": "Citizens have a responsibility to avoid causing harm to others.", "correct": true}, {"text": "The rights of the minority must be protected from unfair influence.", "correct": false}, {"text": "The rights of the individual must be balanced by the common good.", "correct": true}, {"text": "Citizens have a responsibility to engage with causes that matter to them.", "correct": false}, {"text": "Citizens have a responsibility to stay informed on issues affecting their community.", "correct": false}], "hint": "The excerpt is about speech creating danger and the balance between liberty and public safety."}, {"type": "classify", "label": "Economic Policy Grid", "prompt": "Select whether each action would encourage or slow economic growth.", "columns": ["Encourage Economic Growth", "Slow Economic Growth"], "rows": [{"text": "Cut federal income tax rates", "correct": "Encourage Economic Growth"}, {"text": "Increase taxes on corporations", "correct": "Slow Economic Growth"}, {"text": "Reduce spending on government programs", "correct": "Slow Economic Growth"}, {"text": "Fund a multi-billion dollar government infrastructure project", "correct": "Encourage Economic Growth"}], "hint": "Expansionary fiscal policy lowers taxes or increases spending. Contractionary policy does the opposite."}, {"type": "multiSelect", "label": "Select Three", "prompt": "Select three ways that the 1851 Ohio Constitution represented a change to improve governing.", "select": 3, "choices": [{"text": "It instituted a system of district courts.", "correct": true}, {"text": "It established direct elections for judges.", "correct": true}, {"text": "It granted universal suffrage to all Ohio citizens.", "correct": false}, {"text": "It limited the amount of debt the state could accumulate.", "correct": true}, {"text": "It expanded the power of the General Assembly over the other branches.", "correct": false}], "hint": "The 1851 reforms included district courts, elected judges, and debt limitations."}, {"type": "classify", "label": "Constitution Principles Grid", "prompt": "Match each excerpt to the constitutional principle it best reflects.", "columns": ["Separation of Powers", "Federalism", "Limited Government", "Popular Sovereignty"], "rows": [{"text": "Preamble: 'We the People of the United States ... do ordain and establish this Constitution ...'", "correct": "Popular Sovereignty"}, {"text": "The president makes treaties with the advice and consent of the Senate.", "correct": "Separation of Powers"}, {"text": "Congress shall make no law respecting an establishment of religion ...", "correct": "Limited Government"}, {"text": "The Constitution and federal laws are the supreme law of the land.", "correct": "Federalism"}], "hint": "People = popular sovereignty; limits on Congress = limited government; state-national relationship = federalism."}, {"type": "twoPart", "label": "Two-Part", "prompt": "Answer Part A, then Part B.", "partA": {"prompt": "What feature of constitutional government in the United States has changed over time?", "select": 1, "choices": [{"text": "the number of federal government branches", "correct": false}, {"text": "the ability of citizens to vote in federal elections", "correct": true}, {"text": "the ability of the president to veto a bill passed by Congress", "correct": false}, {"text": "the designation of the president as commander in chief of the armed forces", "correct": false}]}, "partB": {"prompt": "What action has been used to change the feature identified in Part A?", "choices": [{"text": "a formal declaration of war", "correct": false}, {"text": "the approval of a federal budget", "correct": false}, {"text": "the impeachment of executive officials", "correct": false}, {"text": "the ratification of constitutional amendments", "correct": true}]}, "hint": "Voting rights changed through amendments."}, {"type": "mcq", "label": "Bill of Rights", "prompt": "Which excerpt from the Bill of Rights protects an individual’s right to protest a Supreme Court decision?", "choices": [{"text": "Congress shall make no law abridging freedom of speech, press, assembly, or petition.", "correct": true}, {"text": "A well regulated militia ... the right to keep and bear arms ...", "correct": false}, {"text": "The right of the people to be secure against unreasonable searches ...", "correct": false}, {"text": "In all criminal prosecutions, the accused shall enjoy the right to a speedy and public trial ...", "correct": false}], "hint": "Protesting a decision involves speech, assembly, and petition."}, {"type": "twoPart", "label": "Passage Two-Part", "prompt": "Read the excerpt, then answer Part A and Part B.", "stimulus": {"title": "Anti-Federalist Essay", "body": "It [the national government] has authority to make laws which will affect the lives, the liberty, and property of every man in the United States; nor can the constitution or laws of any state prevent or impede the full and complete execution of every power given. — Brutus"}, "partA": {"prompt": "Which constitutional principle is discussed in the excerpt?", "select": 1, "choices": [{"text": "Judicial review", "correct": false}, {"text": "limited government", "correct": true}, {"text": "separation of powers", "correct": false}, {"text": "checks and balances", "correct": false}]}, "partB": {"prompt": "What concern does the author express?", "choices": [{"text": "The Constitution expanded the powers of judicial oversight.", "correct": false}, {"text": "The Constitution diminished the powers of state governments.", "correct": true}, {"text": "The Constitution granted more powers to the executive branch than the legislative branch.", "correct": false}, {"text": "The Constitution gave the same powers to the national and state governments.", "correct": false}]}, "hint": "Brutus feared the national government would overpower the states."}, {"type": "dropdown", "label": "Dropdown", "prompt": "Choose the best option for each blank, then answer the follow-up.", "stem": "Individuals in Ohio can directly help address problems at the local level by running for a ___ and problems at the state level by ___.", "blanks": [{"answer": "school board seat", "options": ["state legislature seat", "school board seat", "Senate seat"]}, {"answer": "serving in the National Guard", "options": ["forming a community watch group", "joining a volunteer fire department", "serving in the National Guard"]}], "followup": "What do both actions suggest about the relationship between Ohioans and government?", "followChoices": [{"text": "Ohioans can assist government only by seeking public office.", "correct": false}, {"text": "Ohioans require training to help government only in limited roles.", "correct": false}, {"text": "Ohioans are needed only during emergencies.", "correct": false}, {"text": "Ohioans can use different approaches to help government improve their communities.", "correct": true}], "hint": "Local office = school board; state-level assistance = National Guard."}, {"type": "classify", "label": "Checks & Balances Grid", "prompt": "Match each action to the branch using the power.", "columns": ["Legislative", "Executive", "Judicial"], "rows": [{"text": "Overrides a veto with a two-thirds vote", "correct": "Legislative"}, {"text": "Vetoes a bill passed by Congress", "correct": "Executive"}, {"text": "Rules a law unconstitutional", "correct": "Judicial"}, {"text": "Approves presidential appointments", "correct": "Legislative"}], "hint": "Think which branch is acting."}, {"type": "twoPart", "label": "Two-Part", "prompt": "Answer Part A, then Part B.", "partA": {"prompt": "Which amendment abolished slavery?", "select": 1, "choices": [{"text": "13th Amendment", "correct": true}, {"text": "14th Amendment", "correct": false}, {"text": "15th Amendment", "correct": false}, {"text": "19th Amendment", "correct": false}]}, "partB": {"prompt": "Which amendment prohibited states from denying equal protection?", "choices": [{"text": "13th Amendment", "correct": false}, {"text": "14th Amendment", "correct": true}, {"text": "15th Amendment", "correct": false}, {"text": "24th Amendment", "correct": false}]}, "hint": "13th ended slavery; 14th includes due process and equal protection."}, {"type": "multiSelect", "label": "Select Two", "prompt": "Select the two amendments that expanded suffrage to disenfranchised groups.", "select": 2, "choices": [{"text": "19th Amendment", "correct": true}, {"text": "24th Amendment", "correct": true}, {"text": "22nd Amendment", "correct": false}, {"text": "25th Amendment", "correct": false}, {"text": "7th Amendment", "correct": false}], "hint": "One expanded voting rights for women; the other removed poll taxes in federal elections."}, {"type": "dropdown", "label": "Dropdown", "prompt": "Complete the sentence about fiscal policy.", "stem": "To encourage economic growth, the federal government may ___ taxes and ___ spending.", "blanks": [{"answer": "lower", "options": ["lower", "raise"]}, {"answer": "increase", "options": ["increase", "decrease"]}], "hint": "Expansionary fiscal policy lowers taxes and increases spending."}, {"type": "dropdown", "label": "Dropdown", "prompt": "Complete the sentence about monetary policy.", "stem": "To slow economic growth, the Federal Reserve may ___ bonds and ___ interest rates.", "blanks": [{"answer": "sell", "options": ["buy", "sell"]}, {"answer": "raise", "options": ["lower", "raise"]}], "hint": "Tighter money = sell bonds and raise rates."}, {"type": "classify", "label": "Policy Input Grid", "prompt": "Match each action to the branch where it is most directly aimed.", "columns": ["Legislative", "Executive", "Judicial"], "rows": [{"text": "Provide testimony before a committee", "correct": "Legislative"}, {"text": "Submit comments on a proposed regulation", "correct": "Executive"}, {"text": "File a brief in a court case", "correct": "Judicial"}], "hint": "Committees = legislative, regulations = executive, briefs = judicial."}, {"type": "dragSort", "label": "Drag & Drop", "prompt": "Sort each power into the correct branch.", "categories": ["Legislative Branch", "Executive Branch"], "items": [{"text": "Declares war", "category": "Legislative Branch"}, {"text": "Imposes taxes", "category": "Legislative Branch"}, {"text": "Carries out laws", "category": "Executive Branch"}, {"text": "Commands the military", "category": "Executive Branch"}], "hint": "Congress makes law and taxes; the president carries out laws and commands the military."}, {"type": "twoPart", "label": "Two-Part", "prompt": "Answer Part A, then Part B.", "partA": {"prompt": "Which amendment limited presidents to two terms?", "select": 1, "choices": [{"text": "22nd Amendment", "correct": true}, {"text": "23rd Amendment", "correct": false}, {"text": "24th Amendment", "correct": false}, {"text": "25th Amendment", "correct": false}]}, "partB": {"prompt": "Which amendment addresses presidential succession and disability?", "choices": [{"text": "22nd Amendment", "correct": false}, {"text": "23rd Amendment", "correct": false}, {"text": "24th Amendment", "correct": false}, {"text": "25th Amendment", "correct": true}]}, "hint": "22nd = term limits; 25th = succession and disability."}, {"type": "mcq", "label": "Civic Skills", "prompt": "Which democratic process skill focuses most directly on convincing others to accept a position?", "choices": [{"text": "Persuasion", "correct": true}, {"text": "Federalism", "correct": false}, {"text": "Judicial review", "correct": false}, {"text": "Reserved powers", "correct": false}], "hint": "Look for the group-decision skill, not a constitutional principle."}, {"type": "multiSelect", "label": "Select Two", "prompt": "Select the two examples that show limited government.", "select": 2, "choices": [{"text": "The First Amendment restricts Congress.", "correct": true}, {"text": "The Fourth Amendment requires probable cause for warrants.", "correct": true}, {"text": "The president negotiates treaties.", "correct": false}, {"text": "The Senate confirms appointments.", "correct": false}, {"text": "States hold elections.", "correct": false}], "hint": "Limited government means the Constitution restrains government power."}, {"type": "dropdown", "label": "Dropdown", "prompt": "Complete the sentence about federalism.", "stem": "Federalism means power is divided between the ___ government and the ___ governments.", "blanks": [{"answer": "national", "options": ["national", "judicial", "military"]}, {"answer": "state", "options": ["state", "private", "foreign"]}], "hint": "Federalism divides power between national and state governments."}, {"type": "classify", "label": "Amendment Grid", "prompt": "Match each voting-rights expansion to the correct amendment.", "columns": ["15th Amendment", "19th Amendment", "24th Amendment", "26th Amendment"], "rows": [{"text": "Prohibited denial of voting rights based on race", "correct": "15th Amendment"}, {"text": "Prohibited denial based on sex", "correct": "19th Amendment"}, {"text": "Eliminated poll taxes in federal elections", "correct": "24th Amendment"}, {"text": "Lowered the voting age to 18", "correct": "26th Amendment"}], "hint": "15th race, 19th sex, 24th poll taxes, 26th age."}, {"type": "twoPart", "label": "Two-Part", "prompt": "Answer Part A, then Part B.", "partA": {"prompt": "Which branch can declare war?", "select": 1, "choices": [{"text": "Legislative branch", "correct": true}, {"text": "Executive branch", "correct": false}, {"text": "Judicial branch", "correct": false}, {"text": "State governments", "correct": false}]}, "partB": {"prompt": "Which branch carries out foreign policy decisions?", "choices": [{"text": "Legislative branch", "correct": false}, {"text": "Executive branch", "correct": true}, {"text": "Judicial branch", "correct": false}, {"text": "County governments", "correct": false}]}, "hint": "Congress declares war; the president and executive agencies carry policy out."}, {"type": "multiSelect", "label": "Select Two", "prompt": "Select the two actions most clearly associated with public-policy participation by individuals and organizations.", "select": 2, "choices": [{"text": "Lobbying members of a legislature", "correct": true}, {"text": "Providing testimony before legislative committees", "correct": true}, {"text": "Appointing Supreme Court justices", "correct": false}, {"text": "Writing the Constitution from scratch today", "correct": false}, {"text": "Issuing executive orders as a private citizen", "correct": false}], "hint": "Look for methods citizens and organizations can actually use."}, {"type": "dropdown", "label": "Dropdown", "prompt": "Complete the sentence about majority rule and minority rights.", "stem": "Over time, the federal government increasingly extended ___ rights to marginalized groups and broadened opportunities for ___.", "blanks": [{"answer": "civil", "options": ["civil", "property", "military"]}, {"answer": "participation", "options": ["participation", "secession", "debt"]}], "hint": "This language comes directly from the content statement."}, {"type": "mcq", "label": "Source Credibility", "prompt": "Which source characteristic is most directly related to credibility?", "choices": [{"text": "Qualifications and reputation of the writer or organization", "correct": true}, {"text": "Whether the source uses the most colorful graphics", "correct": false}, {"text": "Whether it agrees with a student’s opinion", "correct": false}, {"text": "Whether it avoids all statistics", "correct": false}], "hint": "Credibility depends on expertise, evidence, and reliability."}, {"type": "classify", "label": "Government Level Grid", "prompt": "Match each example to the level or institution described.", "columns": ["Federal Executive", "Federal Legislative", "State Legislative", "State Judicial"], "rows": [{"text": "Department of State", "correct": "Federal Executive"}, {"text": "Congressional Budget Office", "correct": "Federal Legislative"}, {"text": "Ohio Legislative Service Commission", "correct": "State Legislative"}, {"text": "Ohio Courts of Common Pleas", "correct": "State Judicial"}], "hint": "These are examples from the public policy content elaborations."}, {"type": "twoPart", "label": "Two-Part", "prompt": "Answer Part A, then Part B.", "partA": {"prompt": "Which amendment granted electoral votes to residents of the District of Columbia?", "select": 1, "choices": [{"text": "22nd Amendment", "correct": false}, {"text": "23rd Amendment", "correct": true}, {"text": "24th Amendment", "correct": false}, {"text": "25th Amendment", "correct": false}]}, "partB": {"prompt": "What problem did this amendment address?", "choices": [{"text": "It gave D.C. residents participation in presidential elections.", "correct": true}, {"text": "It eliminated the Senate.", "correct": false}, {"text": "It made the popular vote determine the presidency.", "correct": false}, {"text": "It created term limits for the president.", "correct": false}]}, "hint": "The 23rd Amendment is the D.C. electoral votes amendment."}, {"type": "classify", "label": "Constitution / Ohio Grid", "prompt": "Classify each feature as more closely associated with the Ohio Constitution or the U.S. Constitution.", "columns": ["Ohio Constitution", "U.S. Constitution"], "rows": [{"text": "Judges are elected", "correct": "Ohio Constitution"}, {"text": "Judges are appointed", "correct": "U.S. Constitution"}, {"text": "Citizens can vote directly on laws by initiative and referendum", "correct": "Ohio Constitution"}, {"text": "Legislators vote on laws for citizens at the federal level", "correct": "U.S. Constitution"}], "hint": "Ohio has elected judges and direct democracy tools."}, {"type": "multiSelect", "label": "Select Two", "prompt": "Select the two examples of local-level civic assistance in Ohio.", "select": 2, "choices": [{"text": "Joining a community watch group", "correct": true}, {"text": "Serving in a volunteer fire department", "correct": true}, {"text": "Ratifying a federal amendment", "correct": false}, {"text": "Serving on the U.S. Supreme Court", "correct": false}, {"text": "Negotiating a treaty", "correct": false}], "hint": "Local-level involvement often happens in the community itself."}, {"type": "dropdown", "label": "Dropdown", "prompt": "Complete the sentence about the Electoral College.", "stem": "A candidate must win a ___ of electoral votes to secure the presidency, and each state’s total is based on its number of ___ and senators.", "blanks": [{"answer": "majority", "options": ["majority", "plurality"]}, {"answer": "representatives", "options": ["representatives", "judges"]}], "hint": "The Electoral College is tied to each state's congressional representation."}, {"type": "mcq", "label": "Rights & Responsibilities", "prompt": "Which responsibility is most directly tied to the right to vote?", "choices": [{"text": "Being informed on public issues", "correct": true}, {"text": "Serving in the military", "correct": false}, {"text": "Owning property", "correct": false}, {"text": "Running for president", "correct": false}], "hint": "Rights carry responsibilities that support informed participation."}, {"type": "classify", "label": "Reconstruction Grid", "prompt": "Match each constitutional protection to the correct Reconstruction Amendment.", "columns": ["13th Amendment", "14th Amendment", "15th Amendment"], "rows": [{"text": "Abolished slavery", "correct": "13th Amendment"}, {"text": "Defined citizenship and provided equal protection", "correct": "14th Amendment"}, {"text": "Prevented denial of voting rights based on race", "correct": "15th Amendment"}], "hint": "13th slavery, 14th citizenship/equal protection, 15th voting rights."}, {"type": "twoPart", "label": "Two-Part", "prompt": "Answer Part A, then Part B.", "partA": {"prompt": "Which branch used troops to help integrate schools?", "select": 1, "choices": [{"text": "Executive branch", "correct": true}, {"text": "Legislative branch", "correct": false}, {"text": "Judicial branch", "correct": false}, {"text": "State judicial branch", "correct": false}]}, "partB": {"prompt": "Which branch enacted civil rights acts and voting rights acts?", "choices": [{"text": "Executive branch", "correct": false}, {"text": "Legislative branch", "correct": true}, {"text": "Judicial branch", "correct": false}, {"text": "County government", "correct": false}]}, "hint": "Executive enforcement and legislative lawmaking both expanded civil rights."}, {"type": "multiSelect", "label": "Select Two", "prompt": "Select the two Federal Reserve actions that encourage economic growth.", "select": 2, "choices": [{"text": "Buy bonds", "correct": true}, {"text": "Lower interest rates", "correct": true}, {"text": "Sell bonds", "correct": false}, {"text": "Raise reserve requirements", "correct": false}, {"text": "Raise interest rates", "correct": false}], "hint": "Easy money encourages growth."}, {"type": "dropdown", "label": "Dropdown", "prompt": "Complete the sentence about incorporation.", "stem": "The Supreme Court used the ___ clause and the ___ clause of the 14th Amendment to apply most of the Bill of Rights to the states.", "blanks": [{"answer": "due process", "options": ["due process", "elastic", "supremacy"]}, {"answer": "equal protection", "options": ["equal protection", "commerce", "appointments"]}], "hint": "Both clauses are in the 14th Amendment."}, {"type": "mcq", "label": "Popular Sovereignty", "prompt": "Which phrase best represents popular sovereignty?", "choices": [{"text": "We the People", "correct": true}, {"text": "Necessary and Proper Clause", "correct": false}, {"text": "Advice and Consent", "correct": false}, {"text": "Judicial review", "correct": false}], "hint": "Popular sovereignty means the people are the ultimate source of governmental power."}, {"type": "classify", "label": "Government & Economy Grid", "prompt": "Match each policy tool to the correct category.", "columns": ["Fiscal Policy", "Monetary Policy"], "rows": [{"text": "Tax rates", "correct": "Fiscal Policy"}, {"text": "Government spending", "correct": "Fiscal Policy"}, {"text": "Bond sales and purchases", "correct": "Monetary Policy"}, {"text": "Interest rates", "correct": "Monetary Policy"}], "hint": "Fiscal = Congress/government budgeting; monetary = Federal Reserve."}, {"type": "mcq", "label": "Public Policy", "prompt": "Which action is the best example of providing input to the judicial branch on public policy?", "choices": [{"text": "Preparing a brief for court proceedings", "correct": true}, {"text": "Lobbying legislators on a bill", "correct": false}, {"text": "Campaigning for a candidate", "correct": false}, {"text": "Commenting on a proposed executive regulation", "correct": false}], "hint": "Judicial input happens in court-related proceedings."}];
+const $ = s => document.querySelector(s);
+const fmtTime = d => d.toLocaleTimeString([], {hour:'numeric', minute:'2-digit', second:'2-digit'});
+const fmtDateTime = d => d.toLocaleString([], {year:'numeric', month:'short', day:'numeric', hour:'numeric', minute:'2-digit', second:'2-digit'});
+const clockDiff = ms => {const s=Math.floor(ms/1000),m=String(Math.floor(s/60)).padStart(2,'0'),ss=String(s%60).padStart(2,'0'); return `${m}:${ss}`;};
+const clone = obj => JSON.parse(JSON.stringify(obj));
+const shuffle = arr => {const a=arr.map(clone); for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1)); [a[i],a[j]]=[a[j],a[i]];} return a;};
 
-const questions=[
+let state = {student:'',startTime:null,timer:null,index:0,attempts:0,correctFirstTry:0,prepared:[]};
 
-{
-q:"Which constitutional principle allows states to share power with the federal government?",
-choices:["Federalism","Judicial Review","Popular Sovereignty","Checks and Balances"],
-a:0,
-hint:"Power is divided between national and state governments."
-},
-
-{
-q:"Which amendment reserves powers to the states?",
-choices:["10th Amendment","1st Amendment","14th Amendment","5th Amendment"],
-a:0,
-hint:"Think federalism."
-},
-
-{
-q:"Which Supreme Court case established judicial review?",
-choices:["Marbury v. Madison","McCulloch v. Maryland","Brown v. Board","Gibbons v. Ogden"],
-a:0,
-hint:"Chief Justice John Marshall established this power."
-},
-
-{
-q:"Which clause allows Congress to pass laws needed to carry out enumerated powers?",
-choices:["Necessary and Proper Clause","Supremacy Clause","Elastic Clause","Commerce Clause"],
-a:0,
-hint:"Also known as the Elastic Clause."
-},
-
-{
-q:"Which amendment limits presidents to two terms?",
-choices:["22nd Amendment","25th Amendment","23rd Amendment","20th Amendment"],
-a:0,
-hint:"Passed after FDR."
-},
-
-{
-q:"Which amendment allows Washington DC residents to vote for president?",
-choices:["23rd Amendment","24th Amendment","26th Amendment","19th Amendment"],
-a:0,
-hint:"Applies to DC."
-},
-
-{
-q:"Which amendment lowered the voting age to 18?",
-choices:["26th Amendment","19th Amendment","15th Amendment","24th Amendment"],
-a:0,
-hint:"Vietnam era change."
-},
-
-{
-q:"Which branch interprets the Constitution?",
-choices:["Judicial Branch","Legislative Branch","Executive Branch","State Governments"],
-a:0,
-hint:"Supreme Court."
-},
-
-{
-q:"Which clause makes federal law the supreme law of the land?",
-choices:["Supremacy Clause","Commerce Clause","Elastic Clause","Necessary Clause"],
-a:0,
-hint:"Article VI."
-},
-
-{
-q:"Which amendment protects freedom of speech?",
-choices:["1st Amendment","2nd Amendment","4th Amendment","6th Amendment"],
-a:0,
-hint:"Five freedoms."
-},
-
-// Additional generated specialty review questions
-
-{
-q:"Which level of government is responsible for conducting national elections?",
-choices:["States","Congress","Supreme Court","President"],
-a:0,
-hint:"States administer elections."
-},
-
-{
-q:"Which amendment protects against unreasonable search and seizure?",
-choices:["4th Amendment","3rd Amendment","6th Amendment","7th Amendment"],
-a:0,
-hint:"Requires probable cause."
-},
-
-{
-q:"Which amendment guarantees due process of law?",
-choices:["5th Amendment","2nd Amendment","9th Amendment","10th Amendment"],
-a:0,
-hint:"Also protects against self-incrimination."
-},
-
-{
-q:"Which amendment guarantees a speedy trial?",
-choices:["6th Amendment","5th Amendment","7th Amendment","8th Amendment"],
-a:0,
-hint:"Criminal trials."
-},
-
-{
-q:"Which amendment prohibits cruel and unusual punishment?",
-choices:["8th Amendment","7th Amendment","6th Amendment","5th Amendment"],
-a:0,
-hint:"Punishment protection."
-},
-
-{
-q:"Which clause gives Congress power to regulate interstate trade?",
-choices:["Commerce Clause","Elastic Clause","Supremacy Clause","Tax Clause"],
-a:0,
-hint:"Economic regulation."
-},
-
-{
-q:"Which amendment abolished slavery?",
-choices:["13th Amendment","14th Amendment","15th Amendment","12th Amendment"],
-a:0,
-hint:"Civil War amendment."
-},
-
-{
-q:"Which amendment guarantees equal protection?",
-choices:["14th Amendment","13th Amendment","15th Amendment","12th Amendment"],
-a:0,
-hint:"Used for incorporation."
-},
-
-{
-q:"Which amendment protects voting rights regardless of race?",
-choices:["15th Amendment","19th Amendment","24th Amendment","26th Amendment"],
-a:0,
-hint:"Reconstruction amendment."
-},
-
-{
-q:"Which amendment gave women the right to vote?",
-choices:["19th Amendment","15th Amendment","24th Amendment","26th Amendment"],
-a:0,
-hint:"1920."
+function initQuestions(){
+  state.prepared = QUESTIONS.map(q=>{
+    const x = clone(q);
+    if(x.choices) x.choices = shuffle(x.choices);
+    if(x.partA && x.partA.choices) x.partA.choices = shuffle(x.partA.choices);
+    if(x.partB && x.partB.choices) x.partB.choices = shuffle(x.partB.choices);
+    if(x.followChoices) x.followChoices = shuffle(x.followChoices);
+    if(x.items) x.items = shuffle(x.items);
+    if(x.blanks) x.blanks = x.blanks.map(b => ({...b, options: shuffle(b.options)}));
+    if(x.columns) x.columns = shuffle(x.columns);
+    return x;
+  });
+  $('#qTotalLabel').textContent = state.prepared.length;
 }
-
-]
-
-let current=0
-let correct=0
-let attempts=0
-let startTime
-let timer
-
-document.getElementById("qTotal").textContent=questions.length
-
 function startGame(){
-
-const name=document.getElementById("studentName").value.trim()
-
-if(!name){alert("Enter name");return}
-
-document.getElementById("player").textContent=name
-
-document.getElementById("startPanel").style.display="none"
-document.getElementById("gamePanel").style.display="block"
-
-startTime=new Date()
-
-timer=setInterval(updateTimer,1000)
-
-loadQuestion()
-
+  const name = $('#studentName').value.trim();
+  if(!name){ $('#startError').classList.remove('hidden'); return; }
+  $('#startError').classList.add('hidden');
+  state.student = name; state.startTime = new Date(); state.index = 0; state.attempts = 0; state.correctFirstTry = 0;
+  initQuestions();
+  $('#studentLabel').textContent = name;
+  $('#startTimeLabel').textContent = fmtTime(state.startTime);
+  $('#startScreen').classList.add('hidden');
+  $('#gameShell').classList.remove('hidden');
+  updateClock();
+  state.timer = setInterval(updateClock, 1000);
+  renderQuestion();
 }
-
-function updateTimer(){
-
-const now=new Date()
-
-let diff=Math.floor((now-startTime)/1000)
-
-let m=Math.floor(diff/60).toString().padStart(2,'0')
-let s=(diff%60).toString().padStart(2,'0')
-
-document.getElementById("timer").textContent=m+":"+s
-
+function updateClock(){ $('#clockLabel').textContent = clockDiff(new Date() - state.startTime); }
+function getAccuracy(){ return state.attempts===0 ? 100 : Math.round((state.correctFirstTry/state.attempts)*100); }
+function updateHeader(){
+  $('#accuracyLabel').textContent = `${getAccuracy()}%`;
+  $('#qIndexLabel').textContent = String(state.index + 1);
+  const pct = Math.round((state.index / state.prepared.length) * 100);
+  $('#progressPctLabel').textContent = `${pct}%`;
+  $('#progressBar').style.width = `${pct}%`;
 }
-
-function loadQuestion(){
-
-if(current>=questions.length){finishGame();return}
-
-document.getElementById("qNum").textContent=current+1
-
-let q=questions[current]
-
-document.getElementById("questionArea").innerHTML="<h3>"+q.q+"</h3>"
-
-let cHTML=""
-
-q.choices.forEach((c,i)=>{
-
-cHTML+=`<div class="choice" onclick="answer(${i})">${c}</div>`
-
-})
-
-document.getElementById("choices").innerHTML=cHTML
-document.getElementById("hint").textContent=""
-
-updateProgress()
-
+function stimulusHTML(q){
+  if(!q.stimulus) return '';
+  return `<div class="stimulus"><h3>${q.stimulus.title}</h3><blockquote>${q.stimulus.body}</blockquote></div>`;
 }
-
-function answer(i){
-
-let q=questions[current]
-
-attempts++
-
-const choices=document.querySelectorAll(".choice")
-
-if(i===q.a){
-
-choices[i].classList.add("good")
-
-correct++
-
-setTimeout(()=>{
-
-current++
-loadQuestion()
-
-},500)
-
-}else{
-
-choices[i].classList.add("bad")
-
-document.getElementById("hint").textContent="Hint: "+q.hint
-
+function wrapQuestion(q, inner){
+  return `<div class="q-type">${q.label || 'Specialty Item'}</div><div class="q-title">${q.prompt}</div>${stimulusHTML(q)}<div id="qBody">${inner}</div><div id="feedbackArea"></div>`;
 }
-
-updateAccuracy()
-
+function setFeedback(kind, msg){
+  const cls = kind === 'good' ? 'goodBox' : 'badBox';
+  $('#feedbackArea').innerHTML = `<div class="feedback ${cls}">${msg}</div>`;
 }
-
-function updateAccuracy(){
-
-let acc=Math.round((correct/attempts)*100)
-
-document.getElementById("accuracy").textContent=acc+"%"
-
+function advance(){
+  setTimeout(()=>{
+    state.index++;
+    if(state.index >= state.prepared.length) finishGame();
+    else renderQuestion();
+  }, PASS_DELAY);
 }
-
-function updateProgress(){
-
-let p=((current)/questions.length)*100
-
-document.getElementById("bar").style.width=p+"%"
-
+function recordAttempt(firstTrySuccess){
+  state.attempts++;
+  if(firstTrySuccess) state.correctFirstTry++;
+  $('#accuracyLabel').textContent = `${getAccuracy()}%`;
 }
+function renderQuestion(){
+  updateHeader();
+  const q = state.prepared[state.index];
+  const host = $('#questionHost');
+  host.dataset.locked = '0';
+  host.dataset.tried = '0';
 
+  if(q.type === 'mcq'){
+    host.innerHTML = wrapQuestion(q, `<div class="choice-list">${q.choices.map((c,i)=>`<button class="choice" data-i="${i}">${c.text}</button>`).join('')}</div>`);
+    host.querySelectorAll('.choice').forEach(btn=>btn.addEventListener('click', ()=>{
+      if(host.dataset.locked==='1') return;
+      const tried = host.dataset.tried === '1';
+      const i = Number(btn.dataset.i);
+      if(q.choices[i].correct){
+        recordAttempt(!tried); host.dataset.locked='1'; btn.classList.add('good'); setFeedback('good','<strong>Correct.</strong> Moving to the next question.'); advance();
+      }else{
+        host.dataset.tried='1'; btn.classList.add('bad'); setFeedback('bad', `<strong>Not yet.</strong> Hint: ${q.hint}`);
+      }
+    }));
+  } else if(q.type === 'multiSelect'){
+    host.innerHTML = wrapQuestion(q, `<div class="choice-list">${q.choices.map((c,i)=>`<label class="check-row"><input type="checkbox" data-i="${i}"><span>${c.text}</span></label>`).join('')}</div><div class="footer-btns"><button class="button" id="checkMS">Check Answer</button></div>`);
+    host.querySelectorAll('.check-row input').forEach(box=>box.addEventListener('change', e=>{ e.target.closest('.check-row').classList.toggle('selected', e.target.checked); }));
+    $('#checkMS').onclick = ()=>{
+      if(host.dataset.locked==='1') return;
+      const checked = [...host.querySelectorAll('input[type=checkbox]')];
+      const picks = checked.map((box,i)=>box.checked);
+      const correctMask = q.choices.map(c=>!!c.correct);
+      const pickedCount = picks.filter(Boolean).length;
+      const requiredCount = q.select || correctMask.filter(Boolean).length;
+      const tried = host.dataset.tried === '1';
+      const ok = pickedCount === requiredCount && picks.every((v,i)=>v===correctMask[i]);
+      if(ok){
+        recordAttempt(!tried); host.dataset.locked='1'; setFeedback('good','<strong>Correct.</strong> Moving to the next question.'); advance();
+      } else {
+        host.dataset.tried='1'; setFeedback('bad', `<strong>Not yet.</strong> Hint: ${q.hint}`);
+      }
+    };
+  } else if(q.type === 'classify'){
+    host.innerHTML = wrapQuestion(q, `${q.rows.map((r,idx)=>`<div class="select-row"><div>${r.text}</div><select data-row="${idx}"><option value="">Select one...</option>${q.columns.map(c=>`<option value="${c}">${c}</option>`).join('')}</select></div>`).join('')}<div class="footer-btns"><button class="button" id="checkCL">Check Answer</button></div>`);
+    $('#checkCL').onclick = ()=>{
+      if(host.dataset.locked==='1') return;
+      const ok = q.rows.every((r,idx)=>host.querySelector(`select[data-row="${idx}"]`).value===r.correct);
+      const tried = host.dataset.tried==='1';
+      if(ok){ recordAttempt(!tried); host.dataset.locked='1'; setFeedback('good','<strong>Correct.</strong> Moving to the next question.'); advance(); }
+      else { host.dataset.tried='1'; setFeedback('bad', `<strong>Not yet.</strong> Hint: ${q.hint}`); }
+    };
+  } else if(q.type === 'dropdown'){
+    let inner = `<div class="stimulus"><div>${q.stem}</div></div>`;
+    inner += q.blanks.map((b,idx)=>`<div class="select-row"><div>Blank ${idx+1}</div><select data-blank="${idx}"><option value="">Select one...</option>${b.options.map(o=>`<option value="${o}">${o}</option>`).join('')}</select></div>`).join('');
+    if(q.followup){
+      inner += `<div class="part-box" style="margin-top:14px"><div style="font-weight:700;margin-bottom:8px">${q.followup}</div><div class="choice-list">${q.followChoices.map((c,i)=>`<button class="choice followChoice" data-i="${i}">${c.text}</button>`).join('')}</div></div>`;
+    }
+    inner += `<div class="footer-btns"><button class="button" id="checkDD">Check Answer</button></div>`;
+    host.innerHTML = wrapQuestion(q, inner);
+    let follow = null;
+    host.querySelectorAll('.followChoice').forEach(btn=>btn.onclick = ()=>{ host.querySelectorAll('.followChoice').forEach(b=>b.classList.remove('good')); btn.classList.add('good'); follow = Number(btn.dataset.i); });
+    $('#checkDD').onclick = ()=>{
+      if(host.dataset.locked==='1') return;
+      const blanksOk = q.blanks.every((b,idx)=>host.querySelector(`select[data-blank="${idx}"]`).value===b.answer);
+      const followOk = !q.followup || (follow!==null && q.followChoices[follow].correct);
+      const tried = host.dataset.tried==='1';
+      if(blanksOk && followOk){ recordAttempt(!tried); host.dataset.locked='1'; setFeedback('good','<strong>Correct.</strong> Moving to the next question.'); advance(); }
+      else { host.dataset.tried='1'; setFeedback('bad', `<strong>Not yet.</strong> Hint: ${q.hint}`); }
+    };
+  } else if(q.type === 'twoPart'){
+    host.innerHTML = wrapQuestion(q, `<div class="two-col"><div class="part-box"><div style="font-weight:800;margin-bottom:8px">Part A</div><div style="margin-bottom:8px">${q.partA.prompt}</div>${q.partA.choices.map((c,i)=>q.partA.select>1?`<label class="check-row"><input type="checkbox" data-a="${i}"><span>${c.text}</span></label>`:`<button class="choice partAChoice" data-a="${i}" type="button">${c.text}</button>`).join('')}</div><div class="part-box"><div style="font-weight:800;margin-bottom:8px">Part B</div><div style="margin-bottom:8px">${q.partB.prompt}</div>${q.partB.choices.map((c,i)=>`<button class="choice partBChoice" data-b="${i}" type="button">${c.text}</button>`).join('')}</div></div><div class="footer-btns"><button class="button" id="checkTP">Check Answer</button></div>`);
+    let pickA = null, pickB = null;
+    host.querySelectorAll('.partAChoice').forEach(btn=>btn.onclick = ()=>{ host.querySelectorAll('.partAChoice').forEach(b=>b.classList.remove('good')); btn.classList.add('good'); pickA = Number(btn.dataset.a); });
+    host.querySelectorAll('.partBChoice').forEach(btn=>btn.onclick = ()=>{ host.querySelectorAll('.partBChoice').forEach(b=>b.classList.remove('good')); btn.classList.add('good'); pickB = Number(btn.dataset.b); });
+    $('#checkTP').onclick = ()=>{
+      if(host.dataset.locked==='1') return;
+      let partAOk = false;
+      if(q.partA.select > 1){
+        const chosen = [...host.querySelectorAll('input[data-a]:checked')].map(x=>Number(x.dataset.a)).sort((a,b)=>a-b);
+        const corr = q.partA.choices.map((c,i)=>c.correct?i:null).filter(x=>x!==null).sort((a,b)=>a-b);
+        partAOk = JSON.stringify(chosen)===JSON.stringify(corr);
+      } else {
+        partAOk = pickA !== null && q.partA.choices[pickA].correct;
+      }
+      const partBOk = pickB !== null && q.partB.choices[pickB].correct;
+      const tried = host.dataset.tried==='1';
+      if(partAOk && partBOk){ recordAttempt(!tried); host.dataset.locked='1'; setFeedback('good','<strong>Correct.</strong> Moving to the next question.'); advance(); }
+      else { host.dataset.tried='1'; setFeedback('bad', `<strong>Not yet.</strong> Hint: ${q.hint}`); }
+    };
+  } else if(q.type === 'dragSort'){
+    host.innerHTML = wrapQuestion(q, `<div class="drag-bank" id="bank">${q.items.map((it,i)=>`<div class="drag-token" draggable="true" data-i="${i}">${it.text}</div>`).join('')}</div><div class="bucket-grid">${q.categories.map(cat=>`<div class="bucket"><h3>${cat}</h3><div class="dropzone" data-cat="${cat}"></div></div>`).join('')}</div><div class="footer-btns"><button class="button" id="checkDR">Check Answer</button></div>`);
+    let current = null;
+    host.querySelectorAll('.drag-token').forEach(tok=>{ tok.ondragstart = e => { current = tok; e.dataTransfer.setData('text/plain', tok.dataset.i); }; });
+    [$('#bank'), ...host.querySelectorAll('.dropzone')].forEach(zone=>{
+      zone.ondragover = e => { e.preventDefault(); zone.classList.add('over'); };
+      zone.ondragleave = () => zone.classList.remove('over');
+      zone.ondrop = e => { e.preventDefault(); zone.classList.remove('over'); if(current) zone.appendChild(current); };
+    });
+    $('#checkDR').onclick = ()=>{
+      if(host.dataset.locked==='1') return;
+      const ok = q.items.every((it,idx)=>{
+        const token = host.querySelector(`.drag-token[data-i="${idx}"]`);
+        return token.parentElement.dataset && token.parentElement.dataset.cat===it.category;
+      });
+      const tried = host.dataset.tried==='1';
+      if(ok){ recordAttempt(!tried); host.dataset.locked='1'; setFeedback('good','<strong>Correct.</strong> Moving to the next question.'); advance(); }
+      else { host.dataset.tried='1'; setFeedback('bad', `<strong>Not yet.</strong> Hint: ${q.hint}`); }
+    };
+  }
+}
 function finishGame(){
-
-clearInterval(timer)
-
-const name=document.getElementById("player").textContent
-
-const end=new Date()
-
-let acc=Math.round((correct/attempts)*100)
-
-let ticket=`
-
-<div class="panel ticket">
-
-<h2>Completion Ticket</h2>
-
-<p><strong>Name:</strong> ${name}</p>
-
-<p><strong>Accuracy:</strong> ${acc}%</p>
-
-<p><strong>Start Time:</strong> ${startTime}</p>
-
-<p><strong>Finish Time:</strong> ${end}</p>
-
-<button onclick="location.reload()">Restart</button>
-
-</div>
-`
-
-document.getElementById("ticketArea").innerHTML=ticket
-
-document.getElementById("gamePanel").style.display="none"
-
+  clearInterval(state.timer);
+  $('#gameShell').classList.add('hidden');
+  const end = new Date();
+  const acc = getAccuracy();
+  const passed = acc === 100;
+  $('#resultHost').classList.remove('hidden');
+  $('#resultHost').innerHTML = `
+    <section class="panel question">
+      <div class="q-type">Run Complete</div>
+      <h2 style="margin:.25rem 0 1rem">${passed ? '<span style="color:#b7f5cd">100% Mastery Ticket Earned</span>' : '<span style="color:#ffb0bf">Ticket Locked — Retry Required</span>'}</h2>
+      <div class="feedback ${passed ? 'goodBox' : 'badBox'}"><strong>${passed ? 'Perfect run.' : 'Accuracy dropped below 100%.'}</strong> ${passed ? 'Your completion ticket is below.' : 'This game requires a perfect run to earn the ticket. Restart and try again.'}</div>
+      <div class="stimulus" style="margin-top:14px">
+        <div><strong>Name:</strong> ${state.student}</div>
+        <div><strong>Questions:</strong> ${state.prepared.length}</div>
+        <div><strong>Accuracy:</strong> ${acc}%</div>
+        <div><strong>Started:</strong> ${fmtDateTime(state.startTime)}</div>
+        <div><strong>Finished:</strong> ${fmtDateTime(end)}</div>
+        <div><strong>Run Time:</strong> ${clockDiff(end - state.startTime)}</div>
+        <div><strong>Status:</strong> ${passed ? 'PASS — 100% Mastery' : 'RETRY — Ticket not earned'}</div>
+      </div>
+      <div class="footer-btns"><button class="button" onclick="location.reload()">Restart Game</button></div>
+    </section>`;
 }
-
+document.getElementById('startBtn').addEventListener('click', startGame);
+document.getElementById('studentName').addEventListener('keydown', e => { if(e.key==='Enter') startGame(); });
 </script>
-
 </body>
 </html>
