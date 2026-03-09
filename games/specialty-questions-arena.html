@@ -1,0 +1,470 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Specialty Questions Arena — American Government OST Review</title>
+
+<style>
+
+:root{
+--bg:#0b1220;
+--panel:#111a2f;
+--text:#e7eefc;
+--muted:#a8b4cf;
+--accent:#7aa2ff;
+--good:#2bd576;
+--bad:#ff5c7a;
+--warn:#ffd166;
+--line:rgba(255,255,255,.12);
+}
+
+*{box-sizing:border-box}
+
+body{
+margin:0;
+background:linear-gradient(180deg,#0b1220,#070b14);
+color:var(--text);
+font-family:system-ui;
+}
+
+.wrap{
+width:min(1000px,92vw);
+margin:30px auto;
+}
+
+.panel{
+background:var(--panel);
+border:1px solid var(--line);
+padding:20px;
+border-radius:18px;
+margin-bottom:20px;
+}
+
+h1{margin-top:0}
+
+.choice{
+border:1px solid var(--line);
+padding:12px;
+border-radius:12px;
+margin:10px 0;
+cursor:pointer;
+color:#ffffff;
+}
+
+.choice:hover{
+border-color:var(--accent);
+background:rgba(255,255,255,.05);
+}
+
+.good{background:rgba(43,213,118,.2)}
+.bad{background:rgba(255,92,122,.2)}
+
+.progress{
+height:12px;
+background:#222;
+border-radius:10px;
+overflow:hidden;
+margin:10px 0;
+}
+
+.bar{
+height:100%;
+background:var(--accent);
+width:0%;
+}
+
+.hint{
+margin-top:10px;
+color:var(--warn);
+}
+
+.ticket{
+background:#0e172c;
+padding:20px;
+border-radius:16px;
+margin-top:20px;
+}
+
+input{
+padding:10px;
+border-radius:10px;
+border:none;
+font-size:16px;
+}
+
+button{
+padding:10px 16px;
+border-radius:10px;
+border:none;
+background:var(--accent);
+color:white;
+cursor:pointer;
+}
+
+button:hover{opacity:.9}
+
+</style>
+</head>
+
+<body>
+
+<div class="wrap">
+
+<div class="panel" id="startPanel">
+
+<h1>Specialty Questions Arena</h1>
+
+<p>American Government OST Review</p>
+
+<p>Enter your name to begin:</p>
+
+<input id="studentName" placeholder="Student Name">
+
+<button onclick="startGame()">Start Game</button>
+
+</div>
+
+<div class="panel" id="gamePanel" style="display:none">
+
+<div>
+
+<strong id="player"></strong>
+
+</div>
+
+<div>
+
+Time: <span id="timer">00:00</span>
+
+</div>
+
+<div>
+
+Accuracy: <span id="accuracy">100%</span>
+
+</div>
+
+<div>
+
+Question <span id="qNum"></span> / <span id="qTotal"></span>
+
+</div>
+
+<div class="progress">
+<div class="bar" id="bar"></div>
+</div>
+
+<div id="questionArea"></div>
+
+<div id="choices"></div>
+
+<div id="hint" class="hint"></div>
+
+</div>
+
+<div id="ticketArea"></div>
+
+</div>
+
+<script>
+
+const questions=[
+
+{
+q:"Which constitutional principle allows states to share power with the federal government?",
+choices:["Federalism","Judicial Review","Popular Sovereignty","Checks and Balances"],
+a:0,
+hint:"Power is divided between national and state governments."
+},
+
+{
+q:"Which amendment reserves powers to the states?",
+choices:["10th Amendment","1st Amendment","14th Amendment","5th Amendment"],
+a:0,
+hint:"Think federalism."
+},
+
+{
+q:"Which Supreme Court case established judicial review?",
+choices:["Marbury v. Madison","McCulloch v. Maryland","Brown v. Board","Gibbons v. Ogden"],
+a:0,
+hint:"Chief Justice John Marshall established this power."
+},
+
+{
+q:"Which clause allows Congress to pass laws needed to carry out enumerated powers?",
+choices:["Necessary and Proper Clause","Supremacy Clause","Elastic Clause","Commerce Clause"],
+a:0,
+hint:"Also known as the Elastic Clause."
+},
+
+{
+q:"Which amendment limits presidents to two terms?",
+choices:["22nd Amendment","25th Amendment","23rd Amendment","20th Amendment"],
+a:0,
+hint:"Passed after FDR."
+},
+
+{
+q:"Which amendment allows Washington DC residents to vote for president?",
+choices:["23rd Amendment","24th Amendment","26th Amendment","19th Amendment"],
+a:0,
+hint:"Applies to DC."
+},
+
+{
+q:"Which amendment lowered the voting age to 18?",
+choices:["26th Amendment","19th Amendment","15th Amendment","24th Amendment"],
+a:0,
+hint:"Vietnam era change."
+},
+
+{
+q:"Which branch interprets the Constitution?",
+choices:["Judicial Branch","Legislative Branch","Executive Branch","State Governments"],
+a:0,
+hint:"Supreme Court."
+},
+
+{
+q:"Which clause makes federal law the supreme law of the land?",
+choices:["Supremacy Clause","Commerce Clause","Elastic Clause","Necessary Clause"],
+a:0,
+hint:"Article VI."
+},
+
+{
+q:"Which amendment protects freedom of speech?",
+choices:["1st Amendment","2nd Amendment","4th Amendment","6th Amendment"],
+a:0,
+hint:"Five freedoms."
+},
+
+// Additional generated specialty review questions
+
+{
+q:"Which level of government is responsible for conducting national elections?",
+choices:["States","Congress","Supreme Court","President"],
+a:0,
+hint:"States administer elections."
+},
+
+{
+q:"Which amendment protects against unreasonable search and seizure?",
+choices:["4th Amendment","3rd Amendment","6th Amendment","7th Amendment"],
+a:0,
+hint:"Requires probable cause."
+},
+
+{
+q:"Which amendment guarantees due process of law?",
+choices:["5th Amendment","2nd Amendment","9th Amendment","10th Amendment"],
+a:0,
+hint:"Also protects against self-incrimination."
+},
+
+{
+q:"Which amendment guarantees a speedy trial?",
+choices:["6th Amendment","5th Amendment","7th Amendment","8th Amendment"],
+a:0,
+hint:"Criminal trials."
+},
+
+{
+q:"Which amendment prohibits cruel and unusual punishment?",
+choices:["8th Amendment","7th Amendment","6th Amendment","5th Amendment"],
+a:0,
+hint:"Punishment protection."
+},
+
+{
+q:"Which clause gives Congress power to regulate interstate trade?",
+choices:["Commerce Clause","Elastic Clause","Supremacy Clause","Tax Clause"],
+a:0,
+hint:"Economic regulation."
+},
+
+{
+q:"Which amendment abolished slavery?",
+choices:["13th Amendment","14th Amendment","15th Amendment","12th Amendment"],
+a:0,
+hint:"Civil War amendment."
+},
+
+{
+q:"Which amendment guarantees equal protection?",
+choices:["14th Amendment","13th Amendment","15th Amendment","12th Amendment"],
+a:0,
+hint:"Used for incorporation."
+},
+
+{
+q:"Which amendment protects voting rights regardless of race?",
+choices:["15th Amendment","19th Amendment","24th Amendment","26th Amendment"],
+a:0,
+hint:"Reconstruction amendment."
+},
+
+{
+q:"Which amendment gave women the right to vote?",
+choices:["19th Amendment","15th Amendment","24th Amendment","26th Amendment"],
+a:0,
+hint:"1920."
+}
+
+]
+
+let current=0
+let correct=0
+let attempts=0
+let startTime
+let timer
+
+document.getElementById("qTotal").textContent=questions.length
+
+function startGame(){
+
+const name=document.getElementById("studentName").value.trim()
+
+if(!name){alert("Enter name");return}
+
+document.getElementById("player").textContent=name
+
+document.getElementById("startPanel").style.display="none"
+document.getElementById("gamePanel").style.display="block"
+
+startTime=new Date()
+
+timer=setInterval(updateTimer,1000)
+
+loadQuestion()
+
+}
+
+function updateTimer(){
+
+const now=new Date()
+
+let diff=Math.floor((now-startTime)/1000)
+
+let m=Math.floor(diff/60).toString().padStart(2,'0')
+let s=(diff%60).toString().padStart(2,'0')
+
+document.getElementById("timer").textContent=m+":"+s
+
+}
+
+function loadQuestion(){
+
+if(current>=questions.length){finishGame();return}
+
+document.getElementById("qNum").textContent=current+1
+
+let q=questions[current]
+
+document.getElementById("questionArea").innerHTML="<h3>"+q.q+"</h3>"
+
+let cHTML=""
+
+q.choices.forEach((c,i)=>{
+
+cHTML+=`<div class="choice" onclick="answer(${i})">${c}</div>`
+
+})
+
+document.getElementById("choices").innerHTML=cHTML
+document.getElementById("hint").textContent=""
+
+updateProgress()
+
+}
+
+function answer(i){
+
+let q=questions[current]
+
+attempts++
+
+const choices=document.querySelectorAll(".choice")
+
+if(i===q.a){
+
+choices[i].classList.add("good")
+
+correct++
+
+setTimeout(()=>{
+
+current++
+loadQuestion()
+
+},500)
+
+}else{
+
+choices[i].classList.add("bad")
+
+document.getElementById("hint").textContent="Hint: "+q.hint
+
+}
+
+updateAccuracy()
+
+}
+
+function updateAccuracy(){
+
+let acc=Math.round((correct/attempts)*100)
+
+document.getElementById("accuracy").textContent=acc+"%"
+
+}
+
+function updateProgress(){
+
+let p=((current)/questions.length)*100
+
+document.getElementById("bar").style.width=p+"%"
+
+}
+
+function finishGame(){
+
+clearInterval(timer)
+
+const name=document.getElementById("player").textContent
+
+const end=new Date()
+
+let acc=Math.round((correct/attempts)*100)
+
+let ticket=`
+
+<div class="panel ticket">
+
+<h2>Completion Ticket</h2>
+
+<p><strong>Name:</strong> ${name}</p>
+
+<p><strong>Accuracy:</strong> ${acc}%</p>
+
+<p><strong>Start Time:</strong> ${startTime}</p>
+
+<p><strong>Finish Time:</strong> ${end}</p>
+
+<button onclick="location.reload()">Restart</button>
+
+</div>
+`
+
+document.getElementById("ticketArea").innerHTML=ticket
+
+document.getElementById("gamePanel").style.display="none"
+
+}
+
+</script>
+
+</body>
+</html>
