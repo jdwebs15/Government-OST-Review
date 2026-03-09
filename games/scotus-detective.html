@@ -1,401 +1,1211 @@
 <!doctype html>
 <html lang="en">
 <head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1">
-<title>SCOTUS Detective — Constitutional Case Files</title>
-
-<link rel="stylesheet" href="../styles.css"/>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>SCOTUS Detective — Constitutional Case Files (OST Review)</title>
+<link rel="stylesheet" href="../styles.css" />
 
 <style>
-
-:root{
---bg:#0b1220;
---panel:#111a2f;
---text:#e7eefc;
---muted:#a8b4cf;
---line:rgba(255,255,255,.12);
---good:#2bd576;
---bad:#ff5c7a;
---warn:#ffd166;
---accent:#7aa2ff;
---radius:18px;
---shadow:0 18px 55px rgba(0,0,0,.40);
-}
-
-*{box-sizing:border-box}
-
-body{
-margin:0;
-background:linear-gradient(180deg,#0b1220,#070b14);
-color:var(--text);
-font-family:system-ui,Segoe UI,Roboto,Helvetica;
-}
-
-.wrap{
-width:min(1000px,92vw);
-margin:40px auto;
-}
-
-.card{
-background:var(--panel);
-border-radius:var(--radius);
-padding:28px;
-border:1px solid var(--line);
-box-shadow:var(--shadow);
-}
-
-.answers{
-display:grid;
-gap:10px;
-margin-top:18px;
-}
-
-.answer{
-padding:14px;
-border-radius:10px;
-border:1px solid var(--line);
-cursor:pointer;
-}
-
-.answer:hover{
-background:#162042;
-}
-
-.good{
-background:rgba(43,213,118,.2);
-border-color:var(--good);
-}
-
-.bad{
-background:rgba(255,92,122,.2);
-border-color:var(--bad);
-}
-
-.hint{
-margin-top:10px;
-color:var(--warn);
-}
-
-.topbar{
-display:flex;
-justify-content:space-between;
-margin-bottom:16px;
-}
-
-button{
-padding:10px 16px;
-border:none;
-border-radius:10px;
-background:var(--accent);
-cursor:pointer;
-font-weight:600;
-}
-
-.ticket{
-white-space:pre-wrap;
-background:#0e162e;
-padding:20px;
-border-radius:10px;
-margin-top:20px;
-}
-
+  :root{
+    --bg:#0b1220;
+    --panel:#121a2f;
+    --card:#111a2e;
+    --text:#e7eefc;
+    --muted:#a8b4cf;
+    --line:rgba(255,255,255,.12);
+    --shadow:0 18px 55px rgba(0,0,0,.40);
+    --radius:18px;
+    --good:#2bd576;
+    --bad:#ff5c7a;
+    --warn:#ffd166;
+    --accent:#7aa2ff;
+    --mono:ui-monospace,SFMono-Regular,Menlo,Monaco,Consolas,"Liberation Mono","Courier New",monospace;
+  }
+  *{box-sizing:border-box}
+  body{
+    margin:0;
+    background:linear-gradient(180deg,#0b1220,#070b14);
+    color:var(--text);
+    font-family:system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif;
+  }
+  .wrap{width:min(1100px,94vw);margin:28px auto 60px}
+  .screen{
+    background:linear-gradient(180deg,rgba(255,255,255,.03),rgba(255,255,255,.02));
+    border:1px solid var(--line);
+    border-radius:22px;
+    box-shadow:var(--shadow);
+    overflow:hidden;
+  }
+  .hero{
+    padding:22px 22px 10px;
+    border-bottom:1px solid var(--line);
+    background:linear-gradient(180deg,rgba(122,162,255,.10),rgba(122,162,255,0));
+  }
+  h1{margin:0 0 8px;font-size:clamp(24px,3vw,34px);line-height:1.1}
+  .sub{color:var(--muted);max-width:920px}
+  .topbar{
+    display:grid;
+    grid-template-columns:1fr auto auto auto;
+    gap:10px;
+    padding:14px 22px;
+    border-bottom:1px solid var(--line);
+    align-items:center;
+  }
+  .pill{
+    display:inline-flex;
+    align-items:center;
+    gap:8px;
+    padding:8px 12px;
+    border:1px solid var(--line);
+    border-radius:999px;
+    background:rgba(255,255,255,.03);
+    color:var(--text);
+    font-size:14px;
+    white-space:nowrap;
+  }
+  .mono{font-family:var(--mono)}
+  .content{padding:22px}
+  .grid{display:grid;grid-template-columns:1.15fr .85fr;gap:18px}
+  @media (max-width:980px){.grid{grid-template-columns:1fr}.topbar{grid-template-columns:1fr 1fr}}
+  .card{
+    background:var(--card);
+    border:1px solid var(--line);
+    border-radius:18px;
+    box-shadow:var(--shadow);
+  }
+  .card h2,.card h3{margin:0}
+  .card .hd{
+    padding:14px 16px;
+    border-bottom:1px solid var(--line);
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    gap:10px;
+  }
+  .card .bd{padding:16px}
+  .passage{
+    font-size:17px;
+    line-height:1.65;
+    white-space:pre-line;
+  }
+  .label{
+    font-size:12px;
+    letter-spacing:.08em;
+    text-transform:uppercase;
+    color:var(--muted);
+  }
+  .qtext{
+    margin-top:8px;
+    font-size:20px;
+    line-height:1.35;
+  }
+  .answers{display:grid;gap:10px;margin-top:14px}
+  .answer{
+    width:100%;
+    text-align:left;
+    padding:14px 14px;
+    background:rgba(255,255,255,.03);
+    color:var(--text);
+    border:1px solid var(--line);
+    border-radius:14px;
+    cursor:pointer;
+    transition:transform .08s ease, background .15s ease, border-color .15s ease;
+    font-size:16px;
+    line-height:1.35;
+  }
+  .answer:hover{background:rgba(122,162,255,.10);transform:translateY(-1px)}
+  .answer.good{border-color:rgba(43,213,118,.8);background:rgba(43,213,118,.14)}
+  .answer.bad{border-color:rgba(255,92,122,.8);background:rgba(255,92,122,.14)}
+  .hint{
+    margin-top:12px;
+    padding:12px 14px;
+    border-radius:12px;
+    background:rgba(255,209,102,.10);
+    border:1px solid rgba(255,209,102,.28);
+    color:#ffe29a;
+    display:none;
+  }
+  .toolkit{
+    margin-top:14px;
+    padding:14px;
+    border-radius:14px;
+    background:rgba(122,162,255,.08);
+    border:1px solid rgba(122,162,255,.25);
+  }
+  .toolkit h4{margin:0 0 10px}
+  .tool-grid{
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    gap:8px 14px;
+    font-size:14px;
+  }
+  @media (max-width:720px){.tool-grid{grid-template-columns:1fr}}
+  .tool-item{color:var(--muted)}
+  .tool-item b{color:var(--text)}
+  .controls{
+    display:flex;
+    flex-wrap:wrap;
+    gap:10px;
+    margin-top:16px;
+  }
+  .btn{
+    appearance:none;
+    border:none;
+    cursor:pointer;
+    border-radius:12px;
+    padding:12px 16px;
+    font-weight:700;
+    color:#08111f;
+    background:var(--accent);
+  }
+  .btn.secondary{
+    color:var(--text);
+    background:rgba(255,255,255,.06);
+    border:1px solid var(--line);
+  }
+  .btn.warn{
+    color:#241700;
+    background:var(--warn);
+  }
+  .startbox{
+    max-width:760px;
+    margin:0 auto;
+    padding:26px 22px 28px;
+  }
+  .startbox .lead{color:var(--muted);font-size:17px;line-height:1.6}
+  .field{
+    margin-top:18px;
+    display:grid;
+    gap:8px;
+  }
+  input[type="text"]{
+    width:100%;
+    padding:14px 14px;
+    border-radius:14px;
+    border:1px solid var(--line);
+    background:#0d1528;
+    color:var(--text);
+    font-size:16px;
+  }
+  .mini{
+    color:var(--muted);
+    font-size:14px;
+  }
+  .ticket{
+    margin-top:18px;
+    background:#0d1528;
+    border:1px solid var(--line);
+    border-radius:16px;
+    padding:18px;
+    white-space:pre-wrap;
+    line-height:1.65;
+    font-family:var(--mono);
+    font-size:14px;
+  }
+  .bigscore{
+    font-size:clamp(30px,6vw,54px);
+    font-weight:900;
+    line-height:1;
+    margin:6px 0 10px;
+  }
+  .hide{display:none !important}
 </style>
 </head>
-
 <body>
-
 <div class="wrap">
+  <div class="screen">
+    <div class="hero">
+      <h1>SCOTUS Detective</h1>
+      <div class="sub">
+        Read Supreme Court case passages, identify the amendment, clause, doctrine, or constitutional principle involved, and earn a mastery ticket with 100% accuracy.
+      </div>
+    </div>
 
-<div id="startCard" class="card">
+    <div id="startScreen" class="startbox">
+      <div class="lead">
+        This investigation contains <b>30 OST-style case questions</b>. Questions ramp in difficulty from amendment identification to doctrine, federalism, judicial review, and separation of powers.
+      </div>
 
-<h2>SCOTUS Detective</h2>
+      <div class="toolkit">
+        <h4>Detective Toolkit</h4>
+        <div class="tool-grid">
+          <div class="tool-item"><b>search / warrant / police</b> → 4th Amendment</div>
+          <div class="tool-item"><b>confession / remain silent</b> → 5th Amendment</div>
+          <div class="tool-item"><b>lawyer / counsel / trial</b> → 6th Amendment</div>
+          <div class="tool-item"><b>speech / protest / press</b> → 1st Amendment</div>
+          <div class="tool-item"><b>segregation / equal treatment</b> → 14th Amendment</div>
+          <div class="tool-item"><b>rights applied to states</b> → Incorporation</div>
+        </div>
+      </div>
 
-<p class="muted">
-Investigate Supreme Court cases and determine the constitutional
-right or principle involved.
-</p>
+      <div class="field">
+        <label for="studentName">Student Name</label>
+        <input id="studentName" type="text" placeholder="Enter your name to begin" autocomplete="off" />
+        <div class="mini">Name is required. Game tracks start time, completion time, score, and accuracy.</div>
+      </div>
 
-<input id="name" placeholder="Enter your name">
+      <div class="controls">
+        <button class="btn" id="startBtn">Start Investigation</button>
+      </div>
+    </div>
 
-<br><br>
+    <div id="gameScreen" class="hide">
+      <div class="topbar">
+        <div class="pill">Progress: <span id="progressText" class="mono">1 / 30</span></div>
+        <div class="pill">Accuracy: <span id="accuracyText" class="mono">100%</span></div>
+        <div class="pill">Started: <span id="startedText" class="mono">—</span></div>
+        <div class="pill">Stage: <span id="stageText" class="mono">Part A</span></div>
+      </div>
 
-<button onclick="startGame()">Start Investigation</button>
+      <div class="content">
+        <div class="grid">
+          <div class="card">
+            <div class="hd">
+              <div>
+                <div class="label">Case File</div>
+                <h2 id="caseTitle">Case 1</h2>
+              </div>
+              <div class="pill mono" id="caseTag">SCOTUS</div>
+            </div>
+            <div class="bd">
+              <div id="passageText" class="passage"></div>
+            </div>
+          </div>
 
-</div>
+          <div class="card">
+            <div class="hd">
+              <div>
+                <div class="label" id="partLabel">Part A</div>
+                <h3 id="questionText">Question text</h3>
+              </div>
+            </div>
+            <div class="bd">
+              <div id="answers" class="answers"></div>
+              <div id="hintBox" class="hint"></div>
 
+              <div class="controls">
+                <button class="btn secondary" id="toolkitBtn" type="button">Toggle Detective Toolkit</button>
+                <button class="btn warn" id="restartBtn" type="button">Restart Game</button>
+              </div>
 
-<div id="gameCard" class="card" style="display:none">
+              <div id="toolkitBox" class="toolkit hide">
+                <h4>Detective Toolkit</h4>
+                <div class="tool-grid">
+                  <div class="tool-item"><b>search / warrant / police</b> → 4th Amendment</div>
+                  <div class="tool-item"><b>confession / interrogation</b> → 5th Amendment</div>
+                  <div class="tool-item"><b>lawyer / attorney / counsel</b> → 6th Amendment</div>
+                  <div class="tool-item"><b>speech / protest / press</b> → 1st Amendment</div>
+                  <div class="tool-item"><b>segregation / discrimination</b> → 14th Amendment</div>
+                  <div class="tool-item"><b>rights applied to states</b> → Doctrine of Incorporation</div>
+                  <div class="tool-item"><b>Court strikes law down</b> → Judicial Review</div>
+                  <div class="tool-item"><b>national power over states</b> → Federalism / supremacy</div>
+                  <div class="tool-item"><b>one branch limits another</b> → Checks and Balances</div>
+                  <div class="tool-item"><b>president blocked by law / Congress / Court</b> → Separation of Powers</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
 
-<div class="topbar">
-<div id="progress"></div>
-<div>Accuracy: <span id="accuracy">100%</span></div>
-</div>
+        <div class="card" style="margin-top:18px">
+          <div class="hd">
+            <div>
+              <div class="label">Live Game Data</div>
+              <h3>Investigation Log</h3>
+            </div>
+          </div>
+          <div class="bd">
+            <div class="tool-grid">
+              <div class="tool-item"><b>Student:</b> <span id="logName">—</span></div>
+              <div class="tool-item"><b>Correct Answers:</b> <span id="logCorrect">0</span></div>
+              <div class="tool-item"><b>Total Clicks / Attempts:</b> <span id="logAttempts">0</span></div>
+              <div class="tool-item"><b>Current Case:</b> <span id="logCase">1</span></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
 
-<div id="passage"></div>
-
-<h3 id="question"></h3>
-
-<div id="answers" class="answers"></div>
-
-<div id="hint" class="hint"></div>
-
-<br>
-
-<button onclick="restart()">Restart</button>
-
-</div>
-
-
-<div id="endCard" class="card" style="display:none">
-
-<h2>Investigation Complete</h2>
-
-<div id="ticket" class="ticket"></div>
-
-<button onclick="restart()">Play Again</button>
-
-</div>
-
+    <div id="endScreen" class="hide">
+      <div class="startbox">
+        <div class="label">Case Closed</div>
+        <div class="bigscore" id="finalAccuracy">100%</div>
+        <div class="lead">
+          Investigation complete. Submit or screenshot this mastery ticket.
+        </div>
+        <div id="ticketBox" class="ticket"></div>
+        <div class="controls">
+          <button class="btn warn" id="playAgainBtn" type="button">Restart Game</button>
+        </div>
+      </div>
+    </div>
+  </div>
 </div>
 
 <script>
-
-const questions=[
-
-{
-passage:`Police entered Dollree Mapp’s home without a valid search warrant and found illegal materials.`,
-q:"Which constitutional amendment protects against this action?",
-a:["1st Amendment","4th Amendment","5th Amendment","8th Amendment"],
-c:1,
-h:"Searches and warrants involve the Fourth Amendment."
-},
-
-{
-passage:`Clarence Gideon requested an attorney but was denied because he could not afford one.`,
-q:"Which amendment guarantees the right to legal counsel?",
-a:["4th Amendment","5th Amendment","6th Amendment","10th Amendment"],
-c:2,
-h:"Criminal defendants have the right to an attorney."
-},
-
-{
-passage:`A suspect confessed during police interrogation without being informed of their rights.`,
-q:"Which amendment protects against self-incrimination?",
-a:["4th Amendment","5th Amendment","6th Amendment","8th Amendment"],
-c:1,
-h:"This amendment includes the right to remain silent."
-},
-
-{
-passage:`William Marbury asked the Supreme Court to force the government to deliver his judicial commission.`,
-q:"Which power did this case establish?",
-a:["Judicial Review","Executive Privilege","Federalism","Nullification"],
-c:0,
-h:"The Court gained the power to declare laws unconstitutional."
-},
-
-{
-passage:`Maryland attempted to tax the national bank.`,
-q:"Which clause justified Congress creating the bank?",
-a:["Commerce Clause","Necessary and Proper Clause","Establishment Clause","Full Faith Clause"],
-c:1,
-h:"This clause allows Congress to pass laws needed to carry out powers."
-},
-
-{
-passage:`The state of New York tried to regulate steamboat trade between states.`,
-q:"Which clause gave the national government authority?",
-a:["Commerce Clause","Supremacy Clause","Elastic Clause","Equal Protection Clause"],
-c:0,
-h:"Interstate trade is controlled by Congress."
-},
-
-{
-passage:`A student wore a black armband protesting the Vietnam War and was suspended.`,
-q:"Which constitutional freedom was involved?",
-a:["Freedom of Speech","Freedom of Religion","Right to Privacy","Right to Bear Arms"],
-c:0,
-h:"Symbolic protest is protected speech."
-},
-
-{
-passage:`Segregated schools were challenged because they treated students differently based on race.`,
-q:"Which amendment's Equal Protection Clause was used?",
-a:["10th Amendment","13th Amendment","14th Amendment","19th Amendment"],
-c:2,
-h:"This amendment requires equal protection of the law."
-},
-
-{
-passage:`Police seized evidence illegally but attempted to use it in court.`,
-q:"Which rule prevents illegally obtained evidence from being used?",
-a:["Stare Decisis","Exclusionary Rule","Executive Privilege","Nullification"],
-c:1,
-h:"Evidence obtained illegally cannot be used in trial."
-},
-
-{
-passage:`A president attempted to seize steel mills without Congressional approval.`,
-q:"Which principle limits presidential power here?",
-a:["Popular Sovereignty","Separation of Powers","Federalism","Reserved Powers"],
-c:1,
-h:"Each branch has separate powers."
-},
-
-{
-passage:`A state law attempted to limit free speech during a political protest.`,
-q:"Which amendment protects political speech?",
-a:["1st Amendment","2nd Amendment","4th Amendment","6th Amendment"],
-c:0,
-h:"Speech, press, religion, assembly."
-},
-
-{
-passage:`The Court applied freedom of speech protections to the states.`,
-q:"Which doctrine allowed this?",
-a:["Judicial Review","Doctrine of Incorporation","Elastic Clause","Federal Supremacy"],
-c:1,
-h:"The 14th Amendment applies rights to states."
-},
-
-{
-passage:`A suspect was forced to testify against themselves in court.`,
-q:"Which amendment protects against this?",
-a:["4th Amendment","5th Amendment","6th Amendment","7th Amendment"],
-c:1,
-h:"Self-incrimination is prohibited."
-},
-
-{
-passage:`A criminal defendant demanded a speedy public trial.`,
-q:"Which amendment guarantees this right?",
-a:["5th Amendment","6th Amendment","8th Amendment","10th Amendment"],
-c:1,
-h:"Trial rights are in the Sixth Amendment."
-},
-
-{
-passage:`Congress passed a law and the Supreme Court declared it unconstitutional.`,
-q:"Which constitutional principle is demonstrated?",
-a:["Checks and Balances","Popular Sovereignty","Reserved Powers","Direct Democracy"],
-c:0,
-h:"One branch checking another."
-}
-
+const CASES = [
+  {
+    title: "Marbury v. Madison (1803)",
+    tag: "Judicial Review",
+    passage: `In the final days of the Adams administration, several judicial commissions were signed but not delivered before Thomas Jefferson took office. William Marbury asked the Supreme Court to order Secretary of State James Madison to deliver his commission. Chief Justice John Marshall concluded that Marbury had been wronged, but also ruled that the section of the Judiciary Act of 1789 giving the Court power to issue the order in this case conflicted with the Constitution.`,
+    parts: [
+      {
+        label: "Part A",
+        question: "Which constitutional power was established by this decision?",
+        answers: [
+          "Executive privilege",
+          "Judicial review",
+          "Reserved powers",
+          "Direct democracy"
+        ],
+        correct: 1,
+        hint: "The Court claimed the authority to declare laws unconstitutional."
+      },
+      {
+        label: "Part B",
+        question: "Which basic principle of government was strengthened when the Court limited Congress by declaring part of a law unconstitutional?",
+        answers: [
+          "Checks and balances",
+          "Popular sovereignty",
+          "Republicanism",
+          "Elastic powers"
+        ],
+        correct: 0,
+        hint: "One branch checked the action of another branch."
+      }
+    ]
+  },
+  {
+    title: "Marbury v. Madison (1803)",
+    tag: "Constitutional Change",
+    passage: `The Constitution does not explicitly state that the Supreme Court may strike down acts of Congress. In Marbury v. Madison, however, the Court interpreted its role under Article III and announced that it could refuse to enforce laws that violated the Constitution.`,
+    parts: [
+      {
+        label: "Part A",
+        question: "According to Ohio’s standards, Marbury v. Madison is best classified as an example of constitutional government changing through which method?",
+        answers: [
+          "Informal practices",
+          "Supreme Court decisions",
+          "Amendments",
+          "State referendums"
+        ],
+        correct: 1,
+        hint: "The change came from a Court ruling, not from Congress or an amendment."
+      },
+      {
+        label: "Part B",
+        question: "What was the main effect of this case on the meaning and application of constitutional government?",
+        answers: [
+          "It expanded direct voting by citizens",
+          "It gave states control over federal courts",
+          "It allowed the judicial branch to interpret and limit government actions under the Constitution",
+          "It eliminated checks on the executive branch"
+        ],
+        correct: 2,
+        hint: "Think about the Court’s new role in declaring acts unconstitutional."
+      }
+    ]
+  },
+  {
+    title: "McCulloch v. Maryland (1819)",
+    tag: "Necessary & Proper",
+    passage: `Congress created the Second Bank of the United States. The state of Maryland attempted to tax the bank, arguing that the Constitution did not explicitly list the power to create a national bank. James McCulloch, a bank official, refused to pay the tax. The Supreme Court ruled that Congress had authority to create the bank and that Maryland could not tax it.`,
+    parts: [
+      {
+        label: "Part A",
+        question: "Which clause gave Congress constitutional authority to create the national bank?",
+        answers: [
+          "Necessary and Proper Clause",
+          "Establishment Clause",
+          "Ex Post Facto Clause",
+          "Full Faith and Credit Clause"
+        ],
+        correct: 0,
+        hint: "This clause allows Congress to pass laws needed to carry out its enumerated powers."
+      },
+      {
+        label: "Part B",
+        question: "Which constitutional principle was most directly strengthened by the Court’s ruling that Maryland could not tax the national bank?",
+        answers: [
+          "Popular sovereignty",
+          "Federalism with national supremacy",
+          "State nullification",
+          "Direct democracy"
+        ],
+        correct: 1,
+        hint: "The ruling said a state could not control a legitimate act of the national government."
+      }
+    ]
+  },
+  {
+    title: "McCulloch v. Maryland (1819)",
+    tag: "Federal Power",
+    passage: `Chief Justice John Marshall explained that the Constitution grants Congress certain enumerated powers, but also gives Congress discretion to choose reasonable means to carry them out. He rejected Maryland’s attempt to treat federal institutions as subject to state control.`,
+    parts: [
+      {
+        label: "Part A",
+        question: "Which phrase best explains the Court’s reasoning in this case?",
+        answers: [
+          "States may interpret the Constitution however they choose",
+          "Congress may use implied powers to carry out delegated powers",
+          "The president may suspend laws during emergencies",
+          "Citizens may vote directly on national laws"
+        ],
+        correct: 1,
+        hint: "The Court supported implied powers connected to listed powers."
+      },
+      {
+        label: "Part B",
+        question: "Ohio often uses this case to show that constitutional government changed over time through a broader interpretation of which principle?",
+        answers: [
+          "Limited government as absolute state control",
+          "Federalism as increased national authority over the states",
+          "Popular sovereignty through referendums",
+          "Checks and balances between voters and judges"
+        ],
+        correct: 1,
+        hint: "The national government’s reach increased relative to state governments."
+      }
+    ]
+  },
+  {
+    title: "Gibbons v. Ogden (1824)",
+    tag: "Commerce Clause",
+    passage: `The state of New York granted Aaron Ogden an exclusive license to operate steamboats in waters between New York and New Jersey. Thomas Gibbons held a federal coasting license and continued to operate in the same waters. The Supreme Court ruled that regulating interstate commerce belongs to Congress, not individual states.`,
+    parts: [
+      {
+        label: "Part A",
+        question: "Which constitutional clause was central to the Court’s decision?",
+        answers: [
+          "Commerce Clause",
+          "Takings Clause",
+          "Appointments Clause",
+          "Establishment Clause"
+        ],
+        correct: 0,
+        hint: "The case involved trade and transportation crossing state lines."
+      },
+      {
+        label: "Part B",
+        question: "Which basic principle was strengthened when the Court ruled that a state monopoly could not interfere with interstate commerce regulated by Congress?",
+        answers: [
+          "Popular sovereignty",
+          "Federalism with national control over interstate commerce",
+          "State supremacy",
+          "Trial by jury"
+        ],
+        correct: 1,
+        hint: "This case expanded national power in an area shared with the states."
+      }
+    ]
+  },
+  {
+    title: "Gibbons v. Ogden (1824)",
+    tag: "National Supremacy",
+    passage: `In deciding Gibbons v. Ogden, the Court treated navigation between states as commerce and concluded that Congress has broad authority whenever economic activity crosses state boundaries.`,
+    parts: [
+      {
+        label: "Part A",
+        question: "Which effect did this decision have on the powers of the national government?",
+        answers: [
+          "It reduced Congress to only taxing powers",
+          "It expanded Congress’s authority to regulate interstate economic activity",
+          "It allowed states to veto federal trade laws",
+          "It gave the Supreme Court power to create agencies"
+        ],
+        correct: 1,
+        hint: "The Court broadened the meaning of commerce among the states."
+      },
+      {
+        label: "Part B",
+        question: "Which answer best explains why this case matters on the Ohio Government test?",
+        answers: [
+          "It is used to illustrate federalism and the expansion of national power",
+          "It is used to explain the 19th Amendment",
+          "It is used to explain direct primaries",
+          "It is used to show how impeachment works"
+        ],
+        correct: 0,
+        hint: "Think principle first: division of power between national and state governments."
+      }
+    ]
+  },
+  {
+    title: "Gitlow v. New York (1925)",
+    tag: "Speech + Incorporation",
+    passage: `Benjamin Gitlow was convicted under a New York law for distributing a manifesto that called for political change. He argued that the state law violated freedom of speech and freedom of the press. The Supreme Court upheld Gitlow’s conviction, but it also declared that freedoms protected by the First Amendment are among the liberties protected from state infringement by the Due Process Clause of the 14th Amendment.`,
+    parts: [
+      {
+        label: "Part A",
+        question: "Which amendment freedoms were at issue in this case?",
+        answers: [
+          "First Amendment freedoms of speech and press",
+          "Second Amendment right to bear arms",
+          "Fourth Amendment protections against unreasonable search",
+          "Tenth Amendment reserved powers"
+        ],
+        correct: 0,
+        hint: "The case involved distributing political ideas."
+      },
+      {
+        label: "Part B",
+        question: "Which doctrine did the Court rely on when it said these rights also limit state governments?",
+        answers: [
+          "Spoils system",
+          "Doctrine of Incorporation",
+          "Judicial restraint",
+          "Nullification"
+        ],
+        correct: 1,
+        hint: "This doctrine applies much of the Bill of Rights to the states through the 14th Amendment."
+      }
+    ]
+  },
+  {
+    title: "Gitlow v. New York (1925)",
+    tag: "14th Amendment",
+    passage: `Although the Supreme Court did not reverse Gitlow’s conviction, the case was still significant because it announced that key protections in the Bill of Rights could apply to state governments through the 14th Amendment.`,
+    parts: [
+      {
+        label: "Part A",
+        question: "Which clause of the 14th Amendment was used to support applying rights to the states?",
+        answers: [
+          "Equal Protection Clause",
+          "Due Process Clause",
+          "Privileges and Immunities Clause of Article IV",
+          "Emoluments Clause"
+        ],
+        correct: 1,
+        hint: "Ohio’s standards specifically connect incorporation to this clause."
+      },
+      {
+        label: "Part B",
+        question: "What was the larger constitutional effect of this case?",
+        answers: [
+          "It increased the ability of states to ignore the Bill of Rights",
+          "It helped extend federal civil liberties protections to state and local governments",
+          "It gave Congress the power to appoint judges",
+          "It ended judicial review"
+        ],
+        correct: 1,
+        hint: "Think about the Bill of Rights reaching beyond only the federal government."
+      }
+    ]
+  },
+  {
+    title: "Mapp v. Ohio (1961)",
+    tag: "4th Amendment",
+    passage: `Police officers entered Dollree Mapp’s home looking for a fugitive. They did not present a valid warrant, but they searched the home and found materials that were later used to convict her. Mapp appealed, arguing that the search violated the Constitution.`,
+    parts: [
+      {
+        label: "Part A",
+        question: "Which amendment formed the basis of Mapp’s argument?",
+        answers: [
+          "First Amendment",
+          "Fourth Amendment",
+          "Fifth Amendment",
+          "Seventh Amendment"
+        ],
+        correct: 1,
+        hint: "Searches, seizures, and warrants point to one amendment."
+      },
+      {
+        label: "Part B",
+        question: "Which rule was strengthened when the Court said illegally obtained evidence could not be used in state courts?",
+        answers: [
+          "Exclusionary Rule",
+          "Reserved powers doctrine",
+          "Pocket veto rule",
+          "Advice and consent rule"
+        ],
+        correct: 0,
+        hint: "Evidence obtained through unconstitutional searches is excluded."
+      }
+    ]
+  },
+  {
+    title: "Mapp v. Ohio (1961)",
+    tag: "Rights Applied to States",
+    passage: `Before Mapp, the exclusionary rule mainly restrained the federal government. In Mapp v. Ohio, the Supreme Court held that the protections against unreasonable search and seizure also constrained state law enforcement in state prosecutions.`,
+    parts: [
+      {
+        label: "Part A",
+        question: "Which constitutional doctrine allowed the Court to apply this protection to the states?",
+        answers: [
+          "Doctrine of Incorporation",
+          "Popular sovereignty",
+          "Executive privilege",
+          "Legislative oversight"
+        ],
+        correct: 0,
+        hint: "The Court used the 14th Amendment to apply a Bill of Rights protection to state governments."
+      },
+      {
+        label: "Part B",
+        question: "The Court’s decision in Mapp is most directly used on the Ohio test to show that constitutional government changed through what process?",
+        answers: [
+          "An amendment proposed by state legislatures",
+          "A Supreme Court decision interpreting constitutional rights",
+          "A local referendum",
+          "An executive order by the governor"
+        ],
+        correct: 1,
+        hint: "The change came from Court interpretation."
+      }
+    ]
+  },
+  {
+    title: "Miranda v. Arizona (1966)",
+    tag: "5th Amendment",
+    passage: `Ernesto Miranda confessed to police after hours of questioning. He had not been clearly informed that he had the right to remain silent and the right to an attorney. The Supreme Court ruled that suspects in custody must be informed of specific rights before interrogation.`,
+    parts: [
+      {
+        label: "Part A",
+        question: "Which constitutional amendment was most directly involved in the Court’s concern about self-incrimination?",
+        answers: [
+          "Fourth Amendment",
+          "Fifth Amendment",
+          "Eighth Amendment",
+          "Tenth Amendment"
+        ],
+        correct: 1,
+        hint: "The amendment protects a suspect from being forced to incriminate himself."
+      },
+      {
+        label: "Part B",
+        question: "What is the practical purpose of Miranda warnings?",
+        answers: [
+          "To help police search homes faster",
+          "To inform suspects of constitutional protections before custodial questioning",
+          "To require jury trials in all civil cases",
+          "To let governors appoint prosecutors"
+        ],
+        correct: 1,
+        hint: "The warnings exist before interrogation begins."
+      }
+    ]
+  },
+  {
+    title: "Miranda v. Arizona (1966)",
+    tag: "Criminal Procedure",
+    passage: `In Miranda, the Court concluded that police questioning in custody can place pressure on suspects that undermines their constitutional rights unless officers explain those rights first.`,
+    parts: [
+      {
+        label: "Part A",
+        question: "Which pair of amendments is most likely to appear as plausible distractors on a question about Miranda?",
+        answers: [
+          "1st and 2nd Amendments",
+          "4th and 5th Amendments",
+          "7th and 10th Amendments",
+          "12th and 14th Amendments"
+        ],
+        correct: 1,
+        hint: "Police investigation and confession questions often narrow to one of these two."
+      },
+      {
+        label: "Part B",
+        question: "Which clue words in a passage should most strongly alert students to a Miranda-type question?",
+        answers: [
+          "election, candidate, campaign",
+          "petition, assembly, press",
+          "interrogation, confession, remain silent",
+          "tax, bank, commerce"
+        ],
+        correct: 2,
+        hint: "Focus on police questioning and admissions by a suspect."
+      }
+    ]
+  },
+  {
+    title: "Gideon v. Wainwright (1963)",
+    tag: "6th Amendment",
+    passage: `Clarence Earl Gideon was charged with breaking and entering. He could not afford an attorney and asked the judge to appoint one for him. The request was denied because Florida only provided appointed counsel in capital cases. Gideon was convicted and appealed to the Supreme Court.`,
+    parts: [
+      {
+        label: "Part A",
+        question: "Which amendment served as the basis for the Court’s ruling?",
+        answers: [
+          "Fourth Amendment",
+          "Fifth Amendment",
+          "Sixth Amendment",
+          "Eighth Amendment"
+        ],
+        correct: 2,
+        hint: "This amendment guarantees the assistance of counsel in criminal prosecutions."
+      },
+      {
+        label: "Part B",
+        question: "Which specific right did the Court protect in Gideon?",
+        answers: [
+          "Protection against unreasonable searches",
+          "Right to counsel",
+          "Protection against cruel and unusual punishment",
+          "Right to bear arms"
+        ],
+        correct: 1,
+        hint: "The issue was whether an indigent defendant must be given a lawyer."
+      }
+    ]
+  },
+  {
+    title: "Gideon v. Wainwright (1963)",
+    tag: "Incorporation",
+    passage: `The Supreme Court concluded that a fair trial in felony cases could not be guaranteed unless poor defendants were provided attorneys. It held that the right to counsel is so fundamental that the states must respect it too.`,
+    parts: [
+      {
+        label: "Part A",
+        question: "Which doctrine allowed the Supreme Court to apply this protection to the states?",
+        answers: [
+          "Doctrine of Incorporation",
+          "Reserved powers",
+          "Popular sovereignty",
+          "Executive privilege"
+        ],
+        correct: 0,
+        hint: "This doctrine applies many Bill of Rights protections to state governments."
+      },
+      {
+        label: "Part B",
+        question: "In Gideon v. Wainwright, the Court relied on the Doctrine of Incorporation in order to do what?",
+        answers: [
+          "Carry out Congress’s enumerated powers",
+          "Apply the protections of the Bill of Rights to state governments",
+          "Overrule elections held by state legislatures",
+          "Increase the number of federal judges"
+        ],
+        correct: 1,
+        hint: "Think federal rights reaching state courts."
+      }
+    ]
+  },
+  {
+    title: "Gideon v. Wainwright (1963)",
+    tag: "Ohio Test Pattern",
+    passage: `Ohio frequently presents Gideon as a two-step question: students must identify the amendment and then explain how the Court used the 14th Amendment to extend the right against state governments.`,
+    parts: [
+      {
+        label: "Part A",
+        question: "Which two amendments are most likely to appear together as plausible answer choices in a Gideon passage?",
+        answers: [
+          "5th and 6th Amendments",
+          "1st and 2nd Amendments",
+          "8th and 10th Amendments",
+          "12th and 14th Amendments"
+        ],
+        correct: 0,
+        hint: "Criminal trial rights often narrow to these two, but lawyer/counsel points to one of them."
+      },
+      {
+        label: "Part B",
+        question: "Which clue words should push a student toward the correct answer in Gideon?",
+        answers: [
+          "bank, tax, commerce",
+          "attorney, counsel, defense",
+          "petition, religion, protest",
+          "search, seizure, warrant"
+        ],
+        correct: 1,
+        hint: "Look for the legal representation words."
+      }
+    ]
+  },
+  {
+    title: "Brown v. Board of Education (1954)",
+    tag: "Equal Protection",
+    passage: `Linda Brown was denied admission to a public school closer to her home because the school was reserved for white students. The Supreme Court ruled that segregated public schools are inherently unequal and violate the Constitution.`,
+    parts: [
+      {
+        label: "Part A",
+        question: "Which constitutional amendment provided the basis for the Court’s ruling?",
+        answers: [
+          "Tenth Amendment",
+          "Thirteenth Amendment",
+          "Fourteenth Amendment",
+          "Nineteenth Amendment"
+        ],
+        correct: 2,
+        hint: "The case involved equal treatment under the law."
+      },
+      {
+        label: "Part B",
+        question: "Which clause of that amendment was most directly involved?",
+        answers: [
+          "Equal Protection Clause",
+          "Necessary and Proper Clause",
+          "Free Exercise Clause",
+          "Supremacy Clause"
+        ],
+        correct: 0,
+        hint: "Segregation and unequal treatment point here."
+      }
+    ]
+  },
+  {
+    title: "Brown v. Board of Education (1954)",
+    tag: "Civil Rights",
+    passage: `Brown overturned the idea that “separate but equal” facilities satisfied the Constitution in public education.`,
+    parts: [
+      {
+        label: "Part A",
+        question: "Which earlier case’s reasoning was rejected by Brown in the field of public education?",
+        answers: [
+          "McCulloch v. Maryland",
+          "Miranda v. Arizona",
+          "Plessy v. Ferguson",
+          "Marbury v. Madison"
+        ],
+        correct: 2,
+        hint: "That earlier case approved 'separate but equal.'"
+      },
+      {
+        label: "Part B",
+        question: "On the Ohio test, Brown is often used to illustrate the extension of civil rights to marginalized groups through the actions of which branch?",
+        answers: [
+          "Judicial branch",
+          "Legislative branch",
+          "Executive branch",
+          "Local branch"
+        ],
+        correct: 0,
+        hint: "This result came from a Supreme Court ruling."
+      }
+    ]
+  },
+  {
+    title: "Plessy v. Ferguson (1896)",
+    tag: "Separate but Equal",
+    passage: `Homer Plessy challenged a Louisiana law requiring separate railway cars for white and Black passengers. The Supreme Court upheld the law, ruling that segregation was constitutional as long as the separate facilities were supposedly equal.`,
+    parts: [
+      {
+        label: "Part A",
+        question: "Which amendment was at the center of Plessy’s challenge?",
+        answers: [
+          "Second Amendment",
+          "Fourth Amendment",
+          "Fourteenth Amendment",
+          "Twenty-second Amendment"
+        ],
+        correct: 2,
+        hint: "The case involved equal treatment and discrimination."
+      },
+      {
+        label: "Part B",
+        question: "What constitutional idea did the Court accept in Plessy that was later rejected in Brown?",
+        answers: [
+          "Implied powers",
+          "Separate but equal",
+          "Judicial review",
+          "Executive privilege"
+        ],
+        correct: 1,
+        hint: "The phrase became the symbol of legally approved segregation."
+      }
+    ]
+  },
+  {
+    title: "Plessy v. Ferguson (1896)",
+    tag: "Civil Rights Struggle",
+    passage: `Plessy demonstrates that constitutional amendments do not automatically produce immediate equality. Even after the Reconstruction Amendments, governments and courts sometimes permitted discrimination to continue.`,
+    parts: [
+      {
+        label: "Part A",
+        question: "Which Ohio content statement theme does this case most clearly support?",
+        answers: [
+          "The struggle to fully achieve equality continued despite new constitutional protections",
+          "The Federal Reserve uses monetary tools to regulate the money supply",
+          "Political parties provide opportunities for civic involvement",
+          "Ohio judges are elected under the state constitution"
+        ],
+        correct: 0,
+        hint: "This case shows rights on paper did not instantly end discrimination."
+      },
+      {
+        label: "Part B",
+        question: "Which group was most directly denied equal treatment under the system upheld by Plessy?",
+        answers: [
+          "Corporate shareholders",
+          "African Americans",
+          "Cabinet members",
+          "Foreign ambassadors"
+        ],
+        correct: 1,
+        hint: "Think post-Reconstruction segregation."
+      }
+    ]
+  },
+  {
+    title: "Myers v. United States (1926)",
+    tag: "Executive Power",
+    passage: `A federal law required the president to obtain Senate approval before removing certain executive officials. President Woodrow Wilson removed a postmaster without Senate consent. The Supreme Court ruled that the president had the power to remove executive officers, emphasizing the president’s authority over the executive branch.`,
+    parts: [
+      {
+        label: "Part A",
+        question: "Which branch’s power was strengthened by this ruling?",
+        answers: [
+          "Legislative branch",
+          "Executive branch",
+          "Judicial branch",
+          "State branch"
+        ],
+        correct: 1,
+        hint: "The case focused on presidential control over executive officials."
+      },
+      {
+        label: "Part B",
+        question: "Which constitutional principle is most directly involved when one branch’s powers are defined against another branch’s attempt to limit it?",
+        answers: [
+          "Separation of powers",
+          "Popular sovereignty",
+          "Federalism",
+          "Reserved rights"
+        ],
+        correct: 0,
+        hint: "The case dealt with boundaries between branches."
+      }
+    ]
+  },
+  {
+    title: "Myers v. United States (1926)",
+    tag: "Branch Boundaries",
+    passage: `Myers is commonly used to test whether students understand the distinction between Congress making laws and the president controlling the personnel who execute those laws.`,
+    parts: [
+      {
+        label: "Part A",
+        question: "If Ohio uses this case in a question about the president removing executive officials, which branch interaction is being emphasized?",
+        answers: [
+          "State vs. federal courts",
+          "Executive vs. legislative branches",
+          "Voters vs. political parties",
+          "Local vs. county government"
+        ],
+        correct: 1,
+        hint: "The dispute involved Congress limiting the president."
+      },
+      {
+        label: "Part B",
+        question: "Which answer best describes the educational purpose of this case on the state test?",
+        answers: [
+          "To show how monetary policy changes interest rates",
+          "To show how separation of powers shapes branch responsibilities",
+          "To explain jury selection in criminal trials",
+          "To compare the Ohio and U.S. constitutions"
+        ],
+        correct: 1,
+        hint: "It is about branch structure, not rights or economics."
+      }
+    ]
+  },
+  {
+    title: "Youngstown Sheet & Tube v. Sawyer (1952)",
+    tag: "Limits on the President",
+    passage: `During the Korean War, President Harry Truman ordered the seizure of steel mills to prevent a strike from disrupting war production. The steel companies challenged the order. The Supreme Court ruled that the president lacked authority to seize the mills because Congress had not authorized the action.`,
+    parts: [
+      {
+        label: "Part A",
+        question: "Which branch of government checked the president in this case by declaring the action unconstitutional?",
+        answers: [
+          "Executive branch",
+          "Judicial branch",
+          "State branch",
+          "Local branch"
+        ],
+        correct: 1,
+        hint: "The Supreme Court made the ruling."
+      },
+      {
+        label: "Part B",
+        question: "Which constitutional principle is best illustrated by this decision?",
+        answers: [
+          "Popular sovereignty",
+          "Checks and balances",
+          "Reserved powers of the states",
+          "Direct democracy"
+        ],
+        correct: 1,
+        hint: "One branch restrained the action of another branch."
+      }
+    ]
+  },
+  {
+    title: "Youngstown Sheet & Tube v. Sawyer (1952)",
+    tag: "Executive Orders",
+    passage: `The Court explained that the president’s role is to execute the law, not make law independently where Congress has not granted authority.`,
+    parts: [
+      {
+        label: "Part A",
+        question: "Which principle best explains why Truman’s seizure order failed?",
+        answers: [
+          "Separation of powers",
+          "Full faith and credit",
+          "Popular sovereignty",
+          "Reserved powers"
+        ],
+        correct: 0,
+        hint: "The president cannot simply take over a legislative function."
+      },
+      {
+        label: "Part B",
+        question: "This case is most useful on the Ohio test as an example of what?",
+        answers: [
+          "A governor using initiative and referendum",
+          "A president being limited when acting without constitutional or congressional authority",
+          "A citizen petitioning for free speech rights",
+          "A state court applying the exclusionary rule"
+        ],
+        correct: 1,
+        hint: "The key idea is presidential power has limits."
+      }
+    ]
+  }
 ];
 
-let current=0;
-let correct=0;
-let attempts=0;
-let startTime;
+// Flatten into 30 playable questions, one part at a time.
+const QUESTIONS = CASES.flatMap((c, caseIndex) => c.parts.map((p, partIndex) => ({
+  id: `${caseIndex + 1}-${partIndex + 1}`,
+  title: c.title,
+  tag: c.tag,
+  passage: c.passage,
+  label: p.label,
+  question: p.question,
+  answers: p.answers,
+  correct: p.correct,
+  hint: p.hint
+})));
 
+let currentIndex = 0;
+let attempts = 0;
+let correct = 0;
+let studentName = "";
+let startTime = null;
+let locked = false;
+
+const $ = sel => document.querySelector(sel);
+const startScreen = $("#startScreen");
+const gameScreen = $("#gameScreen");
+const endScreen = $("#endScreen");
+
+function formatDateTime(d){
+  return d.toLocaleString();
+}
+function accuracyPct(){
+  return attempts === 0 ? 100 : Math.round((correct / attempts) * 100);
+}
+function updateHUD(){
+  $("#progressText").textContent = `${currentIndex + 1} / ${QUESTIONS.length}`;
+  $("#accuracyText").textContent = `${accuracyPct()}%`;
+  $("#logName").textContent = studentName || "—";
+  $("#logCorrect").textContent = String(correct);
+  $("#logAttempts").textContent = String(attempts);
+  $("#logCase").textContent = String(currentIndex + 1);
+}
+function renderQuestion(){
+  const q = QUESTIONS[currentIndex];
+  $("#caseTitle").textContent = q.title;
+  $("#caseTag").textContent = q.tag;
+  $("#passageText").textContent = q.passage;
+  $("#partLabel").textContent = q.label;
+  $("#questionText").textContent = q.question;
+  $("#stageText").textContent = q.label;
+  $("#hintBox").style.display = "none";
+  $("#hintBox").textContent = "";
+
+  const answersEl = $("#answers");
+  answersEl.innerHTML = "";
+  q.answers.forEach((ans, idx) => {
+    const btn = document.createElement("button");
+    btn.type = "button";
+    btn.className = "answer";
+    btn.innerHTML = `<span class="mono">${String.fromCharCode(65 + idx)})</span> ${ans}`;
+    btn.addEventListener("click", () => handleAnswer(btn, idx));
+    answersEl.appendChild(btn);
+  });
+  updateHUD();
+}
+function handleAnswer(btn, idx){
+  if(locked) return;
+  const q = QUESTIONS[currentIndex];
+  attempts += 1;
+  updateHUD();
+
+  if(idx === q.correct){
+    locked = true;
+    correct += 1;
+    btn.classList.add("good");
+    updateHUD();
+    setTimeout(() => {
+      currentIndex += 1;
+      locked = false;
+      if(currentIndex >= QUESTIONS.length){
+        finishGame();
+      } else {
+        renderQuestion();
+      }
+    }, 450);
+  } else {
+    btn.classList.add("bad");
+    const hint = $("#hintBox");
+    hint.textContent = `Hint: ${q.hint}`;
+    hint.style.display = "block";
+    setTimeout(() => btn.classList.remove("bad"), 700);
+  }
+}
 function startGame(){
-
-const name=document.getElementById("name").value;
-
-if(!name){alert("Enter your name");return;}
-
-startTime=new Date();
-
-document.getElementById("startCard").style.display="none";
-document.getElementById("gameCard").style.display="block";
-
-loadQuestion();
+  const name = $("#studentName").value.trim();
+  if(!name){
+    alert("Please enter your name to begin.");
+    $("#studentName").focus();
+    return;
+  }
+  studentName = name;
+  startTime = new Date();
+  $("#startedText").textContent = formatDateTime(startTime);
+  startScreen.classList.add("hide");
+  endScreen.classList.add("hide");
+  gameScreen.classList.remove("hide");
+  currentIndex = 0;
+  attempts = 0;
+  correct = 0;
+  locked = false;
+  renderQuestion();
 }
+function finishGame(){
+  gameScreen.classList.add("hide");
+  endScreen.classList.remove("hide");
+  const endTime = new Date();
+  const acc = accuracyPct();
+  $("#finalAccuracy").textContent = `${acc}%`;
 
-function loadQuestion(){
+  const passed = acc === 100 && correct === QUESTIONS.length ? "YES — MASTERY" : "NO — RESTART REQUIRED";
+  $("#ticketBox").textContent =
+`SCOTUS DETECTIVE — SUBMISSION TICKET
 
-if(current>=questions.length){finish();return;}
-
-const q=questions[current];
-
-document.getElementById("progress").innerText=`Case ${current+1} / ${questions.length}`;
-
-document.getElementById("passage").innerHTML="<p>"+q.passage+"</p>";
-
-document.getElementById("question").innerText=q.q;
-
-const answers=document.getElementById("answers");
-
-answers.innerHTML="";
-
-q.a.forEach((text,i)=>{
-
-const div=document.createElement("div");
-div.className="answer";
-div.innerText=text;
-
-div.onclick=()=>choose(div,i);
-
-answers.appendChild(div);
-
-});
-
-document.getElementById("hint").innerText="";
-
-}
-
-function choose(el,i){
-
-attempts++;
-
-const q=questions[current];
-
-if(i===q.c){
-
-correct++;
-
-el.classList.add("good");
-
-setTimeout(()=>{
-current++;
-updateAccuracy();
-loadQuestion();
-},400);
-
-}else{
-
-el.classList.add("bad");
-document.getElementById("hint").innerText=q.h;
-updateAccuracy();
-
-}
-
-}
-
-function updateAccuracy(){
-
-const acc=Math.round((correct/attempts)*100)||0;
-document.getElementById("accuracy").innerText=acc+"%";
-
-}
-
-function finish(){
-
-document.getElementById("gameCard").style.display="none";
-document.getElementById("endCard").style.display="block";
-
-const endTime=new Date();
-
-const ticket=`
-Student: ${document.getElementById("name").value}
-
+Student: ${studentName}
+Questions Completed: ${QUESTIONS.length}
 Correct: ${correct}
 Attempts: ${attempts}
-Accuracy: ${Math.round((correct/attempts)*100)}%
+Accuracy: ${acc}%
+Passed 100% Mastery: ${passed}
 
-Start Time: ${startTime.toLocaleString()}
-End Time: ${endTime.toLocaleString()}
-`;
+Time Started: ${formatDateTime(startTime)}
+Time Completed: ${formatDateTime(endTime)}
 
-document.getElementById("ticket").innerText=ticket;
-
+Game: SCOTUS Detective
+Focus: Supreme Court cases, amendments, doctrines, and constitutional principles`;
+}
+function restartGame(){
+  location.reload();
 }
 
-function restart(){location.reload();}
-
+$("#startBtn").addEventListener("click", startGame);
+$("#restartBtn").addEventListener("click", restartGame);
+$("#playAgainBtn").addEventListener("click", restartGame);
+$("#toolkitBtn").addEventListener("click", () => {
+  $("#toolkitBox").classList.toggle("hide");
+});
+$("#studentName").addEventListener("keydown", (e) => {
+  if(e.key === "Enter") startGame();
+});
 </script>
-
 </body>
 </html>
