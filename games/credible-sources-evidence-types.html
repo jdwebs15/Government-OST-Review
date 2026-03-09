@@ -156,6 +156,7 @@
       color:var(--muted);
       font-weight:900;
       letter-spacing:.06em;
+      line-height:1.25;
     }
     .gridq .r{
       display:grid;
@@ -593,18 +594,26 @@
       answerIndex:0, hint:'Facts must lead to valid conclusions.',
       explain:'Correct: weak reasoning undermines credibility even if some facts are correct.'
     },
-    { id:'CS3_SUPP_11', type:'grid_single_per_row', title:'Which Source is Most Credible?', prompt:
-`Select the most credible source for each research goal.`,
+    {
+      id:'CS3_SUPP_11',
+      type:'grid_single_per_row',
+      title:'Which Source is Most Credible?',
+      prompt:
+`Select the most credible source type for each research goal.`,
       grid:{
-        columns:['Most credible choice A','Most credible choice B','Most credible choice C'],
+        columns:[
+          'Official government document or record',
+          'Budget/data report from a government or nonpartisan research office',
+          'Scholarly legal journal or expert analysis'
+        ],
         rows:[
           { source:'Find the exact wording of a city ordinance passed last month', correctCol:0 },
           { source:'Understand how a policy affected the local budget over time', correctCol:1 },
           { source:'Learn expert analysis of a Supreme Court decision', correctCol:2 }
         ]
       },
-      hint:'A=official text. B=data/budget report. C=expert/peer-reviewed legal analysis.',
-      explain:'Correct: choose sources that best match the task—official documents, data reports, or expert analysis.'
+      hint:'Use the source that best matches the task: official text for exact wording, data reports for budget impact, expert legal analysis for court decisions.',
+      explain:'Correct: the best source depends on the research goal—official records for exact wording, data reports for budget effects, and scholarly analysis for Supreme Court decisions.'
     },
     { id:'CS3_SUPP_12', type:'mcq', title:'Reputation of Organization', prompt:
 `Two articles report the same event. One is published by an established news organization that lists editors and corrections; the other is anonymous with no contact information. Which factor MOST supports the first article’s credibility?`,
