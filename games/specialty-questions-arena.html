@@ -266,9 +266,19 @@ function finishGame(){
   $('#resultHost').innerHTML = `
     <section class="panel question">
       <div class="q-type">Run Complete</div>
-      <h2 style="margin:.25rem 0 1rem">${passed ? '<span style="color:#b7f5cd">100% Mastery Ticket Earned</span>' : '<span style="color:#ffb0bf">Ticket Locked — Retry Required</span>'}</h2>
-      <div class="feedback ${passed ? 'goodBox' : 'badBox'}"><strong>${passed ? 'Perfect run.' : 'Accuracy dropped below 100%.'}</strong> ${passed ? 'Your completion ticket is below.' : 'This game requires a perfect run to earn the ticket. Restart and try again.'}</div>
+      <h2 style="margin:.25rem 0 1rem">
+        ${passed
+          ? '<span style="color:#b7f5cd">100% Mastery Ticket Earned</span>'
+          : '<span style="color:#ffb0bf">Ticket Locked — Retry Required</span>'}
+      </h2>
+      <div class="feedback ${passed ? 'goodBox' : 'badBox'}">
+        <strong>${passed ? 'Perfect run.' : 'Accuracy dropped below 100%.'}</strong>
+        ${passed
+          ? 'Your completion ticket is below.'
+          : 'This game requires a perfect run to earn the ticket. Restart and try again.'}
+      </div>
       <div class="stimulus" style="margin-top:14px">
+        <div><strong>Game:</strong> Government Specialty Questions Arena</div>
         <div><strong>Name:</strong> ${state.student}</div>
         <div><strong>Questions:</strong> ${state.prepared.length}</div>
         <div><strong>Accuracy:</strong> ${acc}%</div>
@@ -277,8 +287,11 @@ function finishGame(){
         <div><strong>Run Time:</strong> ${clockDiff(end - state.startTime)}</div>
         <div><strong>Status:</strong> ${passed ? 'PASS — 100% Mastery' : 'RETRY — Ticket not earned'}</div>
       </div>
-      <div class="footer-btns"><button class="button" onclick="location.reload()">Restart Game</button></div>
+      <div class="footer-btns">
+        <button class="button" onclick="location.reload()">Restart Game</button>
+      </div>
     </section>`;
+}
 }
 document.getElementById('startBtn').addEventListener('click', startGame);
 document.getElementById('studentName').addEventListener('keydown', e => { if(e.key==='Enter') startGame(); });
