@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>Civic Action Plan Sequence — From Issue to Policy (OST Review)</title>
+  <title>Civic Action Fundamentals — Issue to Action Plan (OST Review)</title>
   <link rel="stylesheet" href="../styles.css" />
 
   <style>
@@ -14,26 +14,59 @@
       --mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
     }
     *{box-sizing:border-box}
-    body{margin:0;background:linear-gradient(180deg,#0b1220,#070b14);color:var(--text);font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial;min-height:100vh}
-    .wrap{width:min(980px,92vw);margin:22px auto 40px}
+    body{
+      margin:0;
+      background:linear-gradient(180deg,#0b1220,#070b14);
+      color:var(--text);
+      font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial;
+      min-height:100vh
+    }
+    .wrap{width:min(1040px,92vw);margin:22px auto 40px}
     .topbar{
-      background:rgba(255,255,255,.03);border:1px solid var(--line);border-radius:var(--radius);
-      padding:18px 18px 14px;box-shadow:var(--shadow);display:flex;gap:14px;align-items:flex-start;justify-content:space-between
+      background:rgba(255,255,255,.03);
+      border:1px solid var(--line);
+      border-radius:var(--radius);
+      padding:18px 18px 14px;
+      box-shadow:var(--shadow);
+      display:flex;
+      gap:14px;
+      align-items:flex-start;
+      justify-content:space-between
     }
     .kicker{letter-spacing:.14em;font-size:12px;color:var(--muted);font-weight:800}
     h1{margin:6px 0 6px;font-size:24px}
-    .sub{margin:0;color:var(--muted);line-height:1.4}
+    .sub{margin:0;color:var(--muted);line-height:1.45}
     .pillrow{display:flex;gap:8px;flex-wrap:wrap;justify-content:flex-end}
-    .pill{border:1px solid var(--line);background:rgba(255,255,255,.02);padding:6px 10px;border-radius:999px;font-size:12px;color:var(--muted);white-space:nowrap}
+    .pill{
+      border:1px solid var(--line);
+      background:rgba(255,255,255,.02);
+      padding:6px 10px;
+      border-radius:999px;
+      font-size:12px;
+      color:var(--muted);
+      white-space:nowrap
+    }
 
-    .grid{display:grid;grid-template-columns:1.15fr .85fr;gap:14px;margin-top:14px}
+    .grid{display:grid;grid-template-columns:1.18fr .82fr;gap:14px;margin-top:14px}
     @media (max-width:900px){.grid{grid-template-columns:1fr}}
-    .panel{background:rgba(255,255,255,.03);border:1px solid var(--line);border-radius:var(--radius);box-shadow:var(--shadow);padding:16px}
+    .panel{
+      background:rgba(255,255,255,.03);
+      border:1px solid var(--line);
+      border-radius:var(--radius);
+      box-shadow:var(--shadow);
+      padding:16px
+    }
 
     .row{display:flex;gap:10px;align-items:center;justify-content:space-between;flex-wrap:wrap}
     .label{color:var(--muted);font-size:12px;letter-spacing:.08em;font-weight:900}
     .statline{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
-    .stat{background:rgba(255,255,255,.02);border:1px solid var(--line);border-radius:12px;padding:10px 12px;min-width:140px}
+    .stat{
+      background:rgba(255,255,255,.02);
+      border:1px solid var(--line);
+      border-radius:12px;
+      padding:10px 12px;
+      min-width:140px
+    }
     .stat .big{font-size:16px;font-weight:900}
     .stat .small{font-size:12px;color:var(--muted);margin-top:2px}
 
@@ -42,30 +75,59 @@
 
     .field{display:grid;gap:6px;margin-top:10px}
     input[type="text"]{
-      width:100%;padding:12px 12px;border-radius:14px;border:1px solid var(--line);
-      background:rgba(255,255,255,.02);color:var(--text);outline:none
+      width:100%;
+      padding:12px 12px;
+      border-radius:14px;
+      border:1px solid var(--line);
+      background:rgba(255,255,255,.02);
+      color:var(--text);
+      outline:none
     }
     input[type="text"]:focus{border-color:rgba(122,162,255,.55)}
 
     .actions{display:flex;gap:10px;flex-wrap:wrap;margin-top:12px}
     .btn{
-      border-radius:14px;border:1px solid var(--line);background:rgba(255,255,255,.02);
-      color:var(--text);padding:10px 12px;cursor:pointer;font-weight:900
+      border-radius:14px;
+      border:1px solid var(--line);
+      background:rgba(255,255,255,.02);
+      color:var(--text);
+      padding:10px 12px;
+      cursor:pointer;
+      font-weight:900
     }
     .btn:hover{border-color:rgba(122,162,255,.45)}
     .btn.primary{border-color:rgba(122,162,255,.45);background:rgba(122,162,255,.10)}
     .btn[disabled]{opacity:.6;cursor:not-allowed}
 
-    .msg{border-radius:14px;border:1px solid var(--line);padding:12px;margin-top:12px;display:none}
+    .msg{
+      border-radius:14px;
+      border:1px solid var(--line);
+      padding:12px;
+      margin-top:12px;
+      display:none
+    }
     .msg.good{display:block;border-color:rgba(43,213,118,.35);background:rgba(43,213,118,.08)}
     .msg.bad{display:block;border-color:rgba(255,92,122,.35);background:rgba(255,92,122,.08)}
     .msg.warn{display:block;border-color:rgba(255,209,102,.35);background:rgba(255,209,102,.08)}
     .msg .t{font-weight:900;margin-bottom:4px}
-    .msg .b{color:var(--muted);line-height:1.35}
+    .msg .b{color:var(--muted);line-height:1.4}
 
-    .errbox{display:none;margin-top:14px;border:1px solid rgba(255,92,122,.45);background:rgba(255,92,122,.10);border-radius:14px;padding:12px}
+    .errbox{
+      display:none;
+      margin-top:14px;
+      border:1px solid rgba(255,92,122,.45);
+      background:rgba(255,92,122,.10);
+      border-radius:14px;
+      padding:12px
+    }
     .errbox .t{font-weight:900}
-    .errbox pre{margin:8px 0 0;white-space:pre-wrap;color:var(--text);font-family:var(--mono);font-size:12px}
+    .errbox pre{
+      margin:8px 0 0;
+      white-space:pre-wrap;
+      color:var(--text);
+      font-family:var(--mono);
+      font-size:12px
+    }
 
     .cols{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:10px}
     @media (max-width:900px){.cols{grid-template-columns:1fr}}
@@ -74,7 +136,7 @@
       background:rgba(255,255,255,.02);
       border-radius:14px;
       padding:12px;
-      min-height:120px;
+      min-height:180px;
     }
     .box h3{margin:0 0 10px;font-size:13px;letter-spacing:.08em;color:var(--muted)}
     .step{
@@ -97,41 +159,61 @@
       background:rgba(43,213,118,.06);
     }
 
-    .turning{margin-top:12px;display:none}
-    .turning .opts{display:grid;gap:10px;margin-top:10px}
-    .optbtn{
-      width:100%;
-      text-align:left;
-      border-radius:14px;
-      border:1px solid var(--line);
-      background:rgba(255,255,255,.02);
-      color:var(--text);
-      padding:12px 12px;
-      cursor:pointer;
-      line-height:1.35;
-    }
-    .optbtn:hover{border-color:rgba(122,162,255,.45)}
-    .optbtn[disabled]{opacity:.65;cursor:not-allowed}
-
     .ticket{
-      margin-top:12px;border:1px solid rgba(43,213,118,.35);background:rgba(43,213,118,.07);border-radius:14px;padding:12px
+      margin-top:12px;
+      border:1px solid rgba(43,213,118,.35);
+      background:rgba(43,213,118,.07);
+      border-radius:14px;
+      padding:12px
     }
     .ticket .code{
-      font-family:var(--mono);font-weight:900;letter-spacing:.06em;padding:10px;border-radius:12px;border:1px solid var(--line);
-      background:rgba(255,255,255,.02);margin-top:8px;word-break:break-word
+      font-family:var(--mono);
+      font-weight:900;
+      letter-spacing:.06em;
+      padding:10px;
+      border-radius:12px;
+      border:1px solid var(--line);
+      background:rgba(255,255,255,.02);
+      margin-top:8px;
+      word-break:break-word;
+      white-space:pre-wrap
     }
     .muted{color:var(--muted)}
     .miniGuide{
       margin-top:10px;
-      padding:10px 12px;
+      padding:12px;
       border:1px solid var(--line);
       border-radius:12px;
       background:rgba(255,255,255,.02);
       color:var(--muted);
-      line-height:1.45;
+      line-height:1.5;
       font-size:13px;
     }
     .miniGuide b{color:var(--text)}
+    .seqKey{
+      display:grid;
+      gap:8px;
+      margin-top:10px
+    }
+    .seqItem{
+      border:1px solid var(--line);
+      background:rgba(255,255,255,.02);
+      border-radius:12px;
+      padding:10px 12px;
+      line-height:1.4
+    }
+    .seqItem b{color:var(--accent)}
+    ul.clean{
+      margin:10px 0 0;
+      padding-left:18px;
+      line-height:1.5;
+      color:var(--muted)
+    }
+    hr.sep{
+      border:none;
+      border-top:1px solid var(--line);
+      margin:14px 0
+    }
   </style>
 </head>
 
@@ -140,11 +222,11 @@
     <div class="topbar">
       <div>
         <div class="kicker">GOVERNMENT OST REVIEW</div>
-        <h1>Civic Action Plan Sequence — From Issue to Policy</h1>
+        <h1>Civic Action Fundamentals — Issue to Action Plan</h1>
         <p class="sub">
-          Put each civic action plan in the correct order. Think like this:
-          <b>find the problem → gather evidence → take it to the correct government body → follow up after the decision point.</b>
-          Then identify the step where the issue becomes part of the official government process.
+          This version is built around the actual civic action process the state emphasizes:
+          <b>identify issues, research, debate, propose appropriate solutions, devise action plans, examine possible consequences, and weigh costs and benefits.</b>
+          Your job is to place each scenario’s civic actions in the best order.
         </p>
       </div>
       <div class="pillrow">
@@ -184,7 +266,7 @@
               <button class="btn" id="btnResetAll" title="Hard reset (fresh attempt)">Reset Game</button>
             </div>
             <div class="muted" style="margin-top:6px;font-size:12px;">
-              This game always starts fresh. Back button also restarts clean.
+              This game always starts fresh. Refreshing or restarting begins a clean attempt.
             </div>
           </div>
 
@@ -200,15 +282,14 @@
 
           <div class="miniGuide">
             <b>What to do:</b><br>
-            1. Click the steps in the order they should happen.<br>
-            2. Start with the earliest action a citizen or group should take.<br>
-            3. End with the official meeting, vote, follow-up, or implementation step.<br>
-            4. After the order is correct, choose the <b>turning point</b>: the step where the issue enters the official government process.
+            Build the civic action plan in the best order.<br>
+            Think through the state process:
+            <b>identify the issue → research → debate → propose a solution → devise an action plan → examine consequences → weigh costs and benefits.</b>
           </div>
 
           <div class="cols">
             <div class="box">
-              <h3>AVAILABLE STEPS (CLICK THE FIRST STEP, THEN THE NEXT, THEN THE NEXT)</h3>
+              <h3>AVAILABLE ACTIONS</h3>
               <div id="pool"></div>
             </div>
             <div class="box">
@@ -225,15 +306,6 @@
           <div id="feedback" class="msg" aria-live="polite">
             <div class="t" id="fbTitle"></div>
             <div class="b" id="fbBody"></div>
-          </div>
-
-          <div class="turning" id="turningBox">
-            <div class="label">TURNING POINT</div>
-            <div class="muted" style="margin-top:8px;line-height:1.4">
-              Which step is the turning point — the moment when the issue moves from planning/research into an
-              <b>official government decision space</b> such as a meeting, hearing, agenda item, vote, filing, or submission?
-            </div>
-            <div class="opts" id="turningOpts"></div>
           </div>
 
           <div class="actions">
@@ -272,20 +344,33 @@
       </section>
 
       <aside class="panel">
+        <div class="label">STATE-ALIGNED CIVIC ACTION PROCESS</div>
+        <div class="seqKey">
+          <div class="seqItem"><b>1. Identify the issue</b><br><span class="muted">Define the real problem clearly.</span></div>
+          <div class="seqItem"><b>2. Research</b><br><span class="muted">Gather evidence, facts, data, and rules.</span></div>
+          <div class="seqItem"><b>3. Debate</b><br><span class="muted">Consider viewpoints, questions, and disagreements.</span></div>
+          <div class="seqItem"><b>4. Propose appropriate solutions</b><br><span class="muted">Generate realistic policy or civic responses.</span></div>
+          <div class="seqItem"><b>5. Devise action plans</b><br><span class="muted">Plan who does what, when, and how.</span></div>
+          <div class="seqItem"><b>6. Examine possible consequences</b><br><span class="muted">Predict intended and unintended results.</span></div>
+          <div class="seqItem"><b>7. Weigh costs and benefits</b><br><span class="muted">Judge which approach is most worthwhile.</span></div>
+        </div>
+
+        <hr class="sep">
+
         <div class="label">RULES</div>
-        <ul class="muted" style="margin:10px 0 0; line-height:1.45;">
-          <li><b>Mastery</b> = finish all items with <b>0 misses</b> (100% accuracy).</li>
+        <ul class="clean">
+          <li><b>Mastery</b> = finish all items with <b>0 misses</b>.</li>
           <li>If the order is wrong, you can retry, but the miss stays.</li>
-          <li>If the turning point is wrong, you can retry, but the miss stays.</li>
+          <li>Use hints only when needed.</li>
           <li>Finish screen includes name + start/end timestamps + runtime.</li>
         </ul>
 
-        <hr style="border:none;border-top:1px solid var(--line); margin:14px 0;">
+        <hr class="sep">
 
-        <div class="label">THINKING FRAME</div>
-        <p class="muted" style="margin:10px 0 0; line-height:1.5;">
-          Most civic action plans follow this pattern:
-          <b>identify the issue → gather evidence → propose a solution → go to the correct level of government → official decision point → follow-up or implementation.</b>
+        <div class="label">WHAT THIS GAME NOW PRACTICES</div>
+        <p class="muted" style="margin:10px 0 0;line-height:1.5;">
+          This version no longer asks students to find a “decision point.” Instead, it trains the
+          <b>core civic process</b> the state expects: understanding how citizens move from identifying a public issue to evaluating the best course of action.
         </p>
       </aside>
     </div>
@@ -308,9 +393,8 @@
         k.includes("submission") ||
         k.includes("attempt") ||
         k.includes("progress") ||
-        k.includes("GOV_OST_") ||
         k.includes("GOV_") ||
-        k.includes("SEQ")
+        k.includes("CIVIC")
       );
     };
 
@@ -410,329 +494,184 @@
 
   const QUESTIONS = [
     {
-      id:"SEQ01",
-      title:"Safer Crosswalks Near School",
-      prompt:"A student group wants safer crosswalks near the high school. Put the steps in the order they should happen from first action to official action to follow-up.",
+      id:"CAF01",
+      title:"Unsafe Crosswalk Near School",
+      prompt:"A student group wants safer crosswalks near the school. Put the civic action process in the best order.",
       steps:[
-        "First, identify the exact safety problem and state the goal clearly.",
-        "Next, gather evidence such as traffic data, near-miss reports, and photos, and research current rules.",
-        "Then, prepare a solution proposal such as repainting crosswalks, adding flashing beacons, or assigning a crossing guard.",
-        "Finally, present the proposal at the correct local meeting or traffic committee so officials can consider action."
+        "Identify the issue by clearly defining the safety problem at the crosswalk and explaining why it matters.",
+        "Research the issue by gathering traffic counts, photos, accident reports, and current local traffic rules.",
+        "Debate the issue by discussing different viewpoints such as cost, traffic flow, and student safety.",
+        "Propose appropriate solutions such as repainting the crosswalk, adding signals, or assigning a crossing guard.",
+        "Devise an action plan that identifies who will speak, what evidence will be presented, and which local body should be contacted.",
+        "Examine possible consequences such as slower traffic, increased safety, new costs, or changes in nearby traffic patterns.",
+        "Weigh the costs and benefits to decide which solution gives the strongest safety gain for the most reasonable cost."
       ],
-      turningIndex:3,
-      hint:"The turning point is usually the step where citizens bring the issue into an official meeting or agenda."
+      hint:"Use the official state flow: define the problem first, gather evidence second, then discuss options before choosing the best course of action."
     },
     {
-      id:"SEQ02",
-      title:"Local Recycling Ordinance Support",
-      prompt:"A city is considering a recycling ordinance, and you support it. Put the steps in order from preparation to official participation.",
+      id:"CAF02",
+      title:"School Cell Phone Policy",
+      prompt:"Students want the school district to revise its cell phone policy. Put the civic action process in the best order.",
       steps:[
-        "First, learn what the ordinance would do and find the meeting date or agenda item.",
-        "Next, prepare evidence-based reasons to support the ordinance and anticipate counterarguments.",
-        "Then, attend the city council meeting and give public comment in support of the ordinance.",
-        "Finally, follow up with council members after the meeting to reinforce your position."
+        "Identify the issue by stating exactly what part of the current cell phone policy is causing problems.",
+        "Research the issue by reviewing the current rule, discipline data, and examples from other schools.",
+        "Debate the issue by considering arguments about distraction, emergencies, fairness, and classroom management.",
+        "Propose appropriate solutions such as allowing phones during lunch, limited academic use, or stricter storage rules.",
+        "Devise an action plan for how students will present the proposal to administrators or the school board.",
+        "Examine possible consequences such as improved communication, more distractions, or uneven enforcement.",
+        "Weigh the costs and benefits to judge which policy change is most practical and educationally sound."
       ],
-      turningIndex:2,
-      hint:"The turning point is the official meeting or hearing where decision-makers hear the issue."
+      hint:"Students should not jump straight to a solution. The sequence starts by defining the exact problem."
     },
     {
-      id:"SEQ03",
-      title:"State Education Funding Change",
-      prompt:"Ohio is debating a statewide education funding bill, and you oppose it. Put the advocacy steps in the clearest order.",
+      id:"CAF03",
+      title:"Neighborhood Flooding",
+      prompt:"Residents want the city to address repeated flooding in a neighborhood. Put the civic action process in the best order.",
       steps:[
-        "First, read reliable summaries and key parts of the bill so you understand what it would change.",
-        "Next, contact state legislators with a clear request and evidence explaining your position.",
-        "Then, encourage other citizens to contact legislators too so the message gains support.",
-        "Finally, track the committee hearing or vote and respond at that official decision point."
+        "Identify the issue by pinpointing where flooding occurs, how often it happens, and who is affected.",
+        "Research the issue by collecting photos, rainfall patterns, maintenance records, and drainage maps.",
+        "Debate the issue by discussing possible causes and considering different community concerns.",
+        "Propose appropriate solutions such as drain repairs, retention areas, or more frequent maintenance schedules.",
+        "Devise an action plan for contacting the correct local officials and presenting evidence at the right meeting.",
+        "Examine possible consequences such as construction disruption, reduced flooding, maintenance demands, or neighborhood concerns.",
+        "Weigh the costs and benefits to determine which approach gives the best long-term result for the community."
       ],
-      turningIndex:3,
-      hint:"Look for the step where the bill is at a committee hearing or vote."
+      hint:"The middle of the process is where students compare ideas, not where they first define the problem."
     },
     {
-      id:"SEQ04",
-      title:"Park Maintenance After Budget Cuts",
-      prompt:"Your town cannot afford regular landscaping, but residents want parks maintained. Put the actions in order from identifying the need to reporting results.",
+      id:"CAF04",
+      title:"Recycling Program Expansion",
+      prompt:"A city is considering expanding its recycling program. Put the civic action process in the best order.",
       steps:[
-        "First, confirm exactly what maintenance is missing and when the need occurs.",
-        "Next, coordinate with the parks department so volunteer work is approved, safe, and scheduled.",
-        "Then, carry out the volunteer maintenance and document the results with photos or logs.",
-        "Finally, report the results to officials to support future budget decisions."
+        "Identify the issue by explaining what problem exists in the current waste or recycling system.",
+        "Research the issue by studying current recycling participation, costs, and how nearby communities operate similar programs.",
+        "Debate the issue by considering environmental goals, taxpayer cost, convenience, and possible objections.",
+        "Propose appropriate solutions such as curbside expansion, drop-off sites, or public education campaigns.",
+        "Devise an action plan that outlines the proposal, supporting evidence, speakers, and target audience for advocacy.",
+        "Examine possible consequences such as cleaner communities, higher costs, low participation, or logistical challenges.",
+        "Weigh the costs and benefits to choose the recycling approach that is most effective and realistic."
       ],
-      turningIndex:1,
-      hint:"The turning point is when the idea moves from private concern to coordination with the official government office."
+      hint:"After research comes discussion and comparison of viewpoints before building the action plan."
     },
     {
-      id:"SEQ05",
-      title:"New Skatepark on City Land",
-      prompt:"The city is debating whether to install a skatepark. Put the support steps in order from evidence gathering to official presentation.",
+      id:"CAF05",
+      title:"Later School Start Time",
+      prompt:"A district is discussing a later start time for students. Put the civic action process in the best order.",
       steps:[
-        "First, collect evidence of need and community support such as surveys and examples from other towns.",
-        "Next, prepare a short presentation about benefits, cost, and safety concerns.",
-        "Then, attend the city council meeting and present the case during public comment.",
-        "Finally, ask officials to take a concrete next step such as a site study, pilot project, or budget item."
+        "Identify the issue by defining why current start times may be a problem for students, staff, or families.",
+        "Research the issue by gathering sleep research, transportation schedules, attendance patterns, and district comparisons.",
+        "Debate the issue by hearing concerns about academics, after-school activities, bus routes, and family schedules.",
+        "Propose appropriate solutions such as a later start, a phased change, or different transportation adjustments.",
+        "Devise an action plan for presenting the proposal to the school board with clear evidence and speakers.",
+        "Examine possible consequences such as better student alertness, scheduling complications, or transportation costs.",
+        "Weigh the costs and benefits to determine whether the academic and health gains justify the challenges."
       ],
-      turningIndex:2,
-      hint:"The turning point is the official city council meeting where the issue is publicly presented."
+      hint:"This is not just about board action. The state wants students to understand the full problem-solving sequence."
     },
     {
-      id:"SEQ06",
-      title:"Fixing a Dangerous Intersection",
-      prompt:"Drivers keep speeding at an intersection, and residents want a stop sign. Put the steps in the order a citizen group should take them.",
+      id:"CAF06",
+      title:"Community Skatepark Request",
+      prompt:"Residents want the city to build a skatepark. Put the civic action process in the best order.",
       steps:[
-        "First, document the danger with speed observations, incidents, and near-misses.",
-        "Next, request a traffic study through the local government process.",
-        "Then, attend the meeting where the traffic study is discussed and advocate for a solution.",
-        "Finally, follow up after the decision to track implementation such as sign installation."
+        "Identify the issue by stating the lack of a safe recreation space and who is affected.",
+        "Research the issue by collecting surveys, usage estimates, safety data, and examples from similar communities.",
+        "Debate the issue by discussing recreation needs, liability concerns, noise, and budget priorities.",
+        "Propose appropriate solutions such as a full skatepark, a smaller pilot space, or a shared-use recreation area.",
+        "Devise an action plan that explains how supporters will organize evidence, public comment, and outreach.",
+        "Examine possible consequences such as more youth recreation, maintenance costs, noise complaints, or safer public spaces.",
+        "Weigh the costs and benefits to decide which option best fits community needs and available resources."
       ],
-      turningIndex:2,
-      hint:"The turning point is the meeting where officials review the study and consider action."
+      hint:"The best order mirrors the logic of good civic decision-making: problem first, judgment last."
     },
     {
-      id:"SEQ07",
-      title:"Changing a School Policy",
-      prompt:"Students want a school policy changed. Put the sequence in order from identifying the rule to continuing advocacy.",
+      id:"CAF07",
+      title:"State Education Funding Proposal",
+      prompt:"Citizens are responding to a proposed state education funding change. Put the civic action process in the best order.",
       steps:[
-        "First, identify the exact school rule that needs to be changed and explain the problem it creates.",
-        "Next, gather evidence and prepare a realistic alternative policy.",
-        "Then, present the proposal to the school board or school administration meeting.",
-        "Finally, revise the proposal if needed and continue advocacy at the next meeting."
+        "Identify the issue by explaining exactly what part of the proposed funding change is raising concern.",
+        "Research the issue by reading bill summaries, fiscal impacts, and likely effects on different districts.",
+        "Debate the issue by considering arguments about fairness, taxation, local control, and educational needs.",
+        "Propose appropriate solutions such as revising the funding formula, phasing in changes, or protecting high-need districts.",
+        "Devise an action plan for contacting legislators, organizing testimony, and sharing evidence with the public.",
+        "Examine possible consequences such as district budget shifts, program cuts, improved equity, or taxpayer concerns.",
+        "Weigh the costs and benefits to decide which funding response is the strongest and most practical."
       ],
-      turningIndex:2,
-      hint:"The turning point is when the proposal reaches the actual decision-making body."
+      hint:"In state policy scenarios, research usually includes understanding the bill itself and its fiscal effects."
     },
     {
-      id:"SEQ08",
-      title:"Statewide Ballot Issue Support",
-      prompt:"Citizens want action on a statewide issue through the ballot process. Put the steps in the correct order.",
+      id:"CAF08",
+      title:"Public Library Budget Concern",
+      prompt:"Residents want to prevent cuts to local library services. Put the civic action process in the best order.",
       steps:[
-        "First, research the issue and confirm that it can move through the statewide ballot process.",
-        "Next, draft or select the petition language and learn the signature requirements.",
-        "Then, collect valid signatures while following all verification rules.",
-        "Finally, submit the signatures by the deadline so the issue can be officially reviewed for the ballot."
+        "Identify the issue by defining what library services are threatened and why that matters to the community.",
+        "Research the issue by gathering budget information, community use data, and examples of similar cuts elsewhere.",
+        "Debate the issue by discussing financial pressures, community priorities, and different viewpoints on spending.",
+        "Propose appropriate solutions such as restoring funds, reducing cuts, using grants, or phasing service changes.",
+        "Devise an action plan for public comment, outreach, and presenting evidence to local decision-makers.",
+        "Examine possible consequences such as reduced access, budget strain, improved efficiency, or loss of programs.",
+        "Weigh the costs and benefits to decide which budget response best protects community needs."
       ],
-      turningIndex:3,
-      hint:"The turning point is the formal submission that begins official review."
+      hint:"The final step is evaluative. It asks which option is most worthwhile after considering trade-offs."
     },
     {
-      id:"SEQ09",
-      title:"Federal Policy Concern (Contacting Congress)",
-      prompt:"You want to influence a proposed federal privacy law. Put the civic actions in the most logical order.",
+      id:"CAF09",
+      title:"Bus Route Safety Improvement",
+      prompt:"Families want safer bus pickup and drop-off locations. Put the civic action process in the best order.",
       steps:[
-        "First, read credible summaries and key provisions so you understand the proposal.",
-        "Next, identify your U.S. representative and senators and learn their current positions.",
-        "Then, contact their offices with a clear request supported by evidence.",
-        "Finally, track committee action and respond when the bill reaches the next hearing or vote."
+        "Identify the issue by defining the specific safety concerns at current pickup and drop-off points.",
+        "Research the issue by collecting route maps, traffic patterns, parent reports, and school transportation rules.",
+        "Debate the issue by discussing safety, route efficiency, travel time, and staffing concerns.",
+        "Propose appropriate solutions such as changing stops, adjusting times, or adding supervision in problem areas.",
+        "Devise an action plan that identifies who will contact transportation officials and what evidence will be used.",
+        "Examine possible consequences such as longer bus rides, improved safety, parent inconvenience, or staffing changes.",
+        "Weigh the costs and benefits to determine which route change makes the most sense overall."
       ],
-      turningIndex:3,
-      hint:"The turning point is the committee hearing or vote where the federal bill can move."
+      hint:"Think of this as a planning cycle: define, investigate, discuss, solve, organize, predict, judge."
     },
     {
-      id:"SEQ10",
-      title:"Community Flooding Mitigation",
-      prompt:"Your neighborhood floods after heavy rains, and residents want a solution. Put the steps in order from documenting the problem to building support for action.",
+      id:"CAF10",
+      title:"Town Park Improvement",
+      prompt:"Residents want to improve an aging town park. Put the civic action process in the best order.",
       steps:[
-        "First, collect evidence such as photos, dates, and locations to show the flooding pattern.",
-        "Next, raise the issue with local public works or at a council meeting.",
-        "Then, propose solutions such as drainage improvements or maintenance schedules with costs and benefits.",
-        "Finally, work with civic groups to build support for implementation and funding."
+        "Identify the issue by defining what park problems exist and how they affect community use.",
+        "Research the issue by gathering maintenance records, public input, cost estimates, and examples from other towns.",
+        "Debate the issue by discussing priorities such as playgrounds, lighting, sports space, and taxpayer cost.",
+        "Propose appropriate solutions such as equipment replacement, phased upgrades, or grant-supported improvements.",
+        "Devise an action plan for presenting the preferred upgrade plan to local officials and the community.",
+        "Examine possible consequences such as increased usage, maintenance demands, temporary closures, or neighborhood concerns.",
+        "Weigh the costs and benefits to determine which park improvement option offers the best value."
       ],
-      turningIndex:1,
-      hint:"The turning point is when the issue enters the official local government process."
+      hint:"A strong civic action process does not stop at proposing ideas; it also evaluates consequences and trade-offs."
     },
     {
-      id:"SEQ11",
-      title:"Improving Emergency Services Support",
-      prompt:"A citizen wants emergency services improved both locally and statewide. Put the actions in order from local involvement to broader advocacy.",
+      id:"CAF11",
+      title:"Improving School Lunch Options",
+      prompt:"Students want healthier and more appealing school lunch choices. Put the civic action process in the best order.",
       steps:[
-        "First, support local emergency services directly by volunteering, fundraising, or meeting with local officials.",
-        "Next, identify statewide problems and determine which state officials handle those issues.",
-        "Then, communicate statewide concerns through organized letters, petitions, or advocacy.",
-        "Finally, support candidates or policy platforms that match those statewide improvements."
+        "Identify the issue by explaining the specific concerns students have with current lunch options.",
+        "Research the issue by reviewing nutrition rules, student feedback, participation rates, and available alternatives.",
+        "Debate the issue by considering nutrition, cost, student preferences, food waste, and cafeteria limitations.",
+        "Propose appropriate solutions such as menu revisions, student taste testing, or pilot meal options.",
+        "Devise an action plan for bringing the proposal to school leaders with data and student input.",
+        "Examine possible consequences such as healthier choices, higher food costs, lower waste, or implementation problems.",
+        "Weigh the costs and benefits to decide which lunch improvement plan is the most realistic and beneficial."
       ],
-      turningIndex:2,
-      hint:"The turning point is when the issue shifts from local support to direct state-level advocacy."
+      hint:"Before students choose the best option, they should examine likely results of each idea."
     },
     {
-      id:"SEQ12",
-      title:"Public Meeting Influence",
-      prompt:"A resident wants to influence a local ordinance. Put the actions in order from preparation to follow-up.",
+      id:"CAF12",
+      title:"Community Noise Ordinance Debate",
+      prompt:"Residents disagree about stronger noise restrictions in town. Put the civic action process in the best order.",
       steps:[
-        "First, find the meeting time and agenda item for the ordinance.",
-        "Next, prepare short evidence-based reasons and a clear request.",
-        "Then, give public comment during the official meeting.",
-        "Finally, follow up with decision-makers and track the vote."
+        "Identify the issue by clearly stating the specific noise problem and who is being affected.",
+        "Research the issue by reviewing complaints, existing ordinances, enforcement data, and comparisons with other towns.",
+        "Debate the issue by considering business needs, neighborhood quality of life, enforcement fairness, and rights concerns.",
+        "Propose appropriate solutions such as revised quiet hours, better enforcement, warning systems, or exemptions.",
+        "Devise an action plan for presenting the preferred approach to local leaders with supporting evidence.",
+        "Examine possible consequences such as fewer complaints, business frustration, enforcement costs, or improved livability.",
+        "Weigh the costs and benefits to judge which ordinance change best balances community interests."
       ],
-      turningIndex:2,
-      hint:"The turning point is the public comment step inside the official meeting."
-    },
-    {
-      id:"SEQ13",
-      title:"Evaluating Costs and Benefits of a Community Project",
-      prompt:"The city is deciding whether to build a new facility or renovate an old one. Put the evaluation steps in order.",
-      steps:[
-        "First, define the decision criteria such as cost, maintenance, access, and long-term use.",
-        "Next, gather cost projections and expert information from qualified sources.",
-        "Then, compare the options and present the evidence to officials or the public.",
-        "Finally, advocate for the option that best fits community needs and the evidence."
-      ],
-      turningIndex:2,
-      hint:"The turning point is when the evidence is formally presented to decision-makers."
-    },
-    {
-      id:"SEQ14",
-      title:"Responding to Opposition (Constructive Advocacy)",
-      prompt:"A controversial local policy debate becomes heated. Put the constructive civic actions in order.",
-      steps:[
-        "First, clarify the actual facts of the issue using credible information.",
-        "Next, listen to opposing concerns to identify areas of shared interest.",
-        "Then, build a workable compromise that addresses multiple concerns.",
-        "Finally, bring that compromise into the official meeting where action can be taken."
-      ],
-      turningIndex:3,
-      hint:"The turning point is the official meeting where the discussion can affect policy."
-    },
-    {
-      id:"SEQ15",
-      title:"From Idea to Law (Basic Legislative Path)",
-      prompt:"A bill is introduced to change a state policy. Put the legislative steps in order.",
-      steps:[
-        "First, the bill is introduced and sent to a committee.",
-        "Next, the committee holds hearings, debates the bill, and may amend it.",
-        "Then, the chamber votes, and if it passes, the bill moves to the other chamber for the same process.",
-        "Finally, if both chambers pass the bill, it goes to the governor for signature or veto."
-      ],
-      turningIndex:1,
-      hint:"The turning point is often committee action because that is where the bill can advance or die."
-    },
-    {
-      id:"SEQ16",
-      title:"From Complaint to Court Case (Rights Claim)",
-      prompt:"A citizen believes a government action violated constitutional rights. Put the legal response steps in order.",
-      steps:[
-        "First, document what happened and identify which constitutional right may have been affected.",
-        "Next, seek legal guidance and file the case in the correct court.",
-        "Then, present evidence and legal arguments and receive a ruling.",
-        "Finally, appeal through higher courts if necessary."
-      ],
-      turningIndex:1,
-      hint:"The turning point is when the issue is officially filed in court."
-    },
-    {
-      id:"SEQ17",
-      title:"Treaty Ratification (Federal Process)",
-      prompt:"A president wants a treaty ratified. Put the federal treaty process in order.",
-      steps:[
-        "First, the president negotiates the treaty.",
-        "Next, the president submits the treaty to the Senate.",
-        "Then, the Senate debates it and votes, requiring a two-thirds majority for approval.",
-        "Finally, if approved, the treaty is ratified."
-      ],
-      turningIndex:2,
-      hint:"The turning point is the Senate vote because that is the official approval stage."
-    },
-    {
-      id:"SEQ18",
-      title:"Persuasion vs Negotiation Strategy Choice",
-      prompt:"A leader wants support for a proposal in a divided group. Put the steps in order from identifying concerns to making the decision official.",
-      steps:[
-        "First, identify the stakeholder groups and understand their concerns.",
-        "Next, choose the best strategy such as compromise, consensus building, or persuasion.",
-        "Then, meet and negotiate to revise positions and build support.",
-        "Finally, hold the official vote or decision once enough support exists."
-      ],
-      turningIndex:3,
-      hint:"The turning point is the official vote or final decision."
-    },
-    {
-      id:"SEQ19",
-      title:"Verifying a Claim Before Sharing",
-      prompt:"A student sees an online claim that could shape public opinion. Put the evaluation steps in order.",
-      steps:[
-        "First, pause and identify exactly what the claim is saying.",
-        "Next, check multiple credible sources to see whether the claim is supported.",
-        "Then, evaluate whether the evidence is strong and verifiable.",
-        "Finally, decide whether to share the claim, revise your understanding, or reject it."
-      ],
-      turningIndex:1,
-      hint:"The turning point is when the claim is checked against multiple credible sources."
-    },
-    {
-      id:"SEQ20",
-      title:"Organizing a Petition Campaign (Local Change)",
-      prompt:"Residents want a local change and plan to use a petition. Put the steps in the proper order.",
-      steps:[
-        "First, define the specific change being requested and identify who has authority to act on it.",
-        "Next, draft petition language that clearly matches the request.",
-        "Then, collect valid signatures while following all local rules.",
-        "Finally, deliver the petition to the correct official or government body and request action."
-      ],
-      turningIndex:3,
-      hint:"The turning point is when the petition reaches the official who can act on it."
-    },
-    {
-      id:"SEQ21",
-      title:"Building Community Support (Consensus Building)",
-      prompt:"A neighborhood is divided about a proposed policy. Put the consensus-building steps in order.",
-      steps:[
-        "First, hold listening sessions to identify concerns and points of agreement.",
-        "Next, create a shared proposal based on those common concerns.",
-        "Then, present the shared proposal to officials or at public meetings.",
-        "Finally, revise the proposal if needed while protecting the core shared goals."
-      ],
-      turningIndex:2,
-      hint:"The turning point is when the united proposal reaches decision-makers."
-    },
-    {
-      id:"SEQ22",
-      title:"Implementing a Solution After Approval",
-      prompt:"A policy proposal has already been approved. Put the implementation steps in order.",
-      steps:[
-        "First, create an implementation timeline and assign responsibilities.",
-        "Next, communicate the changes to the public and affected groups.",
-        "Then, monitor results with data and feedback.",
-        "Finally, revise implementation if problems appear."
-      ],
-      turningIndex:0,
-      hint:"The turning point here is the move from approval to actual implementation planning."
-    },
-    {
-      id:"SEQ23",
-      title:"Interest Groups Influencing Policy",
-      prompt:"An interest group wants to change a policy. Put its actions in order from preparation to decision tracking.",
-      steps:[
-        "First, research the policy and identify the key decision-makers.",
-        "Next, develop a clear evidence-based position and message.",
-        "Then, lobby officials, testify at hearings, or mobilize supporters.",
-        "Finally, track the vote and continue advocacy through the final decision."
-      ],
-      turningIndex:2,
-      hint:"The turning point is the direct interaction with officials during lobbying or hearings."
-    },
-    {
-      id:"SEQ24",
-      title:"Media and Public Opinion Influence",
-      prompt:"A policy debate gains public attention. Put the sequence in order from awareness to official decision.",
-      steps:[
-        "First, the issue receives media coverage and public awareness grows.",
-        "Next, public opinion forms and citizens begin contacting officials.",
-        "Then, officials respond with hearings, statements, or agenda action.",
-        "Finally, a vote or official decision takes place."
-      ],
-      turningIndex:2,
-      hint:"The turning point is when officials move the issue into hearings or formal agenda action."
-    },
-    {
-      id:"SEQ25",
-      title:"From Concern to Election Action",
-      prompt:"A citizen feels poorly represented at the congressional level. Put the election-related civic actions in order.",
-      steps:[
-        "First, examine the representative's voting record and public positions.",
-        "Next, compare those positions to your values and community needs.",
-        "Then, support a challenger or campaign that could change the outcome.",
-        "Finally, vote and encourage others to turn out."
-      ],
-      turningIndex:2,
-      hint:"The turning point is active campaign involvement because that is where the citizen moves from evaluation to action."
+      hint:"Debate comes before final judgment because citizens need to hear competing views first."
     }
   ];
 
@@ -743,7 +682,7 @@
   let startTime = null;
   let endTime = null;
   let timerId = null;
-  let working = { pool:[], chosen:[], locked:false, orderOk:false, turningOk:false };
+  let working = { pool:[], chosen:[], locked:false };
 
   const startScreen = document.getElementById('startScreen');
   const playBox = document.getElementById('playBox');
@@ -776,9 +715,6 @@
   const btnHint = document.getElementById('btnHint');
   const btnNext = document.getElementById('btnNext');
   const btnRestart = document.getElementById('btnRestart');
-
-  const elTurningBox = document.getElementById('turningBox');
-  const elTurningOpts = document.getElementById('turningOpts');
 
   const elSummaryLine = document.getElementById('summaryLine');
   const elTName = document.getElementById('tName');
@@ -865,8 +801,6 @@
     btnClear.disabled = working.locked || working.chosen.length === 0;
     btnCheck.disabled = working.locked || working.chosen.length !== q.steps.length;
 
-    elTurningBox.style.display = working.orderOk ? 'block' : 'none';
-
     updateStats();
   }
 
@@ -875,15 +809,11 @@
     working = {
       pool: shuffle(q.steps),
       chosen: [],
-      locked: false,
-      orderOk: false,
-      turningOk: false
+      locked: false
     };
     clearFeedback();
     btnHint.disabled = true;
     btnNext.disabled = true;
-    elTurningOpts.innerHTML = '';
-    elTurningBox.style.display = 'none';
     render();
   }
 
@@ -920,21 +850,27 @@
     const q = QUESTIONS[idx];
     attempts += 1;
 
-    const chosen = working.chosen;
-    const correctSteps = q.steps;
-    const ok = chosen.length === correctSteps.length && chosen.every((s,i)=>s===correctSteps[i]);
+    const ok = working.chosen.length === q.steps.length &&
+      working.chosen.every((s,i)=>s===q.steps[i]);
 
     if(ok){
       correct += 1;
-      working.orderOk = true;
-      setFeedback('good', 'Order correct ✅', 'Now choose the turning point — the step where the issue enters the official government process.');
-      buildTurningPointChoices();
-      btnNext.disabled = true;
+      working.locked = true;
+      setFeedback(
+        'good',
+        'Correct sequence ✅',
+        'Strong civic reasoning. You followed the full state process from identifying the issue through weighing costs and benefits. Click Next.'
+      );
       btnHint.disabled = true;
+      btnNext.disabled = false;
     }else{
-      working.orderOk = false;
-      setFeedback('bad', 'Not yet ❌', 'Your order is not correct yet. Rebuild it from earliest step to latest step. Use Hint if needed.');
+      setFeedback(
+        'bad',
+        'Not yet ❌',
+        'Your order is off. Rebuild the sequence so it follows the civic action process: issue → research → debate → propose → plan → consequences → costs/benefits.'
+      );
       btnHint.disabled = false;
+      btnNext.disabled = true;
     }
 
     render();
@@ -942,45 +878,9 @@
 
   btnHint.addEventListener('click', () => {
     const q = QUESTIONS[idx];
-    const h = q.hint || 'Look for the step where the issue enters the official government process.';
-    setFeedback('warn', 'Hint 💡', h);
+    setFeedback('warn', 'Hint 💡', q.hint || 'Start by defining the problem clearly, and end by judging which option is most worthwhile.');
     btnHint.disabled = true;
   });
-
-  function buildTurningPointChoices(){
-    const q = QUESTIONS[idx];
-    elTurningOpts.innerHTML = '';
-    const choices = q.steps.map((s, i) => ({ i, text:s }));
-    const shuffled = shuffle(choices);
-
-    shuffled.forEach((c) => {
-      const b = document.createElement('button');
-      b.className = 'optbtn';
-      b.innerHTML = escapeHtml(c.text);
-      b.addEventListener('click', () => answerTurning(c.i));
-      elTurningOpts.appendChild(b);
-    });
-  }
-
-  function answerTurning(chosenIndex){
-    const q = QUESTIONS[idx];
-    attempts += 1;
-
-    const ok = (chosenIndex === q.turningIndex);
-    if(ok){
-      correct += 1;
-      working.turningOk = true;
-      setFeedback('good', 'Turning point correct ✅', 'Click Next to continue.');
-      Array.from(elTurningOpts.querySelectorAll('button')).forEach(b => b.disabled = true);
-      btnNext.disabled = false;
-      btnHint.disabled = true;
-    }else{
-      working.turningOk = false;
-      setFeedback('bad', 'Not yet ❌', 'That is not the turning point. Try again, or use Hint.');
-      btnHint.disabled = false;
-    }
-    updateStats();
-  }
 
   btnNext.addEventListener('click', () => {
     idx += 1;
@@ -998,7 +898,7 @@
 
     const acc = accuracyPct();
     const misses = attempts - correct;
-    const mastery = (misses === 0) && (attempts >= QUESTIONS.length * 2);
+    const mastery = (misses === 0) && (attempts >= QUESTIONS.length);
 
     startScreen.style.display = "none";
     playBox.style.display = "none";
@@ -1034,7 +934,7 @@ Accuracy: ${acc}%
 Result: ${mastery ? "MASTERED (0 misses)" : "REPLAY for 0 misses"}`;
 
     const raw = `${studentName}|${startTime.toISOString()}|${endTime.toISOString()}|${correct}|${attempts}|${misses}|${QUESTIONS.length}`;
-    const code = `GOV-CIVICSEQ-${base36(hash32(raw))}-${base36(hash32(raw+"SUMMARY")).slice(0,4)}`;
+    const code = `GOV-CIVICPLAN-${base36(hash32(raw))}-${base36(hash32(raw+"SUMMARY")).slice(0,4)}`;
 
     elTCode.textContent = summary + `\n\nCode: ${code}`;
   }
