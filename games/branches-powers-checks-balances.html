@@ -1,622 +1,644 @@
-```html
 <!doctype html>
 <html lang="en">
 <head>
-<meta charset="utf-8"/>
-<meta name="viewport" content="width=device-width,initial-scale=1"/>
-<title>Bill of Rights & Incorporation — CS 8 (OST Review)</title>
-<link rel="stylesheet" href="../styles.css"/>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Branches, Powers & Checks-and-Balances — CS 12–13 + CS 18</title>
+  <link rel="stylesheet" href="../styles.css" />
 
-<style>
-:root{
-  --bg:#0b1220;
-  --text:#e7eefc;
-  --muted:#a8b4cf;
-  --line:rgba(255,255,255,.12);
-  --good:#2bd576;
-  --bad:#ff5c7a;
-  --warn:#ffd166;
-  --accent:#7aa2ff;
-  --panel:rgba(255,255,255,.03);
-}
-*{box-sizing:border-box}
-body{
-  margin:0;
-  background:linear-gradient(180deg,#0b1220,#070b14);
-  color:var(--text);
-  font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial;
-}
-.wrap{width:min(1000px,92vw);margin:30px auto;}
-.panel{
-  background:var(--panel);
-  border:1px solid var(--line);
-  border-radius:16px;
-  padding:20px;
-}
-h2{margin:0 0 6px 0}
-.sub{color:var(--muted);margin:0 0 12px 0}
+  <style>
+    :root{
+      --bg:#0b1220;
+      --panel:#121a2f;
+      --card:#111a2e;
+      --text:#e7eefc;
+      --muted:#a8b4cf;
+      --line:rgba(255,255,255,.12);
+      --shadow:0 18px 55px rgba(0,0,0,.40);
+      --radius:18px;
+      --good:#2bd576;
+      --bad:#ff5c7a;
+      --warn:#ffd166;
+      --accent:#7aa2ff;
+      --mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+    }
+    *{box-sizing:border-box}
+    body{
+      margin:0;
+      background:linear-gradient(180deg,#0b1220,#070b14);
+      color:var(--text);
+      font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial;
+      min-height:100vh;
+    }
+    .wrap{width:min(1020px,92vw);margin:22px auto 40px}
+    .topbar{
+      background:rgba(255,255,255,.03);
+      border:1px solid var(--line);
+      border-radius:var(--radius);
+      padding:18px 18px 14px;
+      box-shadow:var(--shadow);
+      display:flex;
+      gap:14px;
+      align-items:flex-start;
+      justify-content:space-between;
+    }
+    .kicker{letter-spacing:.14em;font-size:12px;color:var(--muted);font-weight:800}
+    h1{margin:6px 0 6px;font-size:24px}
+    .sub{margin:0;color:var(--muted);line-height:1.35}
+    .pillrow{display:flex;gap:8px;flex-wrap:wrap;justify-content:flex-end}
+    .pill{
+      border:1px solid var(--line);
+      background:rgba(255,255,255,.02);
+      padding:6px 10px;
+      border-radius:999px;
+      font-size:12px;
+      color:var(--muted);
+      white-space:nowrap;
+    }
 
-.topbar{
-  display:flex;
-  justify-content:space-between;
-  align-items:flex-start;
-  gap:12px;
-  flex-wrap:wrap;
-  margin-bottom:10px;
-}
-.pills{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
-.pill{
-  border:1px solid var(--line);
-  background:rgba(255,255,255,.02);
-  padding:6px 10px;
-  border-radius:999px;
-  font-weight:800;
-}
-.pill small{color:var(--muted);font-weight:700}
-.hr{height:1px;background:var(--line);margin:14px 0;}
+    .grid{display:grid;grid-template-columns:1.15fr .85fr;gap:14px;margin-top:14px}
+    @media (max-width:900px){.grid{grid-template-columns:1fr}}
 
-.choice{
-  display:block;
-  border:1px solid var(--line);
-  padding:10px;
-  border-radius:12px;
-  margin-bottom:8px;
-  cursor:pointer;
-  background:rgba(255,255,255,.02);
-  user-select:none;
-}
-.choice:hover{border-color:var(--accent);}
-.choice.locked{cursor:default;opacity:.95}
-.choice.correct{
-  border-color:rgba(43,213,118,.7);
-  background:rgba(43,213,118,.08);
-}
-.choice.wrong{
-  border-color:rgba(255,92,122,.7);
-  background:rgba(255,92,122,.08);
-}
+    .panel{
+      background:rgba(255,255,255,.03);
+      border:1px solid var(--line);
+      border-radius:var(--radius);
+      box-shadow:var(--shadow);
+      padding:16px;
+    }
+    .row{display:flex;gap:10px;align-items:center;justify-content:space-between;flex-wrap:wrap}
+    .label{color:var(--muted);font-size:12px;letter-spacing:.08em;font-weight:900}
+    .statline{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
+    .stat{
+      background:rgba(255,255,255,.02);
+      border:1px solid var(--line);
+      border-radius:12px;
+      padding:10px 12px;
+      min-width:140px;
+    }
+    .stat .big{font-size:16px;font-weight:900}
+    .stat .small{font-size:12px;color:var(--muted);margin-top:2px}
 
-.msg{margin-top:10px;padding:10px;border-radius:12px;display:none;}
-.msg.good{background:rgba(43,213,118,.08);border:1px solid rgba(43,213,118,.4);display:block;}
-.msg.bad{background:rgba(255,92,122,.08);border:1px solid rgba(255,92,122,.4);display:block;}
-.msg.warn{background:rgba(255,209,102,.08);border:1px solid rgba(255,209,102,.4);display:block;}
+    .field{display:grid;gap:6px;margin-top:10px}
+    input[type="text"]{
+      width:100%;
+      padding:12px 12px;
+      border-radius:14px;
+      border:1px solid var(--line);
+      background:rgba(255,255,255,.02);
+      color:var(--text);
+      outline:none;
+    }
+    input[type="text"]:focus{border-color:rgba(122,162,255,.55)}
 
-.controls{display:flex;gap:10px;flex-wrap:wrap;margin-top:14px;}
-button{
-  padding:10px 14px;
-  border-radius:12px;
-  border:1px solid var(--line);
-  background:rgba(255,255,255,.03);
-  color:var(--text);
-  cursor:pointer;
-  font-weight:900;
-}
-button:hover{border-color:var(--accent);}
-button:disabled{opacity:.45;cursor:not-allowed}
+    .qtitle{margin:10px 0 6px;font-size:18px}
+    .qtext{margin:0 0 12px;color:var(--text);line-height:1.42;white-space:pre-wrap}
+    .opts{display:grid;gap:10px;margin-top:10px}
+    .optbtn{
+      text-align:left;
+      width:100%;
+      border-radius:14px;
+      border:1px solid var(--line);
+      background:rgba(255,255,255,.02);
+      padding:12px 12px;
+      color:var(--text);
+      cursor:pointer;
+      transition:transform .04s ease,border-color .15s ease,background .15s ease;
+    }
+    .optbtn:hover{border-color:rgba(122,162,255,.45)}
+    .optbtn:active{transform:scale(.995)}
+    .optbtn[disabled]{opacity:.65;cursor:not-allowed}
+    .optbtn .ltr{
+      font-family:var(--mono);
+      font-weight:900;
+      margin-right:8px;
+      color:var(--accent);
+    }
 
-input{
-  padding:10px 12px;
-  border-radius:12px;
-  border:1px solid var(--line);
-  background:rgba(255,255,255,.03);
-  color:var(--text);
-  font-weight:800;
-  width:min(420px,100%);
-}
+    .msg{
+      border-radius:14px;
+      border:1px solid var(--line);
+      padding:12px;
+      margin-top:12px;
+      display:none;
+    }
+    .msg.good{display:block;border-color:rgba(43,213,118,.35);background:rgba(43,213,118,.08)}
+    .msg.bad{display:block;border-color:rgba(255,92,122,.35);background:rgba(255,92,122,.08)}
+    .msg.warn{display:block;border-color:rgba(255,209,102,.35);background:rgba(255,209,102,.08)}
+    .msg .t{font-weight:900;margin-bottom:4px}
+    .msg .b{color:var(--muted);line-height:1.35}
 
-.small{color:var(--muted);font-size:.95rem}
-.codebox{
-  border:1px solid var(--line);
-  border-radius:14px;
-  padding:12px;
-  background:rgba(255,255,255,.02);
-  overflow:auto;
-  font-family:ui-monospace,SFMono-Regular,Menlo,Monaco,Consolas,"Liberation Mono","Courier New",monospace;
-  white-space:pre-wrap;
-}
-</style>
+    .actions{display:flex;gap:10px;flex-wrap:wrap;margin-top:12px}
+    .btn{
+      border-radius:14px;
+      border:1px solid var(--line);
+      background:rgba(255,255,255,.02);
+      color:var(--text);
+      padding:10px 12px;
+      cursor:pointer;
+      font-weight:900;
+    }
+    .btn:hover{border-color:rgba(122,162,255,.45)}
+    .btn.primary{
+      border-color:rgba(122,162,255,.45);
+      background:rgba(122,162,255,.10);
+    }
+
+    .errbox{
+      display:none;
+      margin-top:14px;
+      border:1px solid rgba(255,92,122,.45);
+      background:rgba(255,92,122,.10);
+      border-radius:14px;
+      padding:12px;
+    }
+    .errbox .t{font-weight:900}
+    .errbox pre{
+      margin:8px 0 0;
+      white-space:pre-wrap;
+      color:var(--text);
+      font-family:var(--mono);
+      font-size:12px;
+    }
+
+    .ticket{
+      margin-top:12px;
+      border:1px solid rgba(43,213,118,.35);
+      background:rgba(43,213,118,.07);
+      border-radius:14px;
+      padding:12px;
+    }
+    .ticket .code{
+      font-family:var(--mono);
+      font-weight:900;
+      letter-spacing:.06em;
+      padding:10px;
+      border-radius:12px;
+      border:1px solid var(--line);
+      background:rgba(255,255,255,.02);
+      margin-top:8px;
+      word-break:break-word;
+    }
+    .muted{color:var(--muted)}
+  </style>
 </head>
 
 <body>
-<div class="wrap">
-  <div class="panel">
-
+  <div class="wrap">
     <div class="topbar">
       <div>
-        <h2>Bill of Rights & Incorporation — CS 8</h2>
+        <div class="kicker">GOVERNMENT OST REVIEW</div>
+        <h1>Branches, Powers &amp; Checks-and-Balances — CS 12–13 + CS 18</h1>
         <p class="sub">
-          Mastery = 100% accuracy (0 misses). Click an answer to submit instantly. Incorrect shows a hint and you keep trying.
+          Identify branch powers, checks and balances, and inter-branch collaboration. Mastery requires <b>100% accuracy</b>.
+          Name, date, start time, and runtime stay visible while students play.
         </p>
       </div>
-      <div class="pills">
-        <div class="pill"><small>Student</small> <span id="studentName">—</span></div>
-        <div class="pill"><small>Q</small> <span id="qNum">0</span>/<span id="qTotal">0</span></div>
-        <div class="pill"><small>Accuracy</small> <span id="acc">—</span></div>
-        <div class="pill"><small>Elapsed</small> <span id="clock">00:00</span></div>
-        <div class="pill"><small>Started</small> <span id="startedAt">—</span></div>
-        <div class="pill"><small>Now</small> <span id="nowAt">—</span></div>
+      <div class="pillrow">
+        <div class="pill">CS 12–13 + 18 ✅</div>
+        <div class="pill">35 items ✅</div>
+        <div class="pill">100% mastery ✅</div>
+        <div class="pill">Ticket + timestamps ✅</div>
       </div>
     </div>
 
-    <div class="hr"></div>
-
-    <!-- START SCREEN -->
-    <div id="startScreen">
-      <p class="sub" style="margin-top:0;">
-        Enter your name to begin. You must complete all questions with <b>0 misses</b> to finish.
-      </p>
-      <div style="display:flex; gap:10px; flex-wrap:wrap; align-items:center;">
-        <input id="nameInput" type="text" placeholder="Enter your name (First + Last)" autocomplete="name"/>
-        <button id="startBtn">Start</button>
-      </div>
-      <p class="small" style="margin-top:10px;">
-        Tip: A wrong click records a miss immediately. You can still keep trying to move on, but you’ll need to replay for mastery.
-      </p>
+    <div id="errbox" class="errbox" role="alert">
+      <div class="t">On-page error box</div>
+      <div class="muted">Copy the details below if anything white-screens.</div>
+      <pre id="errtext"></pre>
     </div>
 
-    <!-- GAME SCREEN -->
-    <div id="gameScreen" style="display:none;">
-      <div id="game"></div>
-      <div id="feedback" class="msg"></div>
+    <div class="grid">
+      <section class="panel">
+        <div class="row">
+          <div class="label">ATTEMPT STATUS</div>
+          <div class="statline">
+            <div class="stat">
+              <div class="big" id="qpos">—</div>
+              <div class="small">Progress</div>
+            </div>
+            <div class="stat">
+              <div class="big" id="acc">—</div>
+              <div class="small">Accuracy</div>
+            </div>
+            <div class="stat">
+              <div class="big" id="runtime">—</div>
+              <div class="small">Runtime</div>
+            </div>
+          </div>
+        </div>
 
-      <div class="controls">
-        <!-- Keep ONLY the restart button -->
-        <button id="restartBtn" title="Hard restart (fresh attempt)">Restart</button>
-      </div>
+        <h2 class="qtitle" id="qtitle">Enter your name to begin</h2>
+        <p class="qtext" id="qtext">Your teacher requires a submission ticket at the end (no cropping). Use your real name.</p>
+
+        <div id="nameBox" class="field">
+          <label class="muted" for="studentName"><b>Student Name</b></label>
+          <input id="studentName" type="text" placeholder="e.g., Jordan Smith" autocomplete="name" />
+          <div class="actions">
+            <button class="btn primary" id="btnStart">Start</button>
+            <button class="btn" id="btnResetAll">Restart</button>
+          </div>
+        </div>
+
+        <div id="questionBox" style="display:none;">
+          <div class="opts" id="opts"></div>
+
+          <div id="feedback" class="msg" aria-live="polite">
+            <div class="t" id="fbTitle"></div>
+            <div class="b" id="fbBody"></div>
+          </div>
+
+          <div class="actions">
+            <button class="btn" id="btnHint" disabled>Hint</button>
+            <button class="btn primary" id="btnNext" disabled>Next</button>
+            <button class="btn" id="btnRestartMid">Restart Attempt</button>
+          </div>
+        </div>
+
+        <div id="finishBox" style="display:none;">
+          <h2 class="qtitle">Finish</h2>
+          <p class="qtext">
+            If you have <b>100% accuracy</b>, you’ll receive a submission ticket. If not, restart and replay for mastery.
+          </p>
+
+          <div id="finishMsg" class="msg warn" style="display:block;">
+            <div class="t" id="finishTitle">Checking mastery…</div>
+            <div class="b" id="finishBody">—</div>
+          </div>
+
+          <div id="ticket" class="ticket" style="display:none;">
+            <div><b>Submission Ticket</b> (screenshot this)</div>
+            <div class="muted" style="margin-top:6px;line-height:1.35">
+              Name: <span id="tName"></span><br/>
+              Date: <span id="tDate"></span><br/>
+              Start: <span id="tStart"></span><br/>
+              End: <span id="tEnd"></span><br/>
+              Runtime: <span id="tRun"></span><br/>
+              Accuracy: <span id="tAcc"></span>
+            </div>
+            <div class="code" id="tCode">—</div>
+            <div class="actions" style="margin-top:10px;">
+              <button class="btn primary" id="btnCopy">Copy Ticket Code</button>
+              <button class="btn" id="btnReset">Play Again</button>
+            </div>
+          </div>
+
+          <div class="actions" style="margin-top:10px;">
+            <button class="btn" onclick="location.href='../index.html'">Back to Hub</button>
+          </div>
+        </div>
+      </section>
+
+      <aside class="panel">
+        <div class="label">VISIBLE WHILE PLAYING</div>
+        <p class="muted" style="margin:10px 0 0;line-height:1.45;">
+          Student name, current date, attempt start time, progress, accuracy, and live runtime remain on screen during play.
+        </p>
+
+        <hr style="border:none;border-top:1px solid var(--line);margin:14px 0;">
+
+        <div class="label">RULES</div>
+        <ul class="muted" style="margin:10px 0 0;line-height:1.45;">
+          <li><b>Mastery</b> = finish all 35 questions with <b>0 misses</b>.</li>
+          <li>Wrong answer → hint appears → retry until correct, but accuracy keeps the miss.</li>
+          <li>No resume. Every new attempt starts fresh.</li>
+        </ul>
+
+        <hr style="border:none;border-top:1px solid var(--line);margin:14px 0;">
+
+        <div class="label">ATTEMPT INFO</div>
+        <p class="muted" style="margin:10px 0 0;line-height:1.55">
+          <b>Name:</b> <span id="sideName">—</span><br/>
+          <b>Date:</b> <span id="sideDate">—</span><br/>
+          <b>Start:</b> <span id="sideStart">—</span>
+        </p>
+      </aside>
     </div>
-
-    <!-- FINISH SCREEN -->
-    <div id="finishScreen" style="display:none;">
-      <h3 style="margin:0 0 8px 0;">Attempt Summary</h3>
-      <p class="sub" style="margin:0 0 10px 0;" id="summaryLine"></p>
-
-      <div class="codebox" id="summaryBox"></div>
-
-      <div class="controls">
-        <button id="playAgainBtn">Play Again</button>
-      </div>
-
-      <p class="small" style="margin-top:10px;">
-        Take a screenshot of this summary if you need to submit proof.
-      </p>
-    </div>
-
   </div>
-</div>
 
 <script>
-/* =========================================================
-   HARD RESTART + BACK/FORWARD CACHE FIX
-   ========================================================= */
-const FORCE_FRESH_ATTEMPT = true;
+(() => {
+  const errbox = document.getElementById('errbox');
+  const errtext = document.getElementById('errtext');
+  window.addEventListener('error', (e) => {
+    errbox.style.display = 'block';
+    errtext.textContent = `Error: ${e.message}\nSource: ${e.filename}:${e.lineno}:${e.colno}`;
+  });
+  window.addEventListener('unhandledrejection', (e) => {
+    errbox.style.display = 'block';
+    errtext.textContent = `Unhandled Promise Rejection:\n${(e.reason && e.reason.stack) ? e.reason.stack : e.reason}`;
+  });
 
-function purgeGameState(){
-  const path = location.pathname;
-  const killIfMatch = (k) => {
-    if(!k) return false;
-    return (
-      k.includes(path) ||
-      k.startsWith("LEGEND_") ||
-      k.startsWith("LEGEND_STATE") ||
-      k.startsWith("GAME_STATE") ||
-      k.startsWith("STATE:") ||
-      k.includes("submission") ||
-      k.includes("attempt") ||
-      k.includes("progress")
-    );
+  // Prevent back/forward cache from restoring old finished states
+  window.addEventListener('pageshow', (e) => {
+    if (e.persisted) {
+      location.replace(location.pathname + '?fresh=' + Date.now());
+    }
+  });
+
+  const pad2 = n => String(n).padStart(2,'0');
+  const fmtTime = (d) => {
+    const hr = d.getHours();
+    const ampm = hr >= 12 ? 'PM' : 'AM';
+    const h12 = hr % 12 || 12;
+    return `${h12}:${pad2(d.getMinutes())}:${pad2(d.getSeconds())} ${ampm}`;
+  };
+  const fmtDate = (d) => `${d.getMonth()+1}/${d.getDate()}/${d.getFullYear()}`;
+  const msToHMS = (ms) => {
+    const s = Math.max(0, Math.floor(ms/1000));
+    const hh = Math.floor(s/3600);
+    const mm = Math.floor((s%3600)/60);
+    const ss = s%60;
+    return `${hh}:${pad2(mm)}:${pad2(ss)}`;
+  };
+  const hash32 = (str) => {
+    let h = 2166136261 >>> 0;
+    for (let i=0;i<str.length;i++){
+      h ^= str.charCodeAt(i);
+      h = Math.imul(h, 16777619);
+    }
+    return h >>> 0;
+  };
+  const base36 = (n) => n.toString(36).toUpperCase();
+
+  const QUESTIONS = [
+    {title:"Branch Power",prompt:"Which branch of the federal government has the power to make laws?",options:["Executive","Judicial","Legislative","State governments"],answerIndex:2,hint:"Congress belongs to this branch.",explain:"Correct: the legislative branch makes laws."},
+    {title:"Branch Power",prompt:"Which branch is primarily responsible for enforcing laws?",options:["Executive","Judicial","Legislative","Local governments"],answerIndex:0,hint:"The President and federal agencies are part of this branch.",explain:"Correct: the executive branch enforces laws."},
+    {title:"Branch Power",prompt:"Which branch interprets laws and the Constitution?",options:["Executive","Judicial","Legislative","Cabinet"],answerIndex:1,hint:"The courts are part of this branch.",explain:"Correct: the judicial branch interprets laws."},
+    {title:"Executive Power",prompt:"Which power is granted to the executive branch?",options:["Writing laws","Declaring war","Imposing federal taxes","Nominating federal judges"],answerIndex:3,hint:"Think appointments.",explain:"Correct: the executive branch nominates federal judges."},
+    {title:"Treaties",prompt:"Which entity of government is responsible for negotiating international treaties?",options:["Executive branch","Judicial branch","Legislative branch","State governments"],answerIndex:0,hint:"The President leads this function.",explain:"Correct: the executive branch negotiates treaties."},
+    {title:"Checks and Balances",prompt:"Which scenario demonstrates checks and balances?",options:["Both houses override a veto","The President discusses trade","Congress limits campaign contributions","A senator criticizes a court ruling"],answerIndex:0,hint:"One branch formally limits another.",explain:"Correct: overriding a veto is a legislative check on the executive branch."},
+    {title:"Brown Enforcement",prompt:"Following the Supreme Court’s decision in Brown v. Board of Education, which action helped enforce desegregation?",options:["Federal troops supported desegregation orders","The Supreme Court passed a new law","States ignored the ruling legally","The Electoral College was changed"],answerIndex:0,hint:"Think federal enforcement power.",explain:"Correct: federal action was used in some cases to enforce desegregation."},
+    {title:"Collaboration",prompt:"Which sentence is an example of collaboration in helping create U.S. trade policy?",options:["The President negotiates a treaty and the Senate votes to ratify it.","A state court overturns a federal law.","The Supreme Court writes a law.","A mayor vetoes a bill passed by Congress."],answerIndex:0,hint:"Two branches working together on a foreign-policy action.",explain:"Correct: executive negotiation plus Senate ratification is collaboration."},
+    {title:"Legislative Check",prompt:"Which is an example of the legislative branch checking the executive branch?",options:["The President vetoes a bill","Congress overrides a veto","A court declares a law unconstitutional","A governor signs a state law"],answerIndex:1,hint:"Congress acts after the President acts.",explain:"Correct: overriding a veto is a legislative check."},
+    {title:"Judicial Check",prompt:"Which is an example of the judicial branch checking the legislative branch?",options:["A court strikes down a law as unconstitutional","Congress passes a bill","The President appoints a judge","A state legislature sets a budget"],answerIndex:0,hint:"Judicial review.",explain:"Correct: courts can declare laws unconstitutional."},
+    {title:"Senate Role",prompt:"Which action is a check the Senate has on the President?",options:["Issuing executive orders","Confirming federal appointments","Declaring laws unconstitutional","Collecting taxes"],answerIndex:1,hint:"Advice and consent.",explain:"Correct: the Senate confirms many presidential appointments."},
+    {title:"Oversight",prompt:"Which example best shows congressional oversight of the executive branch?",options:["Holding hearings on agency actions","Issuing a court ruling","Negotiating a treaty","Writing a local ordinance"],answerIndex:0,hint:"Oversight often happens through hearings and investigations.",explain:"Correct: hearings are a major oversight tool."},
+    {title:"House Power",prompt:"Which power belongs to the House of Representatives rather than the Senate?",options:["Ratifying treaties","Trying impeachments","Introducing revenue bills","Confirming judges"],answerIndex:2,hint:"Think taxes and money bills.",explain:"Correct: revenue bills originate in the House."},
+    {title:"Separation of Powers",prompt:"Which statement best describes separation of powers?",options:["One branch performs all major functions","Different branches have different responsibilities","States control the national government","Courts make all policy decisions"],answerIndex:1,hint:"Three branches, different jobs.",explain:"Correct: separation of powers divides responsibilities among branches."},
+    {title:"Foreign Policy",prompt:"Which is an example of the executive branch’s role in foreign policy?",options:["Negotiating treaties","Declaring war","Passing a budget","Ruling on constitutionality"],answerIndex:0,hint:"Negotiation is a presidential function.",explain:"Correct: the executive negotiates treaties."},
+    {title:"Judicial Review",prompt:"Which situation shows judicial review?",options:["A court rules a law violates the Constitution","Congress debates a bill","The President signs an order","A governor creates a task force"],answerIndex:0,hint:"The courts compare law to the Constitution.",explain:"Correct: judicial review is the power to rule on constitutionality."},
+    {title:"State vs Federal Conflict",prompt:"Which situation could involve multiple branches because of a conflict between state and federal authority?",options:["A city changes bus routes","A state refuses to follow a federal court order","A school schedules a pep rally","A library buys new books"],answerIndex:1,hint:"Federal courts + state resistance.",explain:"Correct: state refusal to obey a federal court order can involve courts and executive enforcement."},
+    {title:"Amendments as Check",prompt:"Which example best shows the legislative branch checking the judicial branch?",options:["Congress proposes a constitutional amendment after a court ruling","A court overturns a statute","The President vetoes a bill","An agency issues a regulation"],answerIndex:0,hint:"Congress can respond through the amendment process.",explain:"Correct: constitutional amendments can override court interpretations."},
+    {title:"Implementation",prompt:"A federal agency creates detailed rules to carry out a law passed by Congress. This is an example of:",options:["Implementation of public policy","Judicial review","State nullification","Direct democracy"],answerIndex:0,hint:"Agencies carry out laws.",explain:"Correct: agencies implement public policy through enforcement and regulation."},
+    {title:"Why Checks Matter",prompt:"Why are checks and balances important?",options:["They eliminate elections","They prevent any one branch from becoming too powerful","They guarantee every policy succeeds","They give courts control of Congress"],answerIndex:1,hint:"Prevent concentration of power.",explain:"Correct: checks and balances prevent abuse by limiting branch power."},
+    {title:"Collaboration",prompt:"Which example best shows collaboration among branches to make policy?",options:["Congress passes a law; the President signs it; agencies enforce it","A judge gives a speech","A mayor posts online","A citizen writes a blog"],answerIndex:0,hint:"Creation + approval + implementation.",explain:"Correct: multiple branches can work together to produce policy."},
+    {title:"Shared Action",prompt:"Which power requires action from more than one branch?",options:["A court issues a verdict","A treaty becomes binding","Congress holds a hearing","The President issues a pardon"],answerIndex:1,hint:"Treaties need two branches.",explain:"Correct: treaties require executive negotiation and Senate ratification."},
+    {title:"Confirmations",prompt:"Which branch nominates judges, but another branch confirms them?",options:["Legislative nominates, executive confirms","Executive nominates, legislative confirms","Judicial nominates, executive confirms","States nominate, Congress confirms"],answerIndex:1,hint:"President nominates; Senate confirms.",explain:"Correct: the executive nominates, and the Senate confirms."},
+    {title:"War Powers",prompt:"Which branch has the constitutional power to declare war?",options:["Executive","Judicial","Legislative","Cabinet"],answerIndex:2,hint:"Congress has this power.",explain:"Correct: the legislative branch declares war."},
+    {title:"Commander in Chief",prompt:"Which branch includes the commander in chief of the military?",options:["Executive","Judicial","Legislative","State"],answerIndex:0,hint:"The President holds this role.",explain:"Correct: the President, part of the executive branch, is commander in chief."},
+    {title:"Court Function",prompt:"Which action is most directly associated with the judicial branch?",options:["Enforcing laws","Interpreting laws and the Constitution","Writing legislation","Collecting taxes"],answerIndex:1,hint:"Courts interpret.",explain:"Correct: the judicial branch interprets laws."},
+    {title:"Policy Process",prompt:"Which branch is most responsible for creating statutes that become public policy?",options:["Executive","Judicial","Legislative","Interest groups"],answerIndex:2,hint:"Statutes are laws passed by Congress.",explain:"Correct: the legislative branch creates statutes."},
+    {title:"Executive Check",prompt:"Which is an example of the executive branch checking the legislative branch?",options:["The President vetoes a bill","Congress confirms a judge","A court hears a case","A state passes a law"],answerIndex:0,hint:"Veto power.",explain:"Correct: the President can veto bills passed by Congress."},
+    {title:"Inter-Branch Interaction",prompt:"Which action best shows branches interacting on civil rights policy?",options:["Courts issue rulings and executive officials enforce them","Mayors write federal statutes","State courts negotiate treaties","Congress appoints governors"],answerIndex:0,hint:"Think court ruling + enforcement.",explain:"Correct: civil-rights policy often involved judicial rulings and executive enforcement."},
+    {title:"Checks and Balances",prompt:"If the President appoints a federal judge, what check prevents that decision from being final by itself?",options:["The House declares war","The Senate must confirm the appointment","The Supreme Court must approve all nominations","State governors can veto the appointment"],answerIndex:1,hint:"Advice and consent.",explain:"Correct: Senate confirmation is the check."},
+    {title:"Branch Identification",prompt:"If a court rules a law unconstitutional, which branch acted?",options:["Executive","Judicial","Legislative","State"],answerIndex:1,hint:"A court made the ruling.",explain:"Correct: that is the judicial branch."},
+    {title:"Policy Enforcement",prompt:"Which scenario best shows the executive branch implementing public policy?",options:["A federal agency enforces environmental rules","Congress drafts a bill","A court issues an opinion","A voter signs a petition"],answerIndex:0,hint:"Implementation is enforcement.",explain:"Correct: agencies in the executive branch enforce policy."},
+    {title:"Congressional Role",prompt:"Which action best shows Congress participating in foreign policy?",options:["Ratifying treaties","Issuing court decisions","Commanding troops in battle","Appointing cabinet members"],answerIndex:0,hint:"The Senate has a key role here.",explain:"Correct: the Senate ratifies treaties."},
+    {title:"Balance of Power",prompt:"Which statement best explains the purpose of dividing powers among branches?",options:["To speed up every government action","To make one branch dominant","To prevent abuse of power by any single branch","To eliminate public disagreement"],answerIndex:2,hint:"Power is divided to prevent concentration.",explain:"Correct: separation of powers prevents dominance by one branch."},
+    {title:"CS 18 Collaboration",prompt:"Which is the best example of collaboration in creating public policy?",options:["Congress passes a law and executive agencies carry it out","A single judge writes a tax code","A governor negotiates all local laws alone","Voters replace all court decisions"],answerIndex:0,hint:"Think branches working together on policy creation and implementation.",explain:"Correct: lawmaking plus agency implementation is collaboration in public policy."}
+  ];
+
+  const state = {
+    name: '',
+    startedAtISO: '',
+    startedAtMS: 0,
+    idx: 0,
+    attempts: 0,
+    correct: 0
   };
 
-  try{
-    for(let i = sessionStorage.length - 1; i >= 0; i--){
-      const k = sessionStorage.key(i);
-      if(killIfMatch(k)) sessionStorage.removeItem(k);
-    }
-  }catch(e){}
+  const elQpos = document.getElementById('qpos');
+  const elAcc = document.getElementById('acc');
+  const elRuntime = document.getElementById('runtime');
 
-  try{
-    for(let i = localStorage.length - 1; i >= 0; i--){
-      const k = localStorage.key(i);
-      if(killIfMatch(k)) localStorage.removeItem(k);
-    }
-  }catch(e){}
+  const elNameBox = document.getElementById('nameBox');
+  const elStudentName = document.getElementById('studentName');
+  const btnStart = document.getElementById('btnStart');
+  const btnResetAll = document.getElementById('btnResetAll');
+  const btnRestartMid = document.getElementById('btnRestartMid');
 
-  try{ history.replaceState(null, "", location.pathname); }catch(e){}
-}
+  const elQuestionBox = document.getElementById('questionBox');
+  const elQtitle = document.getElementById('qtitle');
+  const elQtext = document.getElementById('qtext');
+  const elOpts = document.getElementById('opts');
 
-function hardRestart(){
-  purgeGameState();
-  location.replace(location.pathname + "?r=" + Date.now());
-}
+  const elFeedback = document.getElementById('feedback');
+  const elFbTitle = document.getElementById('fbTitle');
+  const elFbBody = document.getElementById('fbBody');
+  const btnHint = document.getElementById('btnHint');
+  const btnNext = document.getElementById('btnNext');
 
-window.addEventListener("pageshow", (e) => {
-  if (e.persisted) {
-    purgeGameState();
-    location.replace(location.pathname + "?r=" + Date.now());
+  const elFinishBox = document.getElementById('finishBox');
+  const elFinishTitle = document.getElementById('finishTitle');
+  const elFinishBody = document.getElementById('finishBody');
+  const elTicket = document.getElementById('ticket');
+
+  const elTName = document.getElementById('tName');
+  const elTDate = document.getElementById('tDate');
+  const elTStart = document.getElementById('tStart');
+  const elTEnd = document.getElementById('tEnd');
+  const elTRun = document.getElementById('tRun');
+  const elTAcc = document.getElementById('tAcc');
+  const elTCode = document.getElementById('tCode');
+  const btnCopy = document.getElementById('btnCopy');
+  const btnReset = document.getElementById('btnReset');
+
+  const sideName = document.getElementById('sideName');
+  const sideDate = document.getElementById('sideDate');
+  const sideStart = document.getElementById('sideStart');
+
+  function updateStats(){
+    const total = QUESTIONS.length;
+    const pos = Math.min(state.idx + 1, total);
+    elQpos.textContent = `${pos} / ${total}`;
+    const acc = state.attempts ? Math.round((state.correct / state.attempts) * 100) : 0;
+    elAcc.textContent = `${acc}%`;
+    const rt = state.startedAtMS ? (Date.now() - state.startedAtMS) : 0;
+    elRuntime.textContent = msToHMS(rt);
+
+    sideName.textContent = state.name || '—';
+    sideDate.textContent = state.startedAtISO ? fmtDate(new Date(state.startedAtISO)) : '—';
+    sideStart.textContent = state.startedAtISO ? fmtTime(new Date(state.startedAtISO)) : '—';
   }
-});
+  setInterval(updateStats, 500);
 
-if(FORCE_FRESH_ATTEMPT){ purgeGameState(); }
-
-/* ===============================
-   QUESTION BANK (25)
-   =============================== */
-const QUESTIONS = [
-  {released:true, prompt:`Which Supreme Court case required states to provide legal counsel to defendants who could not afford an attorney?`,
-   choices:["Gideon v. Wainwright","Marbury v. Madison","McCulloch v. Maryland","Brown v. Board of Education"],
-   correct:0, hint:"This case incorporated the Sixth Amendment right to counsel."},
-
-  {released:true, prompt:`Which amendment protects citizens from unreasonable searches and seizures?`,
-   choices:["First Amendment","Fourth Amendment","Eighth Amendment","Tenth Amendment"],
-   correct:1, hint:"Think: warrants and probable cause."},
-
-  {released:true, prompt:`Which amendment protects the right to freedom of speech and peaceful assembly?`,
-   choices:["First Amendment","Second Amendment","Fifth Amendment","Ninth Amendment"],
-   correct:0, hint:"This amendment lists five freedoms."},
-
-  {prompt:`Which amendment protects individuals from self-incrimination?`,
-   choices:["Fourth","Fifth","Sixth","Eighth"],
-   correct:1, hint:"'I plead the Fifth.'"},
-  {prompt:`Which amendment guarantees a speedy and public trial?`,
-   choices:["Fourth","Sixth","Seventh","Tenth"],
-   correct:1, hint:"Rights of the accused."},
-  {prompt:`Which amendment prohibits cruel and unusual punishment?`,
-   choices:["First","Eighth","Ninth","Tenth"],
-   correct:1, hint:"Think prison conditions and excessive punishment."},
-  {prompt:`The incorporation doctrine applied most Bill of Rights protections to states through which amendment?`,
-   choices:["10th","14th","2nd","7th"],
-   correct:1, hint:"The 14th Amendment Due Process Clause is the key."},
-  {prompt:`Which scenario is protected by the First Amendment?`,
-   choices:["Peaceful protest in a public park","Stealing private property","Driving without a license","Breaking into a home"],
-   correct:0, hint:"Speech + assembly."},
-  {prompt:`Which amendment protects freedom of religion?`,
-   choices:["1st","3rd","6th","9th"],
-   correct:0, hint:"Establishment + Free Exercise."},
-  {prompt:`Which protection requires police to have probable cause before issuing a warrant?`,
-   choices:["4th Amendment","6th Amendment","8th Amendment","9th Amendment"],
-   correct:0, hint:"Search and seizure."},
-  {prompt:`Which amendment protects against double jeopardy?`,
-   choices:["4th","5th","6th","8th"],
-   correct:1, hint:"You can't be tried twice for the same crime."},
-  {prompt:`Which amendment protects the right to bear arms?`,
-   choices:["1st","2nd","4th","9th"],
-   correct:1, hint:"Right to keep and bear arms."},
-  {prompt:`Which amendment protects the right to petition the government?`,
-   choices:["1st","3rd","7th","10th"],
-   correct:0, hint:"One of the five freedoms."},
-  {prompt:`Which amendment reserves powers not delegated to the federal government to the states?`,
-   choices:["8th","9th","10th","14th"],
-   correct:2, hint:"Federalism protection."},
-  {prompt:`Which amendment requires due process of law?`,
-   choices:["5th","7th","8th","10th"],
-   correct:0, hint:"No person shall be deprived of life, liberty, or property without due process."},
-  {prompt:`Which amendment protects the right to an impartial jury?`,
-   choices:["6th","7th","8th","9th"],
-   correct:0, hint:"Criminal trials."},
-  {prompt:`Which amendment protects against excessive bail?`,
-   choices:["4th","6th","8th","10th"],
-   correct:2, hint:"The Eighth also bans excessive fines and cruel and unusual punishment."},
-  {prompt:`Which scenario would violate the First Amendment?`,
-   choices:["Government banning peaceful protest","Charging someone for theft","Arresting someone for assault","Requiring driver’s license"],
-   correct:0, hint:"Peaceful expression."},
-  {prompt:`Which clause in the 14th Amendment made incorporation possible?`,
-   choices:["Equal Protection","Due Process","Privileges and Immunities","Commerce Clause"],
-   correct:1, hint:"Key phrase: no state shall deprive... without due process."},
-  {prompt:`Which amendment protects freedom of the press?`,
-   choices:["1st","2nd","4th","6th"],
-   correct:0, hint:"One of the five freedoms."},
-  {prompt:`Which amendment protects citizens from quartering soldiers in their homes?`,
-   choices:["2nd","3rd","5th","8th"],
-   correct:1, hint:"Rarely tested but important."},
-  {prompt:`Which amendment ensures that rights not specifically listed are still retained by the people?`,
-   choices:["7th","8th","9th","10th"],
-   correct:2, hint:"Unenumerated rights."},
-  {prompt:`Which amendment protects the right to confront witnesses?`,
-   choices:["5th","6th","8th","10th"],
-   correct:1, hint:"Rights of the accused."},
-  {prompt:`Which scenario demonstrates incorporation?`,
-   choices:["A state must provide a jury trial","A city passes a parking ordinance","A governor vetoes a bill","A senator filibusters"],
-   correct:0, hint:"States required to follow Bill of Rights protections (via the 14th)."},
-  {prompt:`Which right is protected by the Sixth Amendment?`,
-   choices:["Right to counsel","Freedom of speech","Protection from self-incrimination","Protection from unreasonable searches"],
-   correct:0, hint:"Gideon v. Wainwright."}
-];
-
-/* ===============================
-   ELEMENTS
-   =============================== */
-const startScreen = document.getElementById("startScreen");
-const gameScreen  = document.getElementById("gameScreen");
-const finishScreen= document.getElementById("finishScreen");
-
-const nameInput   = document.getElementById("nameInput");
-const startBtn    = document.getElementById("startBtn");
-
-const studentNameEl = document.getElementById("studentName");
-const qNumEl      = document.getElementById("qNum");
-const qTotalEl    = document.getElementById("qTotal");
-const accEl       = document.getElementById("acc");
-const clockEl     = document.getElementById("clock");
-const startedAtEl = document.getElementById("startedAt");
-const nowAtEl     = document.getElementById("nowAt");
-
-const game        = document.getElementById("game");
-const feedback    = document.getElementById("feedback");
-const restartBtn  = document.getElementById("restartBtn");
-
-const summaryLine = document.getElementById("summaryLine");
-const summaryBox  = document.getElementById("summaryBox");
-const playAgainBtn= document.getElementById("playAgainBtn");
-
-/* ===============================
-   STATE
-   =============================== */
-let studentName = "";
-let index = 0;
-
-let attempts = 0;   // every click submission counts (correct + incorrect clicks)
-let correct  = 0;
-let misses   = 0;   // mastery cares about misses
-
-let locked = false;               // lock only after correct (briefly) before auto-advance
-let missedThisQuestion = false;   // if any wrong click happened on this question
-
-let startTime = null;         // Date object
-let endTime = null;           // Date object
-let timerId = null;
-let nowId = null;
-
-/* ===============================
-   HELPERS
-   =============================== */
-qTotalEl.textContent = QUESTIONS.length;
-
-function pad2(n){ return String(n).padStart(2,"0"); }
-
-function formatTime(d){
-  const yy = d.getFullYear();
-  const mm = pad2(d.getMonth()+1);
-  const dd = pad2(d.getDate());
-  let hh = d.getHours();
-  const min = pad2(d.getMinutes());
-  const ss = pad2(d.getSeconds());
-  const ampm = hh >= 12 ? "PM" : "AM";
-  hh = hh % 12; if(hh === 0) hh = 12;
-  return `${mm}/${dd}/${yy} ${hh}:${min}:${ss} ${ampm}`;
-}
-
-function elapsedString(){
-  if(!startTime) return "00:00";
-  const ms = Date.now() - startTime.getTime();
-  const totalSec = Math.floor(ms/1000);
-  const m = Math.floor(totalSec/60);
-  const s = totalSec % 60;
-  return `${pad2(m)}:${pad2(s)}`;
-}
-
-function updateHUD(){
-  qNumEl.textContent = String(index + 1);
-  const acc = attempts ? Math.round((correct/attempts)*100) : 100;
-  accEl.textContent = `${acc}%`;
-  clockEl.textContent = elapsedString();
-}
-
-function setFeedback(kind, text){
-  feedback.className = "msg " + kind;
-  feedback.textContent = text;
-}
-function clearFeedback(){
-  feedback.className = "msg";
-  feedback.textContent = "";
-}
-
-function startClock(){
-  if(timerId) clearInterval(timerId);
-  timerId = setInterval(()=>{ clockEl.textContent = elapsedString(); }, 250);
-}
-
-function startNowClock(){
-  if(nowId) clearInterval(nowId);
-  nowId = setInterval(()=>{ nowAtEl.textContent = formatTime(new Date()); }, 500);
-  nowAtEl.textContent = formatTime(new Date());
-}
-
-function stopClocks(){
-  if(timerId) clearInterval(timerId);
-  if(nowId) clearInterval(nowId);
-  timerId = null;
-  nowId = null;
-}
-
-function clearChoiceMarks(){
-  [...game.querySelectorAll(".choice")].forEach(el=>{
-    el.classList.remove("wrong","correct","locked");
-  });
-}
-
-function markWrong(i){
-  const nodes = [...game.querySelectorAll(".choice")];
-  nodes.forEach(n=>n.classList.remove("wrong"));
-  if(nodes[i]) nodes[i].classList.add("wrong");
-}
-
-function lockChoicesShowCorrect(){
-  const q = QUESTIONS[index];
-  const nodes = [...game.querySelectorAll(".choice")];
-  nodes.forEach((node, i)=>{
-    node.classList.add("locked");
-    if(i === q.correct) node.classList.add("correct");
-  });
-}
-
-function advance(){
-  index++;
-  if(index >= QUESTIONS.length){
-    finish();
-    return;
+  function setFeedback(kind, title, body){
+    elFeedback.className = `msg ${kind}`;
+    elFbTitle.textContent = title;
+    elFbBody.textContent = body;
   }
-  loadQuestion();
-}
+  function clearFeedback(){
+    elFeedback.className = 'msg';
+    elFbTitle.textContent = '';
+    elFbBody.textContent = '';
+  }
+  function disableInputs(disabled){
+    document.querySelectorAll('.optbtn').forEach(b => b.disabled = disabled);
+  }
 
-/* =========================================================
-   AUTO-SUBMIT ON CLICK
-   - No Submit button
-   - No Hint button (hint shown only after incorrect)
-   - No Reset-this-question button
-   - Auto-advance on correct
-   - Wrong clicks keep accuracy impact (attempts++, misses++)
-   ========================================================= */
-function handleAnswerClick(choiceIndex){
-  if(locked) return;
-
-  const q = QUESTIONS[index];
-
-  // auto-submit on every click
-  attempts++;
-
-  if(choiceIndex === q.correct){
-    correct++;
-    locked = true;
-
-    // show correct briefly, then auto-advance
+  function showQuestion(){
+    const q = QUESTIONS[state.idx];
     clearFeedback();
-    setFeedback("good", missedThisQuestion ? "Correct (but your earlier miss still counts)." : "Correct.");
-    clearChoiceMarks();
-    lockChoicesShowCorrect();
-    updateHUD();
+    btnNext.disabled = true;
+    btnHint.disabled = true;
 
-    setTimeout(()=>{
-      locked = false;
-      advance();
-    }, 650);
+    elQtitle.textContent = q.title;
+    elQtext.textContent = q.prompt;
+    elOpts.innerHTML = '';
 
-  } else {
-    misses++;
-    missedThisQuestion = true;
+    const letters = ['A','B','C','D','E','F'];
+    q.options.forEach((text, i) => {
+      const b = document.createElement('button');
+      b.className = 'optbtn';
+      b.innerHTML = `<span class="ltr">${letters[i]}.</span>${escapeHtml(text)}`;
+      b.addEventListener('click', () => answerMCQ(i));
+      elOpts.appendChild(b);
+    });
 
-    // hint shown only after incorrect
-    const hintText = q.hint || "Think about the right being tested.";
-    setFeedback("bad", `Incorrect. Hint: ${hintText} (Miss recorded.)`);
-    markWrong(choiceIndex);
-    updateHUD();
+    updateStats();
   }
-}
 
-function renderChoices(q){
-  const wrap = document.createElement("div");
-  q.choices.forEach((c,i)=>{
-    const div = document.createElement("div");
-    div.className = "choice";
-    div.textContent = c;
-    div.addEventListener("click", ()=> handleAnswerClick(i));
-    wrap.appendChild(div);
+  function answerMCQ(choiceIdx){
+    const q = QUESTIONS[state.idx];
+    state.attempts += 1;
+    const correct = (choiceIdx === q.answerIndex);
+
+    if(correct){
+      state.correct += 1;
+      setFeedback('good', 'Correct ✅', q.explain || 'Correct.');
+      disableInputs(true);
+      btnNext.disabled = false;
+      btnHint.disabled = true;
+    } else {
+      setFeedback('bad', 'Not yet ❌', 'Try again. Click “Hint” if you need help.');
+      btnHint.disabled = false;
+      btnNext.disabled = true;
+    }
+    updateStats();
+  }
+
+  btnHint.addEventListener('click', () => {
+    const q = QUESTIONS[state.idx];
+    setFeedback('warn', 'Hint 💡', q.hint || 'Re-read the prompt and choose the best answer.');
+    btnHint.disabled = true;
   });
-  return wrap;
-}
 
-function loadQuestion(){
-  locked = false;
-  missedThisQuestion = false;
-  clearFeedback();
-  updateHUD();
+  btnNext.addEventListener('click', () => {
+    state.idx += 1;
+    if(state.idx >= QUESTIONS.length){
+      showFinish();
+      return;
+    }
+    disableInputs(false);
+    showQuestion();
+  });
 
-  const q = QUESTIONS[index];
-  game.innerHTML = "";
+  function showFinish(){
+    elNameBox.style.display = 'none';
+    elQuestionBox.style.display = 'none';
+    elFinishBox.style.display = '';
 
-  const p = document.createElement("p");
-  p.style.marginTop = "0";
-  p.textContent = q.prompt;
-  game.appendChild(p);
+    const acc = state.attempts ? Math.round((state.correct / state.attempts) * 100) : 0;
+    const ended = new Date();
 
-  game.appendChild(renderChoices(q));
-}
+    if(acc === 100 && state.attempts >= QUESTIONS.length){
+      elFinishTitle.textContent = 'Mastery achieved ✅';
+      elFinishBody.textContent = 'You finished with 100% accuracy. Screenshot the ticket (no cropping).';
 
-function finish(){
-  endTime = new Date();
-  stopClocks();
-  updateHUD();
+      const start = new Date(state.startedAtISO);
+      const runMS = Date.now() - state.startedAtMS;
 
-  const acc = attempts ? Math.round((correct/attempts)*100) : 0;
-  const mastery = (misses === 0) && (index >= QUESTIONS.length);
-  const passed = mastery ? "Yes" : "No";
+      elTName.textContent = state.name;
+      elTDate.textContent = fmtDate(ended);
+      elTStart.textContent = fmtTime(start);
+      elTEnd.textContent = fmtTime(ended);
+      elTRun.textContent = msToHMS(runMS);
+      elTAcc.textContent = `${acc}%`;
 
-  summaryLine.textContent = mastery
-    ? `✅ MASTERED — 100% accuracy (0 misses)`
-    : `❌ Not Mastered — ${acc}% accuracy (${misses} miss${misses===1?"":"es"})`;
+      const raw = `${state.name}|${state.startedAtISO}|${ended.toISOString()}|${state.correct}|${state.attempts}|${QUESTIONS.length}`;
+      const code = `GOV-BR-${base36(hash32(raw))}-${base36(hash32(raw+'BR')).slice(0,4)}`;
+      elTCode.textContent = code;
 
-  const summary =
-`Student: ${studentName}
+      elTicket.style.display = '';
+    } else {
+      elFinishTitle.textContent = 'Mastery NOT achieved ❌';
+      elFinishBody.textContent = `Accuracy: ${acc}%. Restart and replay for 100% mastery.`;
+      elTicket.style.display = 'none';
+    }
 
-Date/Time Started: ${formatTime(startTime)}
-Date/Time Completed: ${formatTime(endTime)}
-Time Elapsed: ${elapsedString()}
-
-Questions: ${QUESTIONS.length}
-Attempts: ${attempts}
-Correct: ${correct}
-Misses: ${misses}
-Accuracy: ${acc}%
-Passed: ${passed}
-
-Result: ${mastery ? "MASTERED (0 misses)" : "REPLAY for 0 misses"}`;
-
-  summaryBox.textContent = summary;
-
-  gameScreen.style.display = "none";
-  finishScreen.style.display = "block";
-}
-
-/* ===============================
-   START FLOW
-   =============================== */
-function begin(){
-  const n = (nameInput.value || "").trim();
-  if(n.length < 2){
-    alert("Please enter your name to begin.");
-    nameInput.focus();
-    return;
+    updateStats();
   }
-  studentName = n;
-  studentNameEl.textContent = studentName;
 
-  startTime = new Date();
-  startedAtEl.textContent = formatTime(startTime);
-  startClock();
-  startNowClock();
+  function hardResetToNameEntry(){
+    state.name = '';
+    state.startedAtISO = '';
+    state.startedAtMS = 0;
+    state.idx = 0;
+    state.attempts = 0;
+    state.correct = 0;
 
-  // reset run stats
-  index = 0;
-  attempts = 0;
-  correct = 0;
-  misses = 0;
+    elStudentName.value = '';
+    elNameBox.style.display = '';
+    elQuestionBox.style.display = 'none';
+    elFinishBox.style.display = 'none';
+    elTicket.style.display = 'none';
+    disableInputs(false);
+    clearFeedback();
 
-  startScreen.style.display = "none";
-  finishScreen.style.display = "none";
-  gameScreen.style.display = "block";
+    elQtitle.textContent = 'Enter your name to begin';
+    elQtext.textContent = 'Your teacher requires a submission ticket at the end (no cropping). Use your real name.';
+    updateStats();
+  }
 
-  loadQuestion();
-  updateHUD();
-}
+  btnReset.addEventListener('click', hardResetToNameEntry);
+  btnResetAll.addEventListener('click', hardResetToNameEntry);
+  btnRestartMid.addEventListener('click', hardResetToNameEntry);
 
-startBtn.addEventListener("click", begin);
-nameInput.addEventListener("keydown", (e)=>{
-  if(e.key === "Enter") begin();
-});
+  btnCopy.addEventListener('click', async () => {
+    try{
+      await navigator.clipboard.writeText(elTCode.textContent.trim());
+      btnCopy.textContent = 'Copied ✅';
+      setTimeout(()=>btnCopy.textContent='Copy Ticket Code', 1100);
+    }catch{
+      btnCopy.textContent = 'Copy failed';
+      setTimeout(()=>btnCopy.textContent='Copy Ticket Code', 1100);
+    }
+  });
 
-/* ===============================
-   BUTTONS (keep restart + play again)
-   =============================== */
-restartBtn.addEventListener("click", hardRestart);
-playAgainBtn.addEventListener("click", hardRestart);
+  btnStart.addEventListener('click', () => {
+    const name = (elStudentName.value || '').trim();
+    if(name.length < 2){
+      setFeedback('bad', 'Name required', 'Enter your name to begin.');
+      elFeedback.style.display = 'block';
+      return;
+    }
 
-/* ===============================
-   INITIAL HUD (pre-start)
-   =============================== */
-qNumEl.textContent = "0";
-accEl.textContent = "—";
-clockEl.textContent = "00:00";
-startedAtEl.textContent = "—";
-nowAtEl.textContent = "—";
+    state.name = name;
+    const start = new Date();
+    state.startedAtISO = start.toISOString();
+    state.startedAtMS = Date.now();
+    state.idx = 0;
+    state.attempts = 0;
+    state.correct = 0;
+
+    elNameBox.style.display = 'none';
+    elQuestionBox.style.display = '';
+    elFinishBox.style.display = 'none';
+    showQuestion();
+  });
+
+  function escapeHtml(s){
+    return String(s)
+      .replaceAll('&','&amp;')
+      .replaceAll('<','&lt;')
+      .replaceAll('>','&gt;')
+      .replaceAll('"','&quot;')
+      .replaceAll("'","&#039;");
+  }
+
+  updateStats();
+})();
 </script>
 </body>
 </html>
-```
