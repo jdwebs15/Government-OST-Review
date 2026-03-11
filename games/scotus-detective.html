@@ -77,7 +77,7 @@
     border-radius:18px;
     box-shadow:var(--shadow);
   }
-  .card h2,.card h3,.card h4{margin:0}
+  .card h2,.card h3{margin:0}
   .card .hd{
     padding:14px 16px;
     border-bottom:1px solid var(--line);
@@ -136,6 +136,7 @@
     background:rgba(122,162,255,.08);
     border:1px solid rgba(122,162,255,.25);
   }
+  .toolkit h4{margin:0 0 10px}
   .tool-grid{
     display:grid;
     grid-template-columns:1fr 1fr;
@@ -226,7 +227,7 @@
 
     <div id="startScreen" class="startbox">
       <div class="lead">
-        This investigation contains <b>30 OST-style case questions</b>. Questions ramp in difficulty from amendment identification to doctrine, federalism, judicial review, and separation of powers.
+        This investigation contains <b>case-file blocks grouped by case</b>. Related case blocks stay together, but the case groups shuffle each time the game starts.
       </div>
 
       <div class="toolkit">
@@ -1079,7 +1080,11 @@ function formatDateTime(d){
   return d ? d.toLocaleString() : "—";
 }
 
-/* ---------- TRUE SHUFFLE HELPERS ---------- */
+function accuracyPct(){
+  return attempts === 0 ? 100 : Math.round((correct / attempts) * 100);
+}
+
+/* ---------- TRUE RANDOM HELPERS ---------- */
 function randomInt(maxExclusive){
   if(maxExclusive <= 0) return 0;
 
@@ -1107,37 +1112,62 @@ function shuffleArray(arr){
   return copy;
 }
 
-/* ---------- BUILD PLAY ORDER ---------- */
-/* Shuffles court-case blocks, but preserves Part A then Part B within each block. */
-function buildQuestions(){
-  const shuffledCases = shuffleArray(CASES);
+function shuffleAnswers(answers, correctIndex){
+  const mapped = answers.map((text, idx) => ({
+    text,
+    isCorrect: idx === correctIndex
+  }));
 
-  return shuffledCases.flatMap((c, caseIndex) => {
-    return c.parts.map((p, partIndex) => {
-      const shuffledAnswers = shuffleArray(
-        p.answers.map((text, idx) => ({
-          text,
-          isCorrect: idx === p.correct
-        }))
-      );
+  const shuffled = shuffleArray(mapped);
 
-      return {
-        id: `${caseIndex + 1}-${partIndex + 1}`,
-        title: c.title,
-        tag: c.tag,
-        passage: c.passage,
-        label: p.label,
-        question: p.question,
-        answers: shuffledAnswers.map(a => a.text),
-        correct: shuffledAnswers.findIndex(a => a.isCorrect),
-        hint: p.hint
-      };
-    });
-  });
+  return {
+    answers: shuffled.map(x => x.text),
+    correct: shuffled.findIndex(x => x.isCorrect)
+  };
 }
 
-function accuracyPct(){
-  return attempts === 0 ? 100 : Math.round((correct / attempts) * 100);
+/* ---------- GROUP SAME-CASE BLOCKS TOGETHER ---------- */
+/* Example: both Plessy blocks stay together, both Brown blocks stay together, all Gideon blocks stay together */
+function groupCasesByTitle(cases){
+  const groups = new Map();
+
+  cases.forEach(caseBlock => {
+    const key = caseBlock.title;
+    if(!groups.has(key)) groups.set(key, []);
+    groups.get(key).push(caseBlock);
+  });
+
+  return Array.from(groups.values());
+}
+
+/* Shuffle case-groups, but preserve order within each group's blocks */
+function buildQuestions(){
+  const grouped = groupCasesByTitle(CASES);
+  const shuffledGroups = shuffleArray(grouped);
+
+  const questionDeck = [];
+
+  shuffledGroups.forEach((group, groupIndex) => {
+    group.forEach((caseBlock, blockIndex) => {
+      caseBlock.parts.forEach((part, partIndex) => {
+        const shuffledQA = shuffleAnswers(part.answers, part.correct);
+
+        questionDeck.push({
+          id: `${groupIndex + 1}-${blockIndex + 1}-${partIndex + 1}`,
+          title: caseBlock.title,
+          tag: caseBlock.tag,
+          passage: caseBlock.passage,
+          label: part.label,
+          question: part.question,
+          answers: shuffledQA.answers,
+          correct: shuffledQA.correct,
+          hint: part.hint
+        });
+      });
+    });
+  });
+
+  return questionDeck;
 }
 
 function updateHUD(){
@@ -1158,9 +1188,9 @@ function renderQuestion(){
   $("#questionText").textContent = q.question;
   $("#stageText").textContent = q.label;
 
-  const hint = $("#hintBox");
-  hint.style.display = "none";
-  hint.textContent = "";
+  const hintBox = $("#hintBox");
+  hintBox.style.display = "none";
+  hintBox.textContent = "";
 
   const answersEl = $("#answers");
   answersEl.innerHTML = "";
@@ -1182,6 +1212,7 @@ function handleAnswer(btn, idx){
 
   const q = QUESTIONS[currentIndex];
   attempts += 1;
+  updateHUD();
 
   if(idx === q.correct){
     locked = true;
@@ -1201,35 +1232,21 @@ function handleAnswer(btn, idx){
     }, 450);
   } else {
     btn.classList.add("bad");
-    $("#hintBox").textContent = `Hint: ${q.hint}`;
-    $("#hintBox").style.display = "block";
-    updateHUD();
-
+    const hint = $("#hintBox");
+    hint.textContent = `Hint: ${q.hint}`;
+    hint.style.display = "block";
     setTimeout(() => btn.classList.remove("bad"), 700);
   }
 }
 
-function resetStateForNewRun(keepName = true){
-  if(!keepName){
-    $("#studentName").value = "";
-    studentName = "";
-  } else {
-    studentName = $("#studentName").value.trim();
-  }
-
-  QUESTIONS = buildQuestions();   // NEW shuffled case order + NEW shuffled answer order every run
+function prepareRun(){
+  QUESTIONS = buildQuestions();
   currentIndex = 0;
   attempts = 0;
   correct = 0;
   locked = false;
   startTime = new Date();
-
   $("#startedText").textContent = formatDateTime(startTime);
-  $("#finalAccuracy").textContent = "100%";
-  $("#ticketBox").textContent = "";
-  $("#toolkitBox").classList.add("hide");
-  $("#hintBox").style.display = "none";
-  $("#hintBox").textContent = "";
 }
 
 function startGame(){
@@ -1240,7 +1257,8 @@ function startGame(){
     return;
   }
 
-  resetStateForNewRun(true);
+  studentName = name;
+  prepareRun();
 
   startScreen.classList.add("hide");
   endScreen.classList.add("hide");
@@ -1277,14 +1295,14 @@ Focus: Supreme Court cases, amendments, doctrines, and constitutional principles
 }
 
 function restartGame(){
-  if(!confirm("Restart this game with a fresh shuffled order?")) return;
-
   const existingName = studentName || $("#studentName").value.trim();
+
   if(existingName){
     $("#studentName").value = existingName;
+    studentName = existingName;
   }
 
-  resetStateForNewRun(true);
+  prepareRun();
 
   startScreen.classList.add("hide");
   endScreen.classList.add("hide");
@@ -1296,17 +1314,12 @@ function restartGame(){
 $("#startBtn").addEventListener("click", startGame);
 $("#restartBtn").addEventListener("click", restartGame);
 $("#playAgainBtn").addEventListener("click", restartGame);
-
 $("#toolkitBtn").addEventListener("click", () => {
   $("#toolkitBox").classList.toggle("hide");
 });
-
 $("#studentName").addEventListener("keydown", (e) => {
   if(e.key === "Enter") startGame();
 });
-
-/* Optional: prepare a shuffled deck on initial load too */
-QUESTIONS = buildQuestions();
 </script>
 </body>
 </html>
