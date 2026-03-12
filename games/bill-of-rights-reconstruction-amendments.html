@@ -1,0 +1,549 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>Bill of Rights & Constitutional Amendments Big Block Challenge — CS 8-11</title>
+
+<style>
+
+:root{
+--bg:#0b1220;
+--panel:#121a2f;
+--text:#e7eefc;
+--muted:#a8b4cf;
+--accent:#7aa2ff;
+--good:#2bd576;
+--bad:#ff5c7a;
+--warn:#ffd166;
+--radius:16px;
+--shadow:0 18px 55px rgba(0,0,0,.40);
+}
+
+body{
+margin:0;
+font-family:system-ui;
+background:linear-gradient(180deg,#0b1220,#070b14);
+color:var(--text);
+}
+
+.wrap{
+max-width:900px;
+margin:auto;
+padding:24px;
+}
+
+.panel{
+background:var(--panel);
+padding:22px;
+border-radius:var(--radius);
+box-shadow:var(--shadow);
+margin-top:20px;
+}
+
+button{
+background:var(--accent);
+border:none;
+padding:10px 16px;
+color:white;
+border-radius:10px;
+cursor:pointer;
+margin:6px;
+}
+
+button:hover{opacity:.85}
+
+.choice{
+display:block;
+padding:10px;
+margin:8px 0;
+background:#1a2444;
+border-radius:8px;
+cursor:pointer;
+}
+
+.choice:hover{background:#263366}
+
+.correct{background:var(--good)!important}
+.incorrect{background:var(--bad)!important}
+
+.topbar{
+display:flex;
+justify-content:space-between;
+margin-bottom:14px;
+font-size:14px;
+color:var(--muted);
+}
+
+.dragbox{
+padding:12px;
+background:#1a2444;
+margin:8px 0;
+border-radius:8px;
+}
+
+.dropzone{
+border:2px dashed #3a4a8a;
+padding:14px;
+margin:8px 0;
+border-radius:10px;
+}
+
+</style>
+</head>
+
+<body>
+
+<div class="wrap">
+
+<h1>Bill of Rights & Constitutional Amendments Big Block Challenge</h1>
+
+<div id="startPanel" class="panel">
+<label>Student Name:</label>
+<input id="studentName" style="width:100%;padding:10px;margin-top:6px;">
+<br><br>
+<button onclick="startGame()">Start Game</button>
+</div>
+
+<div id="gamePanel" class="panel" style="display:none;">
+
+<div class="topbar">
+<div>Student: <span id="player"></span></div>
+<div>Question <span id="qNum"></span>/24</div>
+<div>Accuracy: <span id="accuracy">100%</span></div>
+<div>Time: <span id="timer">0</span>s</div>
+</div>
+
+<div id="questionArea"></div>
+
+<div id="hint" style="color:var(--warn);margin-top:10px"></div>
+
+</div>
+
+<div id="endPanel" class="panel" style="display:none;">
+<h2>Review Complete</h2>
+<p id="finalScore"></p>
+<button onclick="location.reload()">Restart Game</button>
+</div>
+
+</div>
+
+<script>
+
+let q=0
+let correct=0
+let attempts=0
+let timer=0
+let clock
+
+function startGame(){
+let name=document.getElementById("studentName").value
+document.getElementById("player").innerText=name
+document.getElementById("startPanel").style.display="none"
+document.getElementById("gamePanel").style.display="block"
+
+clock=setInterval(()=>{
+timer++
+document.getElementById("timer").innerText=timer
+},1000)
+
+loadQuestion()
+}
+
+const questions=[
+
+{
+type:"mcq",
+q:"Which amendment protects citizens from unreasonable searches and seizures?",
+choices:[
+"First Amendment",
+"Fourth Amendment",
+"Sixth Amendment",
+"Tenth Amendment"
+],
+answer:1,
+hint:"This amendment requires warrants and probable cause."
+},
+
+{
+type:"multi",
+select:2,
+q:"Select TWO freedoms protected by the First Amendment.",
+choices:[
+"Speech",
+"Protection from self-incrimination",
+"Assembly",
+"Trial by jury"
+],
+answers:[0,2],
+hint:"Think of the five freedoms."
+},
+
+{
+type:"mcq",
+q:"Which amendment protects individuals from being tried twice for the same crime?",
+choices:[
+"Fourth Amendment",
+"Fifth Amendment",
+"Eighth Amendment",
+"Tenth Amendment"
+],
+answer:1,
+hint:"This amendment includes self-incrimination protection."
+},
+
+{
+type:"mcq",
+q:"Which amendment guarantees the right to a lawyer?",
+choices:[
+"First Amendment",
+"Fourth Amendment",
+"Sixth Amendment",
+"Eighth Amendment"
+],
+answer:2,
+hint:"This amendment deals with criminal trials."
+},
+
+{
+type:"mcq",
+q:"Which amendment abolished slavery in the United States?",
+choices:[
+"13th Amendment",
+"14th Amendment",
+"15th Amendment",
+"19th Amendment"
+],
+answer:0,
+hint:"First of the Reconstruction Amendments."
+},
+
+{
+type:"multi",
+select:3,
+q:"Select THREE protections established by the Reconstruction Amendments.",
+choices:[
+"Abolishing slavery",
+"Equal protection of the law",
+"Citizenship for people born in the U.S.",
+"Lowering voting age to 18"
+],
+answers:[0,1,2],
+hint:"Three protections came after the Civil War."
+},
+
+{
+type:"mcq",
+q:"Which amendment guarantees equal protection under the law?",
+choices:[
+"13th Amendment",
+"14th Amendment",
+"15th Amendment",
+"19th Amendment"
+],
+answer:1,
+hint:"This amendment expanded citizenship rights."
+},
+
+{
+type:"mcq",
+q:"Which amendment prohibited denying voting rights based on race?",
+choices:[
+"15th Amendment",
+"19th Amendment",
+"24th Amendment",
+"26th Amendment"
+],
+answer:0,
+hint:"Part of Reconstruction."
+},
+
+{
+type:"multi",
+select:4,
+q:"Select FOUR amendments that expanded voting rights.",
+choices:[
+"15th Amendment",
+"19th Amendment",
+"24th Amendment",
+"26th Amendment",
+"22nd Amendment"
+],
+answers:[0,1,2,3],
+hint:"One option relates to presidential terms."
+},
+
+{
+type:"mcq",
+q:"Which amendment granted women the right to vote?",
+choices:[
+"15th Amendment",
+"19th Amendment",
+"23rd Amendment",
+"26th Amendment"
+],
+answer:1,
+hint:"Passed in 1920."
+},
+
+{
+type:"mcq",
+q:"Which amendment lowered the voting age to 18?",
+choices:[
+"22nd Amendment",
+"23rd Amendment",
+"26th Amendment",
+"24th Amendment"
+],
+answer:2,
+hint:"Adopted during the Vietnam War era."
+},
+
+{
+type:"mcq",
+q:"Which amendment gave Washington D.C. electoral votes?",
+choices:[
+"12th Amendment",
+"22nd Amendment",
+"23rd Amendment",
+"25th Amendment"
+],
+answer:2,
+hint:"This allowed residents of D.C. to vote for president."
+},
+
+{
+type:"mcq",
+q:"Which amendment established presidential term limits?",
+choices:[
+"22nd Amendment",
+"23rd Amendment",
+"24th Amendment",
+"25th Amendment"
+],
+answer:0,
+hint:"Passed after Franklin Roosevelt served four terms."
+},
+
+{
+type:"mcq",
+q:"Which amendment clarified presidential succession and disability?",
+choices:[
+"22nd Amendment",
+"23rd Amendment",
+"25th Amendment",
+"12th Amendment"
+],
+answer:2,
+hint:"It explains what happens if the president cannot serve."
+},
+
+{
+type:"mcq",
+q:"Which amendment created separate ballots for president and vice president?",
+choices:[
+"12th Amendment",
+"22nd Amendment",
+"23rd Amendment",
+"25th Amendment"
+],
+answer:0,
+hint:"This fixed an Electoral College tie issue."
+},
+
+{
+type:"mcq",
+q:"Which amendment protects citizens from cruel and unusual punishment?",
+choices:[
+"Sixth Amendment",
+"Eighth Amendment",
+"Fourth Amendment",
+"Tenth Amendment"
+],
+answer:1,
+hint:"Think punishments that are excessive."
+},
+
+{
+type:"mcq",
+q:"Which amendment states powers not given to the federal government belong to the states?",
+choices:[
+"Ninth Amendment",
+"Tenth Amendment",
+"Eleventh Amendment",
+"Fourth Amendment"
+],
+answer:1,
+hint:"Important for federalism."
+},
+
+{
+type:"mcq",
+q:"Which situation best shows the First Amendment?",
+choices:[
+"A jury trial",
+"A protest criticizing government policy",
+"A police search with warrant",
+"A senator voting on a bill"
+],
+answer:1,
+hint:"Think expression of ideas."
+},
+
+{
+type:"mcq",
+q:"Which situation best demonstrates the Fifth Amendment?",
+choices:[
+"A suspect refuses to testify against himself",
+"A newspaper prints an editorial",
+"A jury deliberates in court",
+"A state runs elections"
+],
+answer:0,
+hint:"Self-incrimination."
+},
+
+{
+type:"mcq",
+q:"Which situation demonstrates the Sixth Amendment?",
+choices:[
+"A defendant receives a public trial",
+"A police officer obtains a warrant",
+"A governor signs a bill",
+"A citizen votes in an election"
+],
+answer:0,
+hint:"Think courtroom rights."
+},
+
+{
+type:"mcq",
+q:"Which situation demonstrates the Fourth Amendment?",
+choices:[
+"Police search a house with no warrant",
+"Police search with probable cause and warrant",
+"A judge hears a case",
+"A jury announces a verdict"
+],
+answer:1,
+hint:"Searches must be justified."
+},
+
+{
+type:"mcq",
+q:"Which situation shows the Tenth Amendment in action?",
+choices:[
+"Congress regulates trade",
+"A state controls its public schools",
+"The president signs a treaty",
+"The Supreme Court reviews a law"
+],
+answer:1,
+hint:"State powers."
+},
+
+{
+type:"mcq",
+q:"Why did African Americans still face discrimination after Reconstruction?",
+choices:[
+"The amendments were repealed",
+"Jim Crow laws enforced segregation",
+"Citizenship protections were removed",
+"Voting rights ended"
+],
+answer:1,
+hint:"State segregation laws."
+},
+
+{
+type:"mcq",
+q:"What was the main purpose of the Bill of Rights?",
+choices:[
+"Strengthen the presidency",
+"Limit federal government and protect liberties",
+"Eliminate state governments",
+"Create the Electoral College"
+],
+answer:1,
+hint:"Civil liberties."
+}
+
+]
+
+function loadQuestion(){
+
+if(q>=questions.length){
+clearInterval(clock)
+document.getElementById("gamePanel").style.display="none"
+document.getElementById("endPanel").style.display="block"
+document.getElementById("finalScore").innerText=
+"Final Accuracy: "+Math.round(correct/attempts*100)+"%"
+return
+}
+
+let data=questions[q]
+document.getElementById("qNum").innerText=q+1
+document.getElementById("hint").innerText=""
+
+let html="<h3>"+data.q+"</h3>"
+
+if(data.type==="mcq"){
+data.choices.forEach((c,i)=>{
+html+=`<div class="choice" onclick="checkMCQ(${i})">${c}</div>`
+})
+}
+
+if(data.type==="multi"){
+html+=`<p><em>Select ${data.select} answers</em></p>`
+data.choices.forEach((c,i)=>{
+html+=`<label class="choice"><input type="checkbox" value="${i}"> ${c}</label>`
+})
+html+=`<button onclick="submitMulti()">Submit</button>`
+}
+
+document.getElementById("questionArea").innerHTML=html
+}
+
+function checkMCQ(choice){
+
+attempts++
+
+let data=questions[q]
+
+if(choice===data.answer){
+correct++
+q++
+updateAccuracy()
+loadQuestion()
+}else{
+document.getElementById("hint").innerText=data.hint
+}
+}
+
+function submitMulti(){
+
+attempts++
+
+let data=questions[q]
+
+let checked=[...document.querySelectorAll("input[type=checkbox]:checked")].map(x=>parseInt(x.value))
+
+if(JSON.stringify(checked.sort())===JSON.stringify(data.answers.sort())){
+correct++
+q++
+updateAccuracy()
+loadQuestion()
+}else{
+document.getElementById("hint").innerText=data.hint
+}
+}
+
+function updateAccuracy(){
+let acc=Math.round(correct/attempts*100)
+document.getElementById("accuracy").innerText=acc+"%"
+}
+
+</script>
+
+</body>
+</html>
