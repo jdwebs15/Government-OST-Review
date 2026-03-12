@@ -1,549 +1,1049 @@
 <!doctype html>
 <html lang="en">
 <head>
-<meta charset="utf-8"/>
-<meta name="viewport" content="width=device-width,initial-scale=1"/>
-<title>Bill of Rights & Constitutional Amendments Big Block Challenge — CS 8-11</title>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>Bill of Rights & Constitutional Amendments Big Block Challenge — CS 8–11</title>
+<link rel="stylesheet" href="../styles.css" />
 
 <style>
-
 :root{
---bg:#0b1220;
---panel:#121a2f;
---text:#e7eefc;
---muted:#a8b4cf;
---accent:#7aa2ff;
---good:#2bd576;
---bad:#ff5c7a;
---warn:#ffd166;
---radius:16px;
---shadow:0 18px 55px rgba(0,0,0,.40);
+  --bg:#0b1220;
+  --panel:#121a2f;
+  --panel2:#0f1730;
+  --card:#111a2e;
+  --text:#e7eefc;
+  --muted:#a8b4cf;
+  --line:rgba(255,255,255,.12);
+  --shadow:0 18px 55px rgba(0,0,0,.40);
+  --radius:18px;
+  --good:#2bd576;
+  --bad:#ff5c7a;
+  --warn:#ffd166;
+  --accent:#7aa2ff;
+  --accent2:#9b8cff;
+  --mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
 }
-
+*{box-sizing:border-box}
 body{
-margin:0;
-font-family:system-ui;
-background:linear-gradient(180deg,#0b1220,#070b14);
-color:var(--text);
+  margin:0;
+  background:
+    radial-gradient(1200px 600px at 20% -10%, rgba(122,162,255,.18), transparent 55%),
+    radial-gradient(900px 500px at 100% 0%, rgba(155,140,255,.14), transparent 45%),
+    linear-gradient(180deg,#0b1220,#070b14);
+  color:var(--text);
+  font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;
 }
-
-.wrap{
-max-width:900px;
-margin:auto;
-padding:24px;
+.wrap{max-width:1100px;margin:0 auto;padding:24px}
+.top{
+  display:flex;justify-content:space-between;gap:14px;align-items:flex-start;flex-wrap:wrap;
+  margin-bottom:18px;
 }
-
+h1{margin:0 0 6px 0;font-size:clamp(1.5rem,2.6vw,2.2rem)}
+.sub{margin:0;color:var(--muted);max-width:860px}
 .panel{
-background:var(--panel);
-padding:22px;
-border-radius:var(--radius);
-box-shadow:var(--shadow);
-margin-top:20px;
+  background:linear-gradient(180deg, rgba(18,26,47,.96), rgba(15,23,48,.96));
+  border:1px solid var(--line);
+  border-radius:22px;
+  box-shadow:var(--shadow);
 }
-
-button{
-background:var(--accent);
-border:none;
-padding:10px 16px;
-color:white;
-border-radius:10px;
-cursor:pointer;
-margin:6px;
+.start-card,.end-card{padding:24px}
+.start-grid{
+  display:grid;grid-template-columns:1.1fr .9fr;gap:18px;
 }
+@media (max-width:900px){.start-grid{grid-template-columns:1fr}}
+label{display:block;font-weight:700;margin-bottom:8px}
+input[type="text"]{
+  width:100%;padding:14px 14px;border-radius:14px;border:1px solid var(--line);
+  background:#0f1730;color:var(--text);font-size:1rem;
+}
+.btn{
+  appearance:none;border:0;border-radius:14px;padding:12px 16px;font-weight:800;
+  cursor:pointer;background:linear-gradient(135deg,var(--accent),var(--accent2));color:white;
+  box-shadow:0 10px 24px rgba(0,0,0,.22);
+}
+.btn.secondary{
+  background:#18223f;border:1px solid var(--line);color:var(--text);box-shadow:none;
+}
+.btn.warn{
+  background:linear-gradient(135deg,#ffb347,#ff8f5c);
+}
+.small{font-size:.93rem;color:var(--muted)}
+.kicker{
+  display:inline-block;padding:8px 12px;border:1px solid var(--line);border-radius:999px;
+  color:#d9e5ff;background:rgba(255,255,255,.03);font-weight:700;font-size:.86rem;margin-bottom:10px;
+}
+.features{
+  display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:12px
+}
+.feature{
+  padding:12px;border-radius:14px;background:rgba(255,255,255,.03);border:1px solid var(--line);color:#dfe7fb
+}
+@media (max-width:700px){.features{grid-template-columns:1fr}}
 
-button:hover{opacity:.85}
+.game-shell{
+  display:grid;grid-template-columns:290px 1fr;gap:18px;
+}
+@media (max-width:980px){.game-shell{grid-template-columns:1fr}}
 
+.sidebar{padding:18px}
+.stat{
+  background:rgba(255,255,255,.03);
+  border:1px solid var(--line);
+  border-radius:16px;
+  padding:12px 14px;
+  margin-bottom:10px;
+}
+.stat .label{font-size:.8rem;color:var(--muted);text-transform:uppercase;letter-spacing:.05em}
+.stat .value{font-size:1.05rem;font-weight:800;margin-top:4px}
+.progress-wrap{
+  margin-top:14px;
+  background:rgba(255,255,255,.05);
+  border:1px solid var(--line);
+  border-radius:999px;
+  overflow:hidden;
+  height:16px;
+}
+.progress-bar{
+  height:100%;
+  width:0%;
+  background:linear-gradient(90deg,var(--accent),var(--good));
+  transition:width .25s ease;
+}
+.main{padding:20px}
+.passage{
+  background:rgba(255,255,255,.035);
+  border:1px solid var(--line);
+  border-radius:18px;
+  padding:16px 18px;
+  margin-bottom:16px;
+}
+.type-pill{
+  display:inline-block;
+  font-size:.78rem;font-weight:800;text-transform:uppercase;letter-spacing:.04em;
+  color:#d7e3ff;background:#17213f;border:1px solid var(--line);border-radius:999px;
+  padding:6px 10px;margin-bottom:10px;
+}
+.qtext{font-size:1.12rem;font-weight:800;line-height:1.35;margin:6px 0 10px}
+.direction{color:var(--warn);font-weight:800;margin:0 0 12px}
+.choices{display:grid;gap:10px}
 .choice{
-display:block;
-padding:10px;
-margin:8px 0;
-background:#1a2444;
-border-radius:8px;
-cursor:pointer;
+  display:block;width:100%;text-align:left;padding:14px 14px;border-radius:14px;
+  border:1px solid var(--line);background:#16213e;color:var(--text);cursor:pointer;
+  font-size:1rem;
 }
-
-.choice:hover{background:#263366}
-
-.correct{background:var(--good)!important}
-.incorrect{background:var(--bad)!important}
-
-.topbar{
-display:flex;
-justify-content:space-between;
-margin-bottom:14px;
-font-size:14px;
-color:var(--muted);
+.choice:hover{transform:translateY(-1px);background:#1a2748}
+.choice.disabled{pointer-events:none;opacity:.96}
+.choice.correct{background:rgba(43,213,118,.17);border-color:rgba(43,213,118,.55)}
+.choice.incorrect{background:rgba(255,92,122,.16);border-color:rgba(255,92,122,.55)}
+.checkrow{
+  display:flex;align-items:flex-start;gap:12px;padding:14px;border-radius:14px;
+  border:1px solid var(--line);background:#16213e;cursor:pointer;
 }
-
-.dragbox{
-padding:12px;
-background:#1a2444;
-margin:8px 0;
-border-radius:8px;
+.checkrow input,.drop-select{margin-top:2px}
+.checkrow:hover{background:#1a2748}
+.actions{display:flex;gap:10px;flex-wrap:wrap;margin-top:14px}
+.hint,.feedback{
+  margin-top:14px;padding:12px 14px;border-radius:14px;border:1px solid var(--line);
 }
-
-.dropzone{
-border:2px dashed #3a4a8a;
-padding:14px;
-margin:8px 0;
-border-radius:10px;
+.hint{background:rgba(255,209,102,.09);color:#ffe7aa}
+.feedback.good{background:rgba(43,213,118,.11);color:#b9f5cf}
+.feedback.bad{background:rgba(255,92,122,.10);color:#ffc3ce}
+.drop-select{
+  width:100%;padding:13px;border-radius:14px;background:#0f1730;color:var(--text);
+  border:1px solid var(--line);font-size:1rem;
 }
-
+.ticket{
+  font-family:var(--mono);
+  background:#0d1428;border:1px solid var(--line);border-radius:18px;
+  padding:16px;white-space:pre-wrap;color:#dce7ff
+}
+.end-actions{display:flex;gap:10px;flex-wrap:wrap;margin-top:16px}
+.score-big{font-size:1.2rem;font-weight:900}
+.note{color:var(--muted)}
+.hidden{display:none!important}
 </style>
 </head>
-
 <body>
-
 <div class="wrap">
+  <div class="top">
+    <div>
+      <div class="kicker">LEGEND • GOVERNMENT OST REVIEW</div>
+      <h1>Bill of Rights &amp; Constitutional Amendments Big Block Challenge</h1>
+      <p class="sub">
+        Mixed-format OST review for Content Statements 8–11. Practice Bill of Rights application,
+        Reconstruction Amendments, suffrage expansions, and constitutional changes to the Electoral
+        College and presidency.
+      </p>
+    </div>
+  </div>
 
-<h1>Bill of Rights & Constitutional Amendments Big Block Challenge</h1>
+  <!-- START -->
+  <section id="startScreen" class="panel start-card">
+    <div class="start-grid">
+      <div>
+        <label for="studentName">Student Name</label>
+        <input id="studentName" type="text" placeholder="Enter your name to begin" autocomplete="off" />
+        <div class="actions" style="margin-top:16px">
+          <button class="btn" id="startBtn">Start Challenge</button>
+        </div>
+        <p class="small" style="margin-top:12px">
+          Mastery target: work toward strong accuracy while practicing the exact question styles students
+          see on the Ohio OST.
+        </p>
+      </div>
 
-<div id="startPanel" class="panel">
-<label>Student Name:</label>
-<input id="studentName" style="width:100%;padding:10px;margin-top:6px;">
-<br><br>
-<button onclick="startGame()">Start Game</button>
-</div>
+      <div>
+        <div class="feature"><strong>36 questions</strong><br><span class="small">Expanded from 24 for better coverage</span></div>
+        <div class="features">
+          <div class="feature">MCQ</div>
+          <div class="feature">Multi-select</div>
+          <div class="feature">Dropdown</div>
+          <div class="feature">Part A / Part B</div>
+        </div>
+      </div>
+    </div>
+  </section>
 
-<div id="gamePanel" class="panel" style="display:none;">
+  <!-- GAME -->
+  <section id="gameScreen" class="game-shell hidden">
+    <aside class="panel sidebar">
+      <div class="stat">
+        <div class="label">Student</div>
+        <div class="value" id="statStudent">—</div>
+      </div>
 
-<div class="topbar">
-<div>Student: <span id="player"></span></div>
-<div>Question <span id="qNum"></span>/24</div>
-<div>Accuracy: <span id="accuracy">100%</span></div>
-<div>Time: <span id="timer">0</span>s</div>
-</div>
+      <div class="stat">
+        <div class="label">Progress</div>
+        <div class="value"><span id="statIndex">1</span> / <span id="statTotal">36</span></div>
+        <div class="progress-wrap"><div class="progress-bar" id="progressBar"></div></div>
+      </div>
 
-<div id="questionArea"></div>
+      <div class="stat">
+        <div class="label">Accuracy</div>
+        <div class="value" id="statAccuracy">100%</div>
+      </div>
 
-<div id="hint" style="color:var(--warn);margin-top:10px"></div>
+      <div class="stat">
+        <div class="label">Timer</div>
+        <div class="value" id="statTimer">00:00</div>
+      </div>
 
-</div>
+      <div class="stat">
+        <div class="label">Started</div>
+        <div class="value" id="statStarted">—</div>
+      </div>
 
-<div id="endPanel" class="panel" style="display:none;">
-<h2>Review Complete</h2>
-<p id="finalScore"></p>
-<button onclick="location.reload()">Restart Game</button>
-</div>
+      <div class="actions">
+        <button class="btn secondary" id="restartBtnSide" type="button">Restart Game</button>
+      </div>
+    </aside>
 
+    <main class="panel main">
+      <div id="questionMount"></div>
+    </main>
+  </section>
+
+  <!-- END -->
+  <section id="endScreen" class="panel end-card hidden">
+    <div class="score-big">Challenge Complete</div>
+    <p id="finalLine" class="note"></p>
+
+    <div class="ticket" id="ticketBox"></div>
+
+    <div class="end-actions">
+      <button class="btn" id="playAgainBtn" type="button">Play Again</button>
+      <button class="btn secondary" id="backTopBtn" type="button">Back to Top</button>
+    </div>
+  </section>
 </div>
 
 <script>
+/* =========================
+   QUESTION SET — 36 ITEMS
+   ========================= */
+const QUESTIONS = [
+  {
+    type: "mcq",
+    stem: "Which amendment most directly protects people from unreasonable searches and seizures by the government?",
+    choices: ["First Amendment", "Fourth Amendment", "Sixth Amendment", "Tenth Amendment"],
+    correct: 1,
+    hint: "Think warrants and probable cause."
+  },
+  {
+    type: "multi",
+    stem: "Which protections belong to the First Amendment?",
+    direction: "Select TWO answers.",
+    selectCount: 2,
+    choices: ["Freedom of speech", "Freedom of religion", "Protection from double jeopardy", "Right to counsel"],
+    correct: [0,1],
+    hint: "The First Amendment includes five core freedoms."
+  },
+  {
+    type: "mcq",
+    stem: "A police officer searches a person's home without probable cause and without a warrant. Which constitutional protection is most likely being violated?",
+    choices: ["Fourth Amendment", "Fifth Amendment", "Eighth Amendment", "Tenth Amendment"],
+    correct: 0,
+    hint: "Searches and seizures."
+  },
+  {
+    type: "dropdown",
+    stem: "Choose the amendment that protects a person from being tried twice for the same crime.",
+    options: ["Select an answer", "Fourth Amendment", "Fifth Amendment", "Sixth Amendment", "Eighth Amendment"],
+    correctValue: "Fifth Amendment",
+    hint: "This amendment also includes protection against self-incrimination."
+  },
+  {
+    type: "mcq",
+    stem: "Which amendment guarantees the right to a speedy and public trial by an impartial jury?",
+    choices: ["Second Amendment", "Fourth Amendment", "Sixth Amendment", "Eighth Amendment"],
+    correct: 2,
+    hint: "This amendment focuses on accused persons in criminal trials."
+  },
+  {
+    type: "mcq",
+    stem: "Which amendment protects people from cruel and unusual punishment?",
+    choices: ["Fourth Amendment", "Sixth Amendment", "Eighth Amendment", "Tenth Amendment"],
+    correct: 2,
+    hint: "Think punishments, not trials or searches."
+  },
+  {
+    type: "mcq",
+    stem: "Which amendment reserves powers not delegated to the federal government to the states or the people?",
+    choices: ["Fifth Amendment", "Eighth Amendment", "Tenth Amendment", "Fourteenth Amendment"],
+    correct: 2,
+    hint: "This amendment is tied closely to federalism."
+  },
+  {
+    type: "part",
+    passage: "A student newspaper publishes editorials criticizing a new school district policy. In response, a local official pressures the school to shut down the paper unless the criticism stops.",
+    partA: {
+      stem: "Part A: Which constitutional freedom is most directly involved?",
+      choices: ["Right to counsel", "Freedom of the press", "Protection from self-incrimination", "Protection from double jeopardy"],
+      correct: 1
+    },
+    partB: {
+      stem: "Part B: Which statement best explains why that freedom applies?",
+      choices: [
+        "It protects people from being searched without probable cause.",
+        "It protects citizens from excessive punishments.",
+        "It protects the ability to publish criticism of government actions.",
+        "It protects the right to vote at age 18."
+      ],
+      correct: 2
+    },
+    hint: "Think about one of the five First Amendment freedoms."
+  },
+  {
+    type: "mcq",
+    stem: "Which situation best demonstrates the right to petition the government?",
+    choices: [
+      "Writing lawmakers to request policy change",
+      "Serving on a jury",
+      "Carrying a licensed firearm",
+      "Refusing to answer a police question"
+    ],
+    correct: 0,
+    hint: "Petition means formally asking government to act."
+  },
+  {
+    type: "multi",
+    stem: "Which rights belong to the Sixth Amendment?",
+    direction: "Select THREE answers.",
+    selectCount: 3,
+    choices: [
+      "Right to confront witnesses",
+      "Right to counsel",
+      "Protection from unreasonable search and seizure",
+      "Right to a speedy and public trial"
+    ],
+    correct: [0,1,3],
+    hint: "This amendment focuses on trial rights of the accused."
+  },
+  {
+    type: "mcq",
+    stem: "Which amendment abolished slavery in the United States?",
+    choices: ["13th Amendment", "14th Amendment", "15th Amendment", "19th Amendment"],
+    correct: 0,
+    hint: "This is the first Reconstruction Amendment."
+  },
+  {
+    type: "mcq",
+    stem: "Which amendment defined citizenship as applying to all people born or naturalized in the United States?",
+    choices: ["13th Amendment", "14th Amendment", "15th Amendment", "24th Amendment"],
+    correct: 1,
+    hint: "This amendment also includes due process and equal protection."
+  },
+  {
+    type: "mcq",
+    stem: "Which clause in the Fourteenth Amendment requires states to treat people equally under the law?",
+    choices: ["Supremacy Clause", "Necessary and Proper Clause", "Equal Protection Clause", "Establishment Clause"],
+    correct: 2,
+    hint: "This clause is central to civil rights cases."
+  },
+  {
+    type: "multi",
+    stem: "Which protections came from the Reconstruction Amendments?",
+    direction: "Select THREE answers.",
+    selectCount: 3,
+    choices: [
+      "Abolition of slavery",
+      "Citizenship for people born in the U.S.",
+      "Equal protection of the laws",
+      "Lowering the voting age to 18"
+    ],
+    correct: [0,1,2],
+    hint: "The 26th Amendment is not part of Reconstruction."
+  },
+  {
+    type: "mcq",
+    stem: "Which amendment prohibited denying voting rights based on race, color, or previous condition of servitude?",
+    choices: ["14th Amendment", "15th Amendment", "19th Amendment", "26th Amendment"],
+    correct: 1,
+    hint: "This amendment directly addresses racial discrimination in voting."
+  },
+  {
+    type: "part",
+    passage: "After the Reconstruction Amendments were adopted, many Southern states created Jim Crow laws that enforced segregation and restricted African Americans' ability to fully exercise their rights.",
+    partA: {
+      stem: "Part A: What does this example best show?",
+      choices: [
+        "The Reconstruction Amendments immediately created full equality.",
+        "The amendments expanded protections, but the struggle for equality continued.",
+        "The federal government gave up all authority over civil rights.",
+        "The Fifteenth Amendment abolished slavery."
+      ],
+      correct: 1
+    },
+    partB: {
+      stem: "Part B: Which evidence best supports the answer to Part A?",
+      choices: [
+        "Jim Crow laws enforced segregation despite the new constitutional protections.",
+        "The Electoral College was revised by constitutional amendment.",
+        "States gained full power over citizenship questions.",
+        "Congress eliminated all court review of civil rights cases."
+      ],
+      correct: 0
+    },
+    hint: "The amendments mattered, but did not end discrimination overnight."
+  },
+  {
+    type: "mcq",
+    stem: "Which amendment granted women the right to vote?",
+    choices: ["15th Amendment", "19th Amendment", "24th Amendment", "26th Amendment"],
+    correct: 1,
+    hint: "Ratified in 1920."
+  },
+  {
+    type: "mcq",
+    stem: "Which amendment prohibited poll taxes in federal elections?",
+    choices: ["19th Amendment", "22nd Amendment", "24th Amendment", "25th Amendment"],
+    correct: 2,
+    hint: "Poll taxes were used to suppress voting, especially among African Americans and poor voters."
+  },
+  {
+    type: "mcq",
+    stem: "Which amendment lowered the voting age to 18?",
+    choices: ["22nd Amendment", "24th Amendment", "26th Amendment", "12th Amendment"],
+    correct: 2,
+    hint: "Think Vietnam era."
+  },
+  {
+    type: "multi",
+    stem: "Which amendments expanded voting rights to previously disenfranchised groups?",
+    direction: "Select FOUR answers.",
+    selectCount: 4,
+    choices: ["15th Amendment", "19th Amendment", "24th Amendment", "26th Amendment", "22nd Amendment"],
+    correct: [0,1,2,3],
+    hint: "One choice is about presidential term limits, not voting rights expansion."
+  },
+  {
+    type: "dropdown",
+    stem: "Choose the amendment that required separate ballots for president and vice president.",
+    options: ["Select an answer", "12th Amendment", "22nd Amendment", "23rd Amendment", "25th Amendment"],
+    correctValue: "12th Amendment",
+    hint: "This fixed an Electoral College problem."
+  },
+  {
+    type: "mcq",
+    stem: "Which amendment granted electoral votes to the District of Columbia?",
+    choices: ["12th Amendment", "22nd Amendment", "23rd Amendment", "25th Amendment"],
+    correct: 2,
+    hint: "This amendment expanded presidential voting participation to D.C."
+  },
+  {
+    type: "mcq",
+    stem: "Which amendment established presidential term limits?",
+    choices: ["22nd Amendment", "23rd Amendment", "24th Amendment", "25th Amendment"],
+    correct: 0,
+    hint: "This responded in part to Franklin Roosevelt serving four terms."
+  },
+  {
+    type: "mcq",
+    stem: "Which amendment addresses presidential succession and disability?",
+    choices: ["12th Amendment", "22nd Amendment", "23rd Amendment", "25th Amendment"],
+    correct: 3,
+    hint: "This amendment explains what happens when a president cannot serve."
+  },
+  {
+    type: "multi",
+    stem: "Which amendments changed the structure or function of the presidency or Electoral College?",
+    direction: "Select FOUR answers.",
+    selectCount: 4,
+    choices: ["12th Amendment", "22nd Amendment", "23rd Amendment", "25th Amendment", "26th Amendment"],
+    correct: [0,1,2,3],
+    hint: "One amendment is about voting age, not presidency/Electoral College structure."
+  },
+  {
+    type: "mcq",
+    stem: "Which situation best demonstrates the Fifth Amendment protection against self-incrimination?",
+    choices: [
+      "A defendant receives a jury trial",
+      "A suspect refuses to answer questions that may be used against him",
+      "A newspaper criticizes the government",
+      "A state runs its own public schools"
+    ],
+    correct: 1,
+    hint: "A person cannot be forced to testify against himself."
+  },
+  {
+    type: "mcq",
+    stem: "Which situation best illustrates the Tenth Amendment?",
+    choices: [
+      "Congress declares war",
+      "The president appoints ambassadors",
+      "A state government controls its own public schools",
+      "The Supreme Court hears an appeal"
+    ],
+    correct: 2,
+    hint: "Think reserved powers."
+  },
+  {
+    type: "mcq",
+    stem: "What was the main purpose of the Bill of Rights?",
+    choices: [
+      "To create the Electoral College",
+      "To limit the federal government and protect civil liberties",
+      "To weaken the states permanently",
+      "To create presidential term limits"
+    ],
+    correct: 1,
+    hint: "Civil liberties + limits on federal power."
+  },
+  {
+    type: "part",
+    passage: "A defendant is not told the charges against him, is denied an attorney, and is not allowed to question witnesses who testify against him.",
+    partA: {
+      stem: "Part A: Which amendment is most directly being violated?",
+      choices: ["Fourth Amendment", "Fifth Amendment", "Sixth Amendment", "Tenth Amendment"],
+      correct: 2
+    },
+    partB: {
+      stem: "Part B: Which evidence best supports the answer to Part A?",
+      choices: [
+        "The case involves jury selection, charges, witnesses, and legal counsel.",
+        "The case involves voting rights for women.",
+        "The case involves a warrant and probable cause.",
+        "The case involves powers reserved to states."
+      ],
+      correct: 0
+    },
+    hint: "Think trial rights of the accused."
+  },
+  {
+    type: "mcq",
+    stem: "Which statement best explains why the Reconstruction Amendments were significant?",
+    choices: [
+      "They expanded constitutional protections for African Americans after the Civil War.",
+      "They created presidential term limits and succession rules.",
+      "They eliminated the need for state governments.",
+      "They prohibited all future voting restrictions immediately."
+    ],
+    correct: 0,
+    hint: "These amendments addressed slavery, citizenship, equal protection, and voting rights."
+  },
+  {
+    type: "mcq",
+    stem: "Which statement best explains the purpose of the 24th Amendment?",
+    choices: [
+      "It guaranteed women the right to vote.",
+      "It prohibited poll taxes that could be used to restrict voting.",
+      "It granted electoral votes to Washington, D.C.",
+      "It lowered the voting age to 18."
+    ],
+    correct: 1,
+    hint: "Think about barriers to voting."
+  },
+  {
+    type: "dropdown",
+    stem: "Choose the amendment most directly tied to equal protection and due process being applied against state governments.",
+    options: ["Select an answer", "13th Amendment", "14th Amendment", "15th Amendment", "19th Amendment"],
+    correctValue: "14th Amendment",
+    hint: "This amendment is central to incorporation and civil rights."
+  },
+  {
+    type: "mcq",
+    stem: "Which scenario best demonstrates freedom of assembly?",
+    choices: [
+      "Citizens gathering peacefully at the statehouse to protest a policy",
+      "A suspect remaining silent during questioning",
+      "A jury delivering a verdict",
+      "A president nominating a judge"
+    ],
+    correct: 0,
+    hint: "Assembly means people gathering peacefully."
+  },
+  {
+    type: "multi",
+    stem: "Which are core protections found in the Bill of Rights?",
+    direction: "Select FOUR answers.",
+    selectCount: 4,
+    choices: [
+      "Freedom of speech",
+      "Protection against self-incrimination",
+      "Right to a speedy trial",
+      "Protection from cruel and unusual punishment",
+      "Presidential term limits"
+    ],
+    correct: [0,1,2,3],
+    hint: "One option is a later amendment, not part of the Bill of Rights."
+  },
+  {
+    type: "mcq",
+    stem: "Which amendment is most directly connected to ending slavery?",
+    choices: ["13th Amendment", "14th Amendment", "15th Amendment", "19th Amendment"],
+    correct: 0,
+    hint: "This was the first major constitutional protection in Reconstruction."
+  },
+  {
+    type: "part",
+    passage: "A campaign volunteer explains that one amendment expanded voting rights to women, another removed poll taxes as a voting barrier, and another lowered the voting age to 18.",
+    partA: {
+      stem: "Part A: What broad constitutional change is being described?",
+      choices: [
+        "Expansion of suffrage to disenfranchised groups",
+        "Expansion of presidential term limits",
+        "Creation of the Supreme Court",
+        "Elimination of state election systems"
+      ],
+      correct: 0
+    },
+    partB: {
+      stem: "Part B: Which set of amendments best matches the description?",
+      choices: [
+        "13th, 14th, 15th",
+        "12th, 22nd, 25th",
+        "19th, 24th, 26th",
+        "1st, 4th, 6th"
+      ],
+      correct: 2
+    },
+    hint: "Think suffrage expansions, not Reconstruction or presidency structure."
+  },
+  {
+    type: "mcq",
+    stem: "Why is it important on an OST multi-select question to choose exactly the number of answers requested?",
+    choices: [
+      "Because selecting fewer or more than required can reduce or eliminate earned credit",
+      "Because the state always gives full credit for any selection",
+      "Because all multi-select items are graded as essays",
+      "Because students may select every answer and still earn full points"
+    ],
+    correct: 0,
+    hint: "This is a test-taking skill as well as a content skill."
+  }
+];
 
-let q=0
-let correct=0
-let attempts=0
-let timer=0
-let clock
+/* =========================
+   STATE
+   ========================= */
+let currentIndex = 0;
+let correctCount = 0;
+let attempts = 0;
+let startTime = null;
+let timerInterval = null;
+let studentName = "";
+let finished = false;
 
-function startGame(){
-let name=document.getElementById("studentName").value
-document.getElementById("player").innerText=name
-document.getElementById("startPanel").style.display="none"
-document.getElementById("gamePanel").style.display="block"
+/* =========================
+   ELEMENTS
+   ========================= */
+const startScreen = document.getElementById("startScreen");
+const gameScreen = document.getElementById("gameScreen");
+const endScreen = document.getElementById("endScreen");
+const studentNameInput = document.getElementById("studentName");
+const startBtn = document.getElementById("startBtn");
+const restartBtnSide = document.getElementById("restartBtnSide");
+const playAgainBtn = document.getElementById("playAgainBtn");
+const backTopBtn = document.getElementById("backTopBtn");
 
-clock=setInterval(()=>{
-timer++
-document.getElementById("timer").innerText=timer
-},1000)
+const statStudent = document.getElementById("statStudent");
+const statIndex = document.getElementById("statIndex");
+const statTotal = document.getElementById("statTotal");
+const statAccuracy = document.getElementById("statAccuracy");
+const statTimer = document.getElementById("statTimer");
+const statStarted = document.getElementById("statStarted");
+const progressBar = document.getElementById("progressBar");
+const questionMount = document.getElementById("questionMount");
+const finalLine = document.getElementById("finalLine");
+const ticketBox = document.getElementById("ticketBox");
 
-loadQuestion()
+statTotal.textContent = QUESTIONS.length;
+
+/* =========================
+   HELPERS
+   ========================= */
+function formatDateTime(dt){
+  return dt.toLocaleString([], {
+    year: "numeric",
+    month: "numeric",
+    day: "numeric",
+    hour: "numeric",
+    minute: "2-digit",
+    second: "2-digit"
+  });
+}
+function pad(n){ return String(n).padStart(2,"0"); }
+function formatDuration(ms){
+  const totalSec = Math.max(0, Math.floor(ms/1000));
+  const mm = Math.floor(totalSec/60);
+  const ss = totalSec % 60;
+  return `${pad(mm)}:${pad(ss)}`;
+}
+function updateTimer(){
+  if(!startTime) return;
+  statTimer.textContent = formatDuration(Date.now() - startTime.getTime());
+}
+function updateHUD(){
+  statStudent.textContent = studentName || "—";
+  statIndex.textContent = Math.min(currentIndex + 1, QUESTIONS.length);
+  statAccuracy.textContent = attempts === 0 ? "100%" : `${Math.round((correctCount/attempts)*100)}%`;
+  progressBar.style.width = `${(currentIndex / QUESTIONS.length) * 100}%`;
+}
+function escapeHtml(str){
+  return str.replace(/[&<>"']/g, m => ({
+    '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'
+  }[m]));
+}
+function shuffleArray(arr){
+  const copy = arr.slice();
+  for(let i = copy.length - 1; i > 0; i--){
+    const j = Math.floor(Math.random() * (i + 1));
+    [copy[i], copy[j]] = [copy[j], copy[i]];
+  }
+  return copy;
+}
+function restartGame(){
+  clearInterval(timerInterval);
+  currentIndex = 0;
+  correctCount = 0;
+  attempts = 0;
+  finished = false;
+  startTime = null;
+  gameScreen.classList.add("hidden");
+  endScreen.classList.add("hidden");
+  startScreen.classList.remove("hidden");
+  studentNameInput.value = studentName;
+  questionMount.innerHTML = "";
+  progressBar.style.width = "0%";
+  statTimer.textContent = "00:00";
+  statStarted.textContent = "—";
+  updateHUD();
+  window.scrollTo({top:0,behavior:"smooth"});
+}
+function endGame(){
+  finished = true;
+  clearInterval(timerInterval);
+  const endTime = new Date();
+  const accuracy = attempts === 0 ? 100 : Math.round((correctCount/attempts)*100);
+  const runtime = formatDuration(endTime.getTime() - startTime.getTime());
+
+  finalLine.textContent = `${studentName} finished ${QUESTIONS.length} questions with ${accuracy}% accuracy.`;
+
+  ticketBox.textContent =
+`SUBMISSION TICKET
+Student: ${studentName}
+Game: Bill of Rights & Constitutional Amendments Big Block Challenge
+Questions Completed: ${QUESTIONS.length}
+Correct on First Correct-Advance: ${correctCount}
+Attempts: ${attempts}
+Accuracy: ${accuracy}%
+Started: ${formatDateTime(startTime)}
+Finished: ${formatDateTime(endTime)}
+Runtime: ${runtime}`;
+
+  gameScreen.classList.add("hidden");
+  endScreen.classList.remove("hidden");
+  progressBar.style.width = "100%";
+  window.scrollTo({top:0,behavior:"smooth"});
 }
 
-const questions=[
+/* =========================
+   RENDER
+   ========================= */
+function renderQuestion(){
+  updateHUD();
+  if(currentIndex >= QUESTIONS.length){
+    endGame();
+    return;
+  }
 
-{
-type:"mcq",
-q:"Which amendment protects citizens from unreasonable searches and seizures?",
-choices:[
-"First Amendment",
-"Fourth Amendment",
-"Sixth Amendment",
-"Tenth Amendment"
-],
-answer:1,
-hint:"This amendment requires warrants and probable cause."
-},
+  const q = QUESTIONS[currentIndex];
+  let html = "";
 
-{
-type:"multi",
-select:2,
-q:"Select TWO freedoms protected by the First Amendment.",
-choices:[
-"Speech",
-"Protection from self-incrimination",
-"Assembly",
-"Trial by jury"
-],
-answers:[0,2],
-hint:"Think of the five freedoms."
-},
+  if(q.type === "mcq"){
+    const indexed = q.choices.map((c,i)=>({text:c, correct:i===q.correct}));
+    const shuffled = shuffleArray(indexed);
 
-{
-type:"mcq",
-q:"Which amendment protects individuals from being tried twice for the same crime?",
-choices:[
-"Fourth Amendment",
-"Fifth Amendment",
-"Eighth Amendment",
-"Tenth Amendment"
-],
-answer:1,
-hint:"This amendment includes self-incrimination protection."
-},
+    html += `<div class="type-pill">MCQ</div>`;
+    html += `<div class="qtext">${escapeHtml(q.stem)}</div>`;
+    html += `<div class="choices">`;
+    shuffled.forEach((choice, idx)=>{
+      html += `<button class="choice" data-kind="mcq" data-correct="${choice.correct}" data-idx="${idx}">${escapeHtml(choice.text)}</button>`;
+    });
+    html += `</div>`;
+    html += `<div class="hint hidden" id="hintBox">${escapeHtml(q.hint)}</div>`;
+  }
 
-{
-type:"mcq",
-q:"Which amendment guarantees the right to a lawyer?",
-choices:[
-"First Amendment",
-"Fourth Amendment",
-"Sixth Amendment",
-"Eighth Amendment"
-],
-answer:2,
-hint:"This amendment deals with criminal trials."
-},
+  if(q.type === "dropdown"){
+    const opts = q.options.slice();
+    const first = opts.shift();
+    const shuffled = [first, ...shuffleArray(opts)];
 
-{
-type:"mcq",
-q:"Which amendment abolished slavery in the United States?",
-choices:[
-"13th Amendment",
-"14th Amendment",
-"15th Amendment",
-"19th Amendment"
-],
-answer:0,
-hint:"First of the Reconstruction Amendments."
-},
+    html += `<div class="type-pill">Dropdown</div>`;
+    html += `<div class="qtext">${escapeHtml(q.stem)}</div>`;
+    html += `<select class="drop-select" id="dropSelect">`;
+    shuffled.forEach(opt=>{
+      html += `<option value="${escapeHtml(opt)}">${escapeHtml(opt)}</option>`;
+    });
+    html += `</select>`;
+    html += `<div class="actions"><button class="btn" id="dropSubmitBtn" type="button">Submit Answer</button></div>`;
+    html += `<div class="hint hidden" id="hintBox">${escapeHtml(q.hint)}</div>`;
+  }
 
-{
-type:"multi",
-select:3,
-q:"Select THREE protections established by the Reconstruction Amendments.",
-choices:[
-"Abolishing slavery",
-"Equal protection of the law",
-"Citizenship for people born in the U.S.",
-"Lowering voting age to 18"
-],
-answers:[0,1,2],
-hint:"Three protections came after the Civil War."
-},
+  if(q.type === "multi"){
+    const indexed = q.choices.map((c,i)=>({text:c, original:i}));
+    const shuffled = shuffleArray(indexed);
 
-{
-type:"mcq",
-q:"Which amendment guarantees equal protection under the law?",
-choices:[
-"13th Amendment",
-"14th Amendment",
-"15th Amendment",
-"19th Amendment"
-],
-answer:1,
-hint:"This amendment expanded citizenship rights."
-},
+    html += `<div class="type-pill">Multi-Select</div>`;
+    html += `<div class="qtext">${escapeHtml(q.stem)}</div>`;
+    html += `<p class="direction">${escapeHtml(q.direction)}</p>`;
+    html += `<div class="choices">`;
+    shuffled.forEach((choice, idx)=>{
+      html += `
+        <label class="checkrow">
+          <input type="checkbox" value="${choice.original}">
+          <span>${escapeHtml(choice.text)}</span>
+        </label>
+      `;
+    });
+    html += `</div>`;
+    html += `<div class="actions"><button class="btn" id="multiSubmitBtn" type="button">Submit Answer</button></div>`;
+    html += `<div class="hint hidden" id="hintBox">${escapeHtml(q.hint)}</div>`;
+    html += `<div class="feedback hidden" id="feedbackBox"></div>`;
+  }
 
-{
-type:"mcq",
-q:"Which amendment prohibited denying voting rights based on race?",
-choices:[
-"15th Amendment",
-"19th Amendment",
-"24th Amendment",
-"26th Amendment"
-],
-answer:0,
-hint:"Part of Reconstruction."
-},
+  if(q.type === "part"){
+    const aIndexed = q.partA.choices.map((c,i)=>({text:c, correct:i===q.partA.correct}));
+    const bIndexed = q.partB.choices.map((c,i)=>({text:c, correct:i===q.partB.correct}));
+    const aShuffled = shuffleArray(aIndexed);
+    const bShuffled = shuffleArray(bIndexed);
 
-{
-type:"multi",
-select:4,
-q:"Select FOUR amendments that expanded voting rights.",
-choices:[
-"15th Amendment",
-"19th Amendment",
-"24th Amendment",
-"26th Amendment",
-"22nd Amendment"
-],
-answers:[0,1,2,3],
-hint:"One option relates to presidential terms."
-},
+    html += `<div class="type-pill">Part A / Part B</div>`;
+    html += `<div class="passage"><strong>Passage</strong><br><br>${escapeHtml(q.passage)}</div>`;
 
-{
-type:"mcq",
-q:"Which amendment granted women the right to vote?",
-choices:[
-"15th Amendment",
-"19th Amendment",
-"23rd Amendment",
-"26th Amendment"
-],
-answer:1,
-hint:"Passed in 1920."
-},
+    html += `<div class="qtext">${escapeHtml(q.partA.stem)}</div>`;
+    html += `<div class="choices" id="partAChoices">`;
+    aShuffled.forEach((choice, idx)=>{
+      html += `<button class="choice" data-kind="partA" data-correct="${choice.correct}" data-idx="${idx}">${escapeHtml(choice.text)}</button>`;
+    });
+    html += `</div>`;
 
-{
-type:"mcq",
-q:"Which amendment lowered the voting age to 18?",
-choices:[
-"22nd Amendment",
-"23rd Amendment",
-"26th Amendment",
-"24th Amendment"
-],
-answer:2,
-hint:"Adopted during the Vietnam War era."
-},
+    html += `<div id="partBWrap" class="hidden" style="margin-top:18px">`;
+    html += `<div class="qtext">${escapeHtml(q.partB.stem)}</div>`;
+    html += `<div class="choices" id="partBChoices">`;
+    bShuffled.forEach((choice, idx)=>{
+      html += `<button class="choice" data-kind="partB" data-correct="${choice.correct}" data-idx="${idx}">${escapeHtml(choice.text)}</button>`;
+    });
+    html += `</div></div>`;
 
-{
-type:"mcq",
-q:"Which amendment gave Washington D.C. electoral votes?",
-choices:[
-"12th Amendment",
-"22nd Amendment",
-"23rd Amendment",
-"25th Amendment"
-],
-answer:2,
-hint:"This allowed residents of D.C. to vote for president."
-},
+    html += `<div class="hint hidden" id="hintBox">${escapeHtml(q.hint)}</div>`;
+    html += `<div class="feedback hidden" id="feedbackBox"></div>`;
+  }
 
-{
-type:"mcq",
-q:"Which amendment established presidential term limits?",
-choices:[
-"22nd Amendment",
-"23rd Amendment",
-"24th Amendment",
-"25th Amendment"
-],
-answer:0,
-hint:"Passed after Franklin Roosevelt served four terms."
-},
-
-{
-type:"mcq",
-q:"Which amendment clarified presidential succession and disability?",
-choices:[
-"22nd Amendment",
-"23rd Amendment",
-"25th Amendment",
-"12th Amendment"
-],
-answer:2,
-hint:"It explains what happens if the president cannot serve."
-},
-
-{
-type:"mcq",
-q:"Which amendment created separate ballots for president and vice president?",
-choices:[
-"12th Amendment",
-"22nd Amendment",
-"23rd Amendment",
-"25th Amendment"
-],
-answer:0,
-hint:"This fixed an Electoral College tie issue."
-},
-
-{
-type:"mcq",
-q:"Which amendment protects citizens from cruel and unusual punishment?",
-choices:[
-"Sixth Amendment",
-"Eighth Amendment",
-"Fourth Amendment",
-"Tenth Amendment"
-],
-answer:1,
-hint:"Think punishments that are excessive."
-},
-
-{
-type:"mcq",
-q:"Which amendment states powers not given to the federal government belong to the states?",
-choices:[
-"Ninth Amendment",
-"Tenth Amendment",
-"Eleventh Amendment",
-"Fourth Amendment"
-],
-answer:1,
-hint:"Important for federalism."
-},
-
-{
-type:"mcq",
-q:"Which situation best shows the First Amendment?",
-choices:[
-"A jury trial",
-"A protest criticizing government policy",
-"A police search with warrant",
-"A senator voting on a bill"
-],
-answer:1,
-hint:"Think expression of ideas."
-},
-
-{
-type:"mcq",
-q:"Which situation best demonstrates the Fifth Amendment?",
-choices:[
-"A suspect refuses to testify against himself",
-"A newspaper prints an editorial",
-"A jury deliberates in court",
-"A state runs elections"
-],
-answer:0,
-hint:"Self-incrimination."
-},
-
-{
-type:"mcq",
-q:"Which situation demonstrates the Sixth Amendment?",
-choices:[
-"A defendant receives a public trial",
-"A police officer obtains a warrant",
-"A governor signs a bill",
-"A citizen votes in an election"
-],
-answer:0,
-hint:"Think courtroom rights."
-},
-
-{
-type:"mcq",
-q:"Which situation demonstrates the Fourth Amendment?",
-choices:[
-"Police search a house with no warrant",
-"Police search with probable cause and warrant",
-"A judge hears a case",
-"A jury announces a verdict"
-],
-answer:1,
-hint:"Searches must be justified."
-},
-
-{
-type:"mcq",
-q:"Which situation shows the Tenth Amendment in action?",
-choices:[
-"Congress regulates trade",
-"A state controls its public schools",
-"The president signs a treaty",
-"The Supreme Court reviews a law"
-],
-answer:1,
-hint:"State powers."
-},
-
-{
-type:"mcq",
-q:"Why did African Americans still face discrimination after Reconstruction?",
-choices:[
-"The amendments were repealed",
-"Jim Crow laws enforced segregation",
-"Citizenship protections were removed",
-"Voting rights ended"
-],
-answer:1,
-hint:"State segregation laws."
-},
-
-{
-type:"mcq",
-q:"What was the main purpose of the Bill of Rights?",
-choices:[
-"Strengthen the presidency",
-"Limit federal government and protect liberties",
-"Eliminate state governments",
-"Create the Electoral College"
-],
-answer:1,
-hint:"Civil liberties."
+  questionMount.innerHTML = html;
+  wireQuestionHandlers(q);
+  window.scrollTo({top:0,behavior:"smooth"});
 }
 
-]
-
-function loadQuestion(){
-
-if(q>=questions.length){
-clearInterval(clock)
-document.getElementById("gamePanel").style.display="none"
-document.getElementById("endPanel").style.display="block"
-document.getElementById("finalScore").innerText=
-"Final Accuracy: "+Math.round(correct/attempts*100)+"%"
-return
+/* =========================
+   QUESTION LOGIC
+   ========================= */
+function advanceQuestion(){
+  currentIndex += 1;
+  renderQuestion();
 }
 
-let data=questions[q]
-document.getElementById("qNum").innerText=q+1
-document.getElementById("hint").innerText=""
-
-let html="<h3>"+data.q+"</h3>"
-
-if(data.type==="mcq"){
-data.choices.forEach((c,i)=>{
-html+=`<div class="choice" onclick="checkMCQ(${i})">${c}</div>`
-})
+function showHint(){
+  const hint = document.getElementById("hintBox");
+  if(hint) hint.classList.remove("hidden");
+}
+function showFeedback(text, good=false){
+  const box = document.getElementById("feedbackBox");
+  if(!box) return;
+  box.textContent = text;
+  box.className = `feedback ${good ? "good" : "bad"}`;
 }
 
-if(data.type==="multi"){
-html+=`<p><em>Select ${data.select} answers</em></p>`
-data.choices.forEach((c,i)=>{
-html+=`<label class="choice"><input type="checkbox" value="${i}"> ${c}</label>`
-})
-html+=`<button onclick="submitMulti()">Submit</button>`
+function wireQuestionHandlers(q){
+  if(q.type === "mcq"){
+    document.querySelectorAll('[data-kind="mcq"]').forEach(btn=>{
+      btn.addEventListener("click", ()=>{
+        attempts++;
+        const isCorrect = btn.dataset.correct === "true";
+        if(isCorrect){
+          correctCount++;
+          btn.classList.add("correct","disabled");
+          updateHUD();
+          setTimeout(advanceQuestion, 350);
+        }else{
+          btn.classList.add("incorrect","disabled");
+          showHint();
+          updateHUD();
+        }
+      });
+    });
+  }
+
+  if(q.type === "dropdown"){
+    const submitBtn = document.getElementById("dropSubmitBtn");
+    const select = document.getElementById("dropSelect");
+    submitBtn.addEventListener("click", ()=>{
+      attempts++;
+      const isCorrect = select.value === q.correctValue;
+      if(isCorrect){
+        correctCount++;
+        updateHUD();
+        setTimeout(advanceQuestion, 250);
+      }else{
+        showHint();
+        updateHUD();
+      }
+    });
+  }
+
+  if(q.type === "multi"){
+    const submitBtn = document.getElementById("multiSubmitBtn");
+    submitBtn.addEventListener("click", ()=>{
+      const checked = [...document.querySelectorAll('.checkrow input:checked')].map(el => Number(el.value)).sort((a,b)=>a-b);
+      attempts++;
+
+      if(checked.length !== q.selectCount){
+        showFeedback(`You were told to select exactly ${q.selectCount}. You selected ${checked.length}.`);
+        showHint();
+        updateHUD();
+        return;
+      }
+
+      const correctSorted = q.correct.slice().sort((a,b)=>a-b);
+      const isCorrect = JSON.stringify(checked) === JSON.stringify(correctSorted);
+
+      if(isCorrect){
+        correctCount++;
+        showFeedback("Correct.", true);
+        updateHUD();
+        setTimeout(advanceQuestion, 350);
+      }else{
+        showFeedback("Not quite. Re-read the directions and choices carefully.");
+        showHint();
+        updateHUD();
+      }
+    });
+  }
+
+  if(q.type === "part"){
+    let partAComplete = false;
+
+    document.querySelectorAll('[data-kind="partA"]').forEach(btn=>{
+      btn.addEventListener("click", ()=>{
+        if(partAComplete) return;
+        attempts++;
+        const isCorrect = btn.dataset.correct === "true";
+        if(isCorrect){
+          correctCount++;
+          partAComplete = true;
+          btn.classList.add("correct","disabled");
+          document.querySelectorAll('[data-kind="partA"]').forEach(b=>b.classList.add("disabled"));
+          document.getElementById("partBWrap").classList.remove("hidden");
+          showFeedback("Part A correct. Now answer Part B.", true);
+          updateHUD();
+        }else{
+          btn.classList.add("incorrect","disabled");
+          showHint();
+          updateHUD();
+        }
+      });
+    });
+
+    document.querySelectorAll('[data-kind="partB"]').forEach(btn=>{
+      btn.addEventListener("click", ()=>{
+        if(!partAComplete) return;
+        attempts++;
+        const isCorrect = btn.dataset.correct === "true";
+        if(isCorrect){
+          correctCount++;
+          btn.classList.add("correct","disabled");
+          updateHUD();
+          setTimeout(advanceQuestion, 350);
+        }else{
+          btn.classList.add("incorrect","disabled");
+          showHint();
+          updateHUD();
+        }
+      });
+    });
+  }
 }
 
-document.getElementById("questionArea").innerHTML=html
-}
+/* =========================
+   START / RESTART
+   ========================= */
+startBtn.addEventListener("click", ()=>{
+  const raw = studentNameInput.value.trim();
+  if(!raw){
+    alert("Please enter your name before starting.");
+    studentNameInput.focus();
+    return;
+  }
 
-function checkMCQ(choice){
+  studentName = raw;
+  startTime = new Date();
+  statStarted.textContent = formatDateTime(startTime);
 
-attempts++
+  currentIndex = 0;
+  correctCount = 0;
+  attempts = 0;
+  finished = false;
 
-let data=questions[q]
+  startScreen.classList.add("hidden");
+  endScreen.classList.add("hidden");
+  gameScreen.classList.remove("hidden");
 
-if(choice===data.answer){
-correct++
-q++
-updateAccuracy()
-loadQuestion()
-}else{
-document.getElementById("hint").innerText=data.hint
-}
-}
+  updateHUD();
+  updateTimer();
+  clearInterval(timerInterval);
+  timerInterval = setInterval(updateTimer, 1000);
 
-function submitMulti(){
+  renderQuestion();
+});
 
-attempts++
+restartBtnSide.addEventListener("click", restartGame);
+playAgainBtn.addEventListener("click", restartGame);
+backTopBtn.addEventListener("click", ()=>window.scrollTo({top:0,behavior:"smooth"}));
 
-let data=questions[q]
-
-let checked=[...document.querySelectorAll("input[type=checkbox]:checked")].map(x=>parseInt(x.value))
-
-if(JSON.stringify(checked.sort())===JSON.stringify(data.answers.sort())){
-correct++
-q++
-updateAccuracy()
-loadQuestion()
-}else{
-document.getElementById("hint").innerText=data.hint
-}
-}
-
-function updateAccuracy(){
-let acc=Math.round(correct/attempts*100)
-document.getElementById("accuracy").innerText=acc+"%"
-}
-
+studentNameInput.addEventListener("keydown", (e)=>{
+  if(e.key === "Enter") startBtn.click();
+});
 </script>
-
 </body>
 </html>
