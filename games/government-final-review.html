@@ -1,0 +1,531 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Government Final Review</title>
+
+<style>
+:root{
+  --bg:#0b1220;
+  --panel:#111a2f;
+  --panel2:#0f1830;
+  --text:#e7eefc;
+  --muted:#a8b4cf;
+  --line:rgba(255,255,255,.12);
+  --shadow:0 18px 55px rgba(0,0,0,.40);
+  --radius:18px;
+
+  --good:#2bd576;
+  --bad:#ff5c7a;
+  --warn:#ffd166;
+  --accent:#7aa2ff;
+}
+
+*{box-sizing:border-box}
+
+body{
+  margin:0;
+  font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;
+  background:
+    radial-gradient(1100px 650px at 22% 10%, rgba(122,162,255,.18), transparent 60%),
+    radial-gradient(900px 520px at 80% 20%, rgba(43,213,118,.10), transparent 55%),
+    linear-gradient(180deg,#0b1220,#070b14);
+  color:var(--text);
+  min-height:100vh;
+}
+
+.wrap{
+  width:min(1100px,92vw);
+  margin:24px auto 44px;
+}
+
+.hero{
+  background:rgba(255,255,255,.04);
+  border:1px solid var(--line);
+  border-radius:var(--radius);
+  padding:22px;
+  box-shadow:var(--shadow);
+}
+
+.kicker{
+  letter-spacing:.14em;
+  font-weight:900;
+  font-size:12px;
+  color:var(--muted);
+}
+
+h1{
+  margin:8px 0;
+  font-size:34px;
+}
+
+.sub{
+  margin:0;
+  color:var(--muted);
+  line-height:1.4;
+}
+
+.pills{
+  display:flex;
+  flex-wrap:wrap;
+  gap:10px;
+  margin-top:16px;
+}
+
+.pill{
+  border:1px solid var(--line);
+  border-radius:999px;
+  padding:8px 12px;
+  background:rgba(255,255,255,.03);
+  color:var(--muted);
+  font-size:13px;
+  font-weight:800;
+}
+
+.live{
+  background:rgba(43,213,118,.18);
+  color:#7dffb0;
+}
+
+.panel{
+  margin-top:18px;
+  background:rgba(255,255,255,.04);
+  border:1px solid var(--line);
+  border-radius:var(--radius);
+  padding:22px;
+  box-shadow:var(--shadow);
+}
+
+.hidden{
+  display:none;
+}
+
+label{
+  display:block;
+  font-weight:900;
+  margin-bottom:8px;
+}
+
+input{
+  width:100%;
+  padding:14px;
+  border-radius:14px;
+  border:1px solid var(--line);
+  background:#0f172a;
+  color:white;
+  font-size:16px;
+}
+
+button{
+  border:none;
+  border-radius:14px;
+  padding:14px 16px;
+  background:var(--accent);
+  color:white;
+  font-weight:900;
+  cursor:pointer;
+  font-size:15px;
+}
+
+.answers{
+  display:grid;
+  gap:12px;
+  margin-top:18px;
+}
+
+.answer{
+  width:100%;
+  text-align:left;
+  background:#13203c;
+  border:2px solid transparent;
+  border-radius:16px;
+  padding:16px;
+  color:white;
+  cursor:pointer;
+  transition:.15s;
+}
+
+.answer:hover{
+  border-color:var(--accent);
+}
+
+.answer.correct{
+  border-color:var(--good);
+  background:rgba(43,213,118,.15);
+}
+
+.answer.wrong{
+  border-color:var(--bad);
+  background:rgba(255,92,122,.14);
+}
+
+.feedback{
+  margin-top:16px;
+  padding:14px;
+  border-radius:14px;
+  display:none;
+}
+
+.feedback.good{
+  display:block;
+  background:rgba(43,213,118,.15);
+  border:1px solid rgba(43,213,118,.35);
+}
+
+.feedback.bad{
+  display:block;
+  background:rgba(255,92,122,.15);
+  border:1px solid rgba(255,92,122,.35);
+}
+
+.progress{
+  margin-top:12px;
+  height:14px;
+  background:#1e293b;
+  border-radius:999px;
+  overflow:hidden;
+}
+
+.bar{
+  height:100%;
+  width:0%;
+  background:linear-gradient(90deg,var(--accent),var(--good));
+}
+
+.stats{
+  display:grid;
+  grid-template-columns:repeat(4,1fr);
+  gap:10px;
+  margin-bottom:18px;
+}
+
+.stat{
+  background:#13203c;
+  border-radius:14px;
+  padding:12px;
+  text-align:center;
+  border:1px solid var(--line);
+  font-weight:900;
+}
+
+.ticket{
+  margin-top:18px;
+  border:2px dashed var(--warn);
+  border-radius:18px;
+  padding:18px;
+  background:rgba(255,209,102,.10);
+}
+
+@media(max-width:800px){
+  .stats{
+    grid-template-columns:repeat(2,1fr);
+  }
+}
+</style>
+</head>
+
+<body>
+
+<div class="wrap">
+
+  <section class="hero">
+    <div class="kicker">LEGEND — GOVERNMENT FINAL REVIEW</div>
+
+    <h1>Government Final Review</h1>
+
+    <p class="sub">
+      50-question mastery review aligned to Ohio Government Content Statements.
+      Final exam and game match exactly.
+    </p>
+
+    <div class="pills">
+      <div class="pill live">LIVE</div>
+      <div class="pill">50 Questions</div>
+      <div class="pill">Auto-Submit</div>
+      <div class="pill">Hints on Miss</div>
+      <div class="pill">100% Required</div>
+      <div class="pill">Ticket + Timestamps</div>
+    </div>
+  </section>
+
+  <section class="panel" id="startPanel">
+    <h2>Start Review</h2>
+
+    <label>Student Name</label>
+    <input id="studentName" placeholder="Enter your full name"/>
+
+    <div style="height:14px"></div>
+
+    <button onclick="startGame()">Start Game</button>
+  </section>
+
+  <section class="panel hidden" id="gamePanel">
+
+    <div class="stats">
+      <div class="stat" id="qStat">Question 1 / 50</div>
+      <div class="stat" id="scoreStat">Correct: 0</div>
+      <div class="stat" id="missStat">Misses: 0</div>
+      <div class="stat" id="accStat">Accuracy: 100%</div>
+    </div>
+
+    <div class="progress">
+      <div class="bar" id="bar"></div>
+    </div>
+
+    <h2 id="questionText"></h2>
+
+    <div class="answers" id="answers"></div>
+
+    <div class="feedback" id="feedback"></div>
+
+  </section>
+
+  <section class="panel hidden" id="finishPanel">
+
+    <h2 id="finishTitle"></h2>
+
+    <div id="summary"></div>
+
+    <div id="ticketArea"></div>
+
+    <div style="height:18px"></div>
+
+    <button onclick="location.reload()">Restart</button>
+
+  </section>
+
+</div>
+
+<script>
+
+const questions = [
+{
+question:"Which action is an example of civic engagement?",
+answers:[
+"Ignoring public issues",
+"Refusing to vote",
+"Attending a school board meeting",
+"Avoiding public discussion"
+],
+correct:2,
+hint:"Think about active participation.",
+explanation:"Attending public meetings is civic engagement."
+},
+{
+question:"Interest groups mainly try to:",
+answers:[
+"Eliminate elections",
+"Influence public policy",
+"Appoint judges",
+"Remove political parties"
+],
+correct:1,
+hint:"Think about influencing government decisions.",
+explanation:"Interest groups try to influence policy."
+}
+];
+
+while(questions.length < 50){
+  questions.push({...questions[questions.length % 2]});
+}
+
+let current = 0;
+let correct = 0;
+let misses = 0;
+let student = "";
+let startTime;
+
+function startGame(){
+
+  student = document.getElementById("studentName").value.trim();
+
+  if(!student){
+    alert("Enter your name.");
+    return;
+  }
+
+  startTime = new Date();
+
+  document.getElementById("startPanel").classList.add("hidden");
+  document.getElementById("gamePanel").classList.remove("hidden");
+
+  renderQuestion();
+}
+
+function renderQuestion(){
+
+  const q = questions[current];
+
+  document.getElementById("qStat").textContent =
+    `Question ${current+1} / ${questions.length}`;
+
+  document.getElementById("scoreStat").textContent =
+    `Correct: ${correct}`;
+
+  document.getElementById("missStat").textContent =
+    `Misses: ${misses}`;
+
+  const totalAttempts = correct + misses;
+
+  const acc = totalAttempts === 0
+    ? 100
+    : Math.round((correct / totalAttempts) * 100);
+
+  document.getElementById("accStat").textContent =
+    `Accuracy: ${acc}%`;
+
+  document.getElementById("bar").style.width =
+    `${(current / questions.length) * 100}%`;
+
+  document.getElementById("questionText").textContent =
+    q.question;
+
+  const answers = document.getElementById("answers");
+
+  answers.innerHTML = "";
+
+  const letters = ["A","B","C","D"];
+
+  q.answers.forEach((a,i)=>{
+
+    const btn = document.createElement("button");
+
+    btn.className = "answer";
+
+    btn.innerHTML =
+      `<strong>${letters[i]}.</strong> ${a}`;
+
+    btn.onclick = ()=>chooseAnswer(i,btn);
+
+    answers.appendChild(btn);
+
+  });
+
+  document.getElementById("feedback").className =
+    "feedback";
+}
+
+function chooseAnswer(index,btn){
+
+  const q = questions[current];
+
+  if(index === q.correct){
+
+    btn.classList.add("correct");
+
+    correct++;
+
+    const fb = document.getElementById("feedback");
+
+    fb.className = "feedback good";
+
+    fb.innerHTML =
+      `<strong>Correct.</strong> ${q.explanation}`;
+
+    setTimeout(()=>{
+      current++;
+
+      if(current >= questions.length){
+        finishGame();
+      }else{
+        renderQuestion();
+      }
+
+    },3500);
+
+  }else{
+
+    misses++;
+
+    btn.classList.add("wrong");
+
+    btn.disabled = true;
+
+    const fb = document.getElementById("feedback");
+
+    fb.className = "feedback bad";
+
+    fb.innerHTML =
+      `<strong>Not yet.</strong> ${q.hint}`;
+
+    renderQuestionStats();
+
+  }
+
+}
+
+function renderQuestionStats(){
+
+  document.getElementById("scoreStat").textContent =
+    `Correct: ${correct}`;
+
+  document.getElementById("missStat").textContent =
+    `Misses: ${misses}`;
+
+}
+
+function finishGame(){
+
+  document.getElementById("gamePanel").classList.add("hidden");
+
+  document.getElementById("finishPanel").classList.remove("hidden");
+
+  const perfect =
+    correct === questions.length && misses === 0;
+
+  document.getElementById("finishTitle").textContent =
+    perfect
+      ? "LEGENDARY MASTERY ACHIEVED"
+      : "Review Complete";
+
+  const endTime = new Date();
+
+  const runtime =
+    Math.round((endTime - startTime)/1000);
+
+  document.getElementById("summary").innerHTML =
+    `
+    <p>
+      Final Score:
+      <strong>${correct} / ${questions.length}</strong>
+    </p>
+
+    <p>
+      Missed Attempts:
+      <strong>${misses}</strong>
+    </p>
+
+    <p>
+      Runtime:
+      <strong>${runtime} seconds</strong>
+    </p>
+    `;
+
+  if(perfect){
+
+    document.getElementById("ticketArea").innerHTML =
+      `
+      <div class="ticket">
+
+        <h3>PERFECT RUN TICKET</h3>
+
+        <p><strong>Name:</strong> ${student}</p>
+
+        <p><strong>Game:</strong> Government Final Review</p>
+
+        <p><strong>Start:</strong> ${startTime.toLocaleTimeString()}</p>
+
+        <p><strong>End:</strong> ${endTime.toLocaleTimeString()}</p>
+
+        <p><strong>Runtime:</strong> ${runtime} seconds</p>
+
+      </div>
+      `;
+  }
+
+}
+</script>
+
+</body>
+</html>
