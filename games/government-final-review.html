@@ -1,531 +1,74 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Government Final Review</title>
-
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Government Final Review</title>
 <style>
-:root{
-  --bg:#0b1220;
-  --panel:#111a2f;
-  --panel2:#0f1830;
-  --text:#e7eefc;
-  --muted:#a8b4cf;
-  --line:rgba(255,255,255,.12);
-  --shadow:0 18px 55px rgba(0,0,0,.40);
-  --radius:18px;
-
-  --good:#2bd576;
-  --bad:#ff5c7a;
-  --warn:#ffd166;
-  --accent:#7aa2ff;
-}
-
-*{box-sizing:border-box}
-
-body{
-  margin:0;
-  font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;
-  background:
-    radial-gradient(1100px 650px at 22% 10%, rgba(122,162,255,.18), transparent 60%),
-    radial-gradient(900px 520px at 80% 20%, rgba(43,213,118,.10), transparent 55%),
-    linear-gradient(180deg,#0b1220,#070b14);
-  color:var(--text);
-  min-height:100vh;
-}
-
-.wrap{
-  width:min(1100px,92vw);
-  margin:24px auto 44px;
-}
-
-.hero{
-  background:rgba(255,255,255,.04);
-  border:1px solid var(--line);
-  border-radius:var(--radius);
-  padding:22px;
-  box-shadow:var(--shadow);
-}
-
-.kicker{
-  letter-spacing:.14em;
-  font-weight:900;
-  font-size:12px;
-  color:var(--muted);
-}
-
-h1{
-  margin:8px 0;
-  font-size:34px;
-}
-
-.sub{
-  margin:0;
-  color:var(--muted);
-  line-height:1.4;
-}
-
-.pills{
-  display:flex;
-  flex-wrap:wrap;
-  gap:10px;
-  margin-top:16px;
-}
-
-.pill{
-  border:1px solid var(--line);
-  border-radius:999px;
-  padding:8px 12px;
-  background:rgba(255,255,255,.03);
-  color:var(--muted);
-  font-size:13px;
-  font-weight:800;
-}
-
-.live{
-  background:rgba(43,213,118,.18);
-  color:#7dffb0;
-}
-
-.panel{
-  margin-top:18px;
-  background:rgba(255,255,255,.04);
-  border:1px solid var(--line);
-  border-radius:var(--radius);
-  padding:22px;
-  box-shadow:var(--shadow);
-}
-
-.hidden{
-  display:none;
-}
-
-label{
-  display:block;
-  font-weight:900;
-  margin-bottom:8px;
-}
-
-input{
-  width:100%;
-  padding:14px;
-  border-radius:14px;
-  border:1px solid var(--line);
-  background:#0f172a;
-  color:white;
-  font-size:16px;
-}
-
-button{
-  border:none;
-  border-radius:14px;
-  padding:14px 16px;
-  background:var(--accent);
-  color:white;
-  font-weight:900;
-  cursor:pointer;
-  font-size:15px;
-}
-
-.answers{
-  display:grid;
-  gap:12px;
-  margin-top:18px;
-}
-
-.answer{
-  width:100%;
-  text-align:left;
-  background:#13203c;
-  border:2px solid transparent;
-  border-radius:16px;
-  padding:16px;
-  color:white;
-  cursor:pointer;
-  transition:.15s;
-}
-
-.answer:hover{
-  border-color:var(--accent);
-}
-
-.answer.correct{
-  border-color:var(--good);
-  background:rgba(43,213,118,.15);
-}
-
-.answer.wrong{
-  border-color:var(--bad);
-  background:rgba(255,92,122,.14);
-}
-
-.feedback{
-  margin-top:16px;
-  padding:14px;
-  border-radius:14px;
-  display:none;
-}
-
-.feedback.good{
-  display:block;
-  background:rgba(43,213,118,.15);
-  border:1px solid rgba(43,213,118,.35);
-}
-
-.feedback.bad{
-  display:block;
-  background:rgba(255,92,122,.15);
-  border:1px solid rgba(255,92,122,.35);
-}
-
-.progress{
-  margin-top:12px;
-  height:14px;
-  background:#1e293b;
-  border-radius:999px;
-  overflow:hidden;
-}
-
-.bar{
-  height:100%;
-  width:0%;
-  background:linear-gradient(90deg,var(--accent),var(--good));
-}
-
-.stats{
-  display:grid;
-  grid-template-columns:repeat(4,1fr);
-  gap:10px;
-  margin-bottom:18px;
-}
-
-.stat{
-  background:#13203c;
-  border-radius:14px;
-  padding:12px;
-  text-align:center;
-  border:1px solid var(--line);
-  font-weight:900;
-}
-
-.ticket{
-  margin-top:18px;
-  border:2px dashed var(--warn);
-  border-radius:18px;
-  padding:18px;
-  background:rgba(255,209,102,.10);
-}
-
-@media(max-width:800px){
-  .stats{
-    grid-template-columns:repeat(2,1fr);
-  }
-}
+:root{--bg:#0b1220;--panel:#111a2f;--text:#e7eefc;--muted:#a8b4cf;--line:rgba(255,255,255,.12);--shadow:0 18px 55px rgba(0,0,0,.40);--radius:18px;--good:#2bd576;--bad:#ff5c7a;--warn:#ffd166;--accent:#7aa2ff}*{box-sizing:border-box}body{margin:0;font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;background:radial-gradient(1100px 650px at 22% 10%,rgba(122,162,255,.18),transparent 60%),radial-gradient(900px 520px at 80% 20%,rgba(43,213,118,.10),transparent 55%),linear-gradient(180deg,#0b1220,#070b14);color:var(--text);min-height:100vh}.wrap{width:min(1100px,92vw);margin:24px auto 44px}.hero,.panel{background:rgba(255,255,255,.04);border:1px solid var(--line);border-radius:var(--radius);padding:22px;box-shadow:var(--shadow)}.kicker{letter-spacing:.14em;font-weight:900;font-size:12px;color:var(--muted)}h1{margin:8px 0;font-size:34px}.sub{margin:0;color:var(--muted);line-height:1.4}.pills{display:flex;flex-wrap:wrap;gap:10px;margin-top:16px}.pill{border:1px solid var(--line);border-radius:999px;padding:8px 12px;background:rgba(255,255,255,.03);color:var(--muted);font-size:13px;font-weight:800}.live{background:rgba(43,213,118,.18);color:#7dffb0}.panel{margin-top:18px}.hidden{display:none!important}label{display:block;font-weight:900;margin-bottom:8px}input{width:100%;padding:14px;border-radius:14px;border:1px solid var(--line);background:#0f172a;color:white;font-size:16px}button{border:none;border-radius:14px;padding:14px 16px;background:var(--accent);color:white;font-weight:900;cursor:pointer;font-size:15px}.answers{display:grid;gap:12px;margin-top:18px}.answer{width:100%;text-align:left;background:#13203c;border:2px solid transparent;border-radius:16px;padding:16px;color:white;cursor:pointer;transition:.15s}.answer:hover{border-color:var(--accent)}.answer.correct{border-color:var(--good);background:rgba(43,213,118,.15)}.answer.wrong{border-color:var(--bad);background:rgba(255,92,122,.14)}.feedback{margin-top:16px;padding:14px;border-radius:14px;display:none;line-height:1.4}.feedback.good{display:block;background:rgba(43,213,118,.15);border:1px solid rgba(43,213,118,.35)}.feedback.bad{display:block;background:rgba(255,92,122,.15);border:1px solid rgba(255,92,122,.35)}.progress{margin-top:12px;height:14px;background:#1e293b;border-radius:999px;overflow:hidden}.bar{height:100%;width:0%;background:linear-gradient(90deg,var(--accent),var(--good));transition:.25s}.stats{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:18px}.stat{background:#13203c;border-radius:14px;padding:12px;text-align:center;border:1px solid var(--line);font-weight:900}.ticket{margin-top:18px;border:2px dashed var(--warn);border-radius:18px;padding:18px;background:rgba(255,209,102,.10)}.errorbox{display:none;margin-top:12px;background:#7f1d1d;color:white;padding:12px;border-radius:12px;white-space:pre-wrap}@media(max-width:800px){.stats{grid-template-columns:repeat(2,1fr)}}
 </style>
 </head>
-
 <body>
-
 <div class="wrap">
-
-  <section class="hero">
-    <div class="kicker">LEGEND — GOVERNMENT FINAL REVIEW</div>
-
-    <h1>Government Final Review</h1>
-
-    <p class="sub">
-      50-question mastery review aligned to Ohio Government Content Statements.
-      Final exam and game match exactly.
-    </p>
-
-    <div class="pills">
-      <div class="pill live">LIVE</div>
-      <div class="pill">50 Questions</div>
-      <div class="pill">Auto-Submit</div>
-      <div class="pill">Hints on Miss</div>
-      <div class="pill">100% Required</div>
-      <div class="pill">Ticket + Timestamps</div>
-    </div>
-  </section>
-
-  <section class="panel" id="startPanel">
-    <h2>Start Review</h2>
-
-    <label>Student Name</label>
-    <input id="studentName" placeholder="Enter your full name"/>
-
-    <div style="height:14px"></div>
-
-    <button onclick="startGame()">Start Game</button>
-  </section>
-
-  <section class="panel hidden" id="gamePanel">
-
-    <div class="stats">
-      <div class="stat" id="qStat">Question 1 / 50</div>
-      <div class="stat" id="scoreStat">Correct: 0</div>
-      <div class="stat" id="missStat">Misses: 0</div>
-      <div class="stat" id="accStat">Accuracy: 100%</div>
-    </div>
-
-    <div class="progress">
-      <div class="bar" id="bar"></div>
-    </div>
-
-    <h2 id="questionText"></h2>
-
-    <div class="answers" id="answers"></div>
-
-    <div class="feedback" id="feedback"></div>
-
-  </section>
-
-  <section class="panel hidden" id="finishPanel">
-
-    <h2 id="finishTitle"></h2>
-
-    <div id="summary"></div>
-
-    <div id="ticketArea"></div>
-
-    <div style="height:18px"></div>
-
-    <button onclick="location.reload()">Restart</button>
-
-  </section>
-
+<section class="hero"><div class="kicker">LEGEND — GOVERNMENT FINAL REVIEW</div><h1>Government Final Review</h1><p class="sub">50-question mastery review aligned to Ohio Government Content Statements. Final exam and game match exactly.</p><div class="pills"><div class="pill live">LIVE</div><div class="pill">50 Questions</div><div class="pill">Auto-Submit</div><div class="pill">Hints on Miss</div><div class="pill">100% Required</div><div class="pill">Ticket + Timestamps</div></div></section>
+<section class="panel" id="startPanel"><h2>Start Review</h2><label for="studentName">Student Name</label><input id="studentName" placeholder="Enter your full name"/><div style="height:14px"></div><button id="startBtn">Start Game</button><div id="errorbox" class="errorbox"></div></section>
+<section class="panel hidden" id="gamePanel"><div class="stats"><div class="stat" id="qStat">Question 1 / 50</div><div class="stat" id="scoreStat">Correct: 0</div><div class="stat" id="missStat">Misses: 0</div><div class="stat" id="accStat">Accuracy: 100%</div></div><div class="progress"><div class="bar" id="bar"></div></div><p id="csTag" class="pill" style="display:inline-block;margin-top:16px"></p><h2 id="questionText"></h2><div class="answers" id="answers"></div><div class="feedback" id="feedback"></div></section>
+<section class="panel hidden" id="finishPanel"><h2 id="finishTitle"></h2><div id="summary"></div><div id="ticketArea"></div><div style="height:18px"></div><button onclick="location.reload()">Restart</button></section>
 </div>
-
 <script>
-
 const questions = [
-{
-question:"Which action is an example of civic engagement?",
-answers:[
-"Ignoring public issues",
-"Refusing to vote",
-"Attending a school board meeting",
-"Avoiding public discussion"
-],
-correct:2,
-hint:"Think about active participation.",
-explanation:"Attending public meetings is civic engagement."
-},
-{
-question:"Interest groups mainly try to:",
-answers:[
-"Eliminate elections",
-"Influence public policy",
-"Appoint judges",
-"Remove political parties"
-],
-correct:1,
-hint:"Think about influencing government decisions.",
-explanation:"Interest groups try to influence policy."
-}
+{id:1,cs:"CS1",question:"Which action is an example of civic engagement?",answers:["Ignoring public issues","Refusing to vote","Attending a school board meeting","Avoiding public discussion"],correct:2,hint:"Think about active participation in government or public issues.",explanation:"Attending a school board meeting is civic engagement because it involves participating in a public-policy issue."},
+{id:2,cs:"CS2",question:"Interest groups mainly try to:",answers:["Eliminate elections","Influence public policy","Appoint judges","Remove political parties"],correct:1,hint:"Think about groups that share views and try to affect government decisions.",explanation:"Interest groups seek to influence the making and execution of public policy."},
+{id:3,cs:"CS3",question:"A credible source should include:",answers:["Unsupported opinions","Anonymous authors","Evidence and logical conclusions","Emotional arguments only"],correct:2,hint:"Think about what makes information reliable and verifiable.",explanation:"Credible sources use supporting evidence, logical conclusions, consistency, and reliable authorship."},
+{id:4,cs:"CS4",question:"Compromise helps democracy because it:",answers:["Ends all disagreement forever","Prevents discussion","Allows one side total control","Helps groups reach agreements"],correct:3,hint:"Think about how people settle differences in a democracy.",explanation:"Compromise helps people and groups reach agreement when they disagree."},
+{id:5,cs:"CS5",question:"Popular sovereignty means:",answers:["Kings hold power","Government gets power from the people","Judges control elections","Congress controls states"],correct:1,hint:"Think about consent of the governed.",explanation:"Popular sovereignty means government authority comes from the people."},
+{id:6,cs:"CS6",question:"Federalists supported:",answers:["A weak national government","Elimination of taxation","Ratification of the Constitution","State supremacy only"],correct:2,hint:"Think about the group that favored the Constitution.",explanation:"Federalists supported ratification and a stronger national government."},
+{id:7,cs:"CS7",question:"Judicial review allows the Supreme Court to:",answers:["Create taxes","Declare actions unconstitutional","Command the military","Ratify amendments"],correct:1,hint:"Think about the Court checking laws and actions against the Constitution.",explanation:"Judicial review allows the Supreme Court to declare laws or government actions unconstitutional."},
+{id:8,cs:"CS8",question:"The 1st Amendment protects:",answers:["Trial by jury","Freedom of speech","Quartering troops","Voting at age 18"],correct:1,hint:"Think about one of the five First Amendment freedoms.",explanation:"The First Amendment protects speech, religion, press, assembly, and petition."},
+{id:9,cs:"CS9",question:"The 14th Amendment guaranteed:",answers:["Presidential term limits","Equal protection under the law","Direct election of senators","Lower taxes"],correct:1,hint:"Think about citizenship, due process, and equal protection.",explanation:"The 14th Amendment extended citizenship and guaranteed due process and equal protection."},
+{id:10,cs:"CS10",question:"Which amendment gave women the right to vote?",answers:["15th Amendment","22nd Amendment","26th Amendment","19th Amendment"],correct:3,hint:"Think about women’s suffrage.",explanation:"The 19th Amendment prohibited denying voting rights based on gender."},
+{id:11,cs:"CS11",question:"The 25th Amendment addresses:",answers:["Presidential succession","Poll taxes","Suffrage for women","Freedom of religion"],correct:0,hint:"Think about what happens if a president dies, resigns, or is disabled.",explanation:"The 25th Amendment deals with presidential succession and disability."},
+{id:12,cs:"CS12",question:"The legislative branch is responsible for:",answers:["Enforcing laws","Interpreting laws","Making laws","Conducting elections"],correct:2,hint:"Think about Congress.",explanation:"The legislative branch makes laws, declares war, and imposes taxes."},
+{id:13,cs:"CS13",question:"A presidential veto is an example of:",answers:["Federalism","Checks and balances","Judicial review","Popular sovereignty"],correct:1,hint:"Think about one branch limiting another branch.",explanation:"A veto allows the executive branch to check the legislative branch."},
+{id:14,cs:"CS14",question:"Paying taxes is an example of:",answers:["Judicial activism","Civic responsibility","Executive privilege","Lobbying"],correct:1,hint:"Think about responsibilities of citizenship.",explanation:"Paying taxes is a civic responsibility that helps support government services."},
+{id:15,cs:"CS15",question:"Brown v. Board of Education helped:",answers:["Expand segregation","Eliminate voting rights","Extend civil rights","Limit incorporation"],correct:2,hint:"Think about school segregation and equal protection.",explanation:"Brown v. Board of Education helped extend civil rights by ruling school segregation unconstitutional."},
+{id:16,cs:"CS16",question:"One difference between the Ohio and U.S. Constitutions is that Ohio:",answers:["Has no bill of rights","Elects judges","Has no executive branch","Does not allow voting"],correct:1,hint:"Think about how Ohio selects judges compared with the federal system.",explanation:"Ohio elects judges, while federal judges are appointed."},
+{id:17,cs:"CS17",question:"Signing a petition is one way Ohio citizens can:",answers:["Avoid civic involvement","Influence government action","Remove the Constitution","Eliminate taxes"],correct:1,hint:"Think about citizens helping state or local government address issues.",explanation:"Signing petitions allows Ohio citizens to influence government action and ballot issues."},
+{id:18,cs:"CS18",question:"Public policy issues often involve:",answers:["Only one branch of government","No public debate","Collaboration or conflict among branches","Elimination of local government"],correct:2,hint:"Think about multiple levels and branches working together or disagreeing.",explanation:"Public policy issues may involve collaboration or conflict among levels and branches of government."},
+{id:19,cs:"CS19",question:"Lobbying legislators is a method used to:",answers:["Influence public policy","Eliminate courts","Suspend elections","Remove amendments"],correct:0,hint:"Think about individuals and organizations communicating with lawmakers.",explanation:"Lobbying legislators is a way to influence public policy."},
+{id:20,cs:"CS20",question:"Fiscal policy involves government decisions about:",answers:["Jury trials","Taxing and spending","Judicial appointments","Immigration only"],correct:1,hint:"Think about how government uses money to affect the economy.",explanation:"Fiscal policy involves taxing and spending decisions to influence economic conditions."},
+{id:21,cs:"CS21",question:"To encourage economic growth, the Federal Reserve may:",answers:["Raise interest rates","Sell bonds","Increase reserve requirements","Buy bonds"],correct:3,hint:"Think about adding money into the economy.",explanation:"Buying bonds can increase the money supply and encourage economic growth."},
+{id:22,cs:"CS2",question:"A political party primarily seeks to:",answers:["Interpret laws","Win elections and influence policy","Appoint judges directly","Eliminate media influence"],correct:1,hint:"Think about elections and public policy.",explanation:"Political parties try to win elections so their members can hold office and shape policy."},
+{id:23,cs:"CS3",question:"Which source would MOST likely be considered credible?",answers:["Anonymous online rumor","Meme without evidence","Government report with cited evidence","Social media comment"],correct:2,hint:"Think about evidence, authorship, and reliability.",explanation:"A government report with cited evidence is more credible than anonymous or unsupported claims."},
+{id:24,cs:"CS4",question:"Consensus building helps democracy by:",answers:["Encouraging cooperation","Preventing discussion","Eliminating compromise","Weakening participation"],correct:0,hint:"Think about reaching agreement as a group.",explanation:"Consensus building encourages cooperation and helps groups reach shared decisions."},
+{id:25,cs:"CS5",question:"Separation of powers divides government authority among:",answers:["Citizens only","Political parties only","Independent branches","Foreign governments"],correct:2,hint:"Think about legislative, executive, and judicial powers.",explanation:"Separation of powers divides authority among the three branches of government."},
+{id:26,cs:"CS6",question:"Anti-Federalists wanted:",answers:["Stronger monarchy","A Bill of Rights","Elimination of states","Higher tariffs only"],correct:1,hint:"Think about protections against national government power.",explanation:"Anti-Federalists wanted a Bill of Rights to protect individual liberties."},
+{id:27,cs:"CS7",question:"Legislative oversight is an example of:",answers:["Informal constitutional practice","Executive privilege","Judicial restraint","State supremacy"],correct:0,hint:"Think about a practice not specifically detailed but used by Congress.",explanation:"Legislative oversight is an informal practice that helps Congress monitor the executive branch."},
+{id:28,cs:"CS8",question:"The 4th Amendment protects against:",answers:["Double jeopardy","Unreasonable searches and seizures","Cruel punishment","Self-incrimination"],correct:1,hint:"Think about searches, seizures, warrants, and probable cause.",explanation:"The 4th Amendment protects against unreasonable searches and seizures."},
+{id:29,cs:"CS9",question:"Jim Crow laws limited:",answers:["Segregation","Civil rights for African Americans","Federal taxation","Jury trials"],correct:1,hint:"Think about racial discrimination after Reconstruction.",explanation:"Jim Crow laws enforced segregation and limited civil rights for African Americans."},
+{id:30,cs:"CS10",question:"The 24th Amendment addressed:",answers:["Poll taxes","Presidential succession","Free speech","Jury trials"],correct:0,hint:"Think about a barrier that kept poor citizens, especially African Americans, from voting.",explanation:"The 24th Amendment prohibited poll taxes in federal elections."},
+{id:31,cs:"CS11",question:"The Electoral College was modified by the:",answers:["19th Amendment","25th Amendment","12th Amendment","10th Amendment"],correct:2,hint:"Think about separate ballots for president and vice president.",explanation:"The 12th Amendment changed Electoral College procedures by separating votes for president and vice president."},
+{id:32,cs:"CS12",question:"The executive branch enforces laws through:",answers:["Executive orders","Judicial review","Impeachment","Treaties only"],correct:0,hint:"Think about a power used by presidents and governors to direct enforcement.",explanation:"The executive branch enforces law and may issue executive orders."},
+{id:33,cs:"CS13",question:"Senate approval of treaties is an example of:",answers:["Popular sovereignty","Checks on executive power","Judicial activism","Federal supremacy"],correct:1,hint:"Think about the legislative branch checking the executive branch.",explanation:"The Senate checks executive power by approving or rejecting treaties."},
+{id:34,cs:"CS14",question:"Serving on a jury is connected to the:",answers:["Right to jury trial","Right to bear arms","Electoral College","Interstate commerce clause"],correct:0,hint:"Think about a responsibility tied to a constitutional right.",explanation:"Serving on juries is a responsibility connected to the right to a jury trial."},
+{id:35,cs:"CS15",question:"The Voting Rights Act was intended to:",answers:["Expand voting access","Limit suffrage","End federal elections","Remove amendments"],correct:0,hint:"Think about federal action to protect minority voting rights.",explanation:"The Voting Rights Act helped protect and expand access to voting."},
+{id:36,cs:"CS17",question:"Ohio citizens can help local government by:",answers:["Avoiding public meetings","Organizing civic activities","Ignoring community problems","Eliminating commissions"],correct:1,hint:"Think about local civic participation.",explanation:"Organizing civic activities is one way citizens assist local government and communities."},
+{id:37,cs:"CS18",question:"County commissions are examples of:",answers:["Local government entities","Federal courts","National agencies","International organizations"],correct:0,hint:"Think about county-level decision making.",explanation:"County commissions are local government entities that help address public policy issues."},
+{id:38,cs:"CS19",question:"Letter-writing campaigns are used to:",answers:["Influence government policy","Eliminate media","Avoid participation","Remove elections"],correct:0,hint:"Think about citizens communicating with public officials.",explanation:"Letter-writing campaigns are a method individuals and organizations use to influence policy."},
+{id:39,cs:"CS20",question:"Increased government spending is often used to:",answers:["Slow economic growth","Encourage economic growth","Eliminate taxes","End regulation"],correct:1,hint:"Think about putting more money into the economy.",explanation:"Increased government spending can encourage economic growth."},
+{id:40,cs:"CS21",question:"Monetary policy focuses on the nation’s:",answers:["Court system","Voting laws","Money supply","Foreign alliances"],correct:2,hint:"Think about the Federal Reserve.",explanation:"Monetary policy involves Federal Reserve decisions about the money supply."},
+{id:41,cs:"CS2",question:"Interest groups often use media to:",answers:["Influence public opinion","Eliminate voting","Control courts","Appoint officials"],correct:0,hint:"Think about communication with the public.",explanation:"Interest groups use media to shape public opinion and influence policy."},
+{id:42,cs:"CS3",question:"Internal consistency is important when evaluating:",answers:["Campaign slogans only","Source credibility","Political parties only","Elections only"],correct:1,hint:"Think about whether a source’s claims fit together logically.",explanation:"Internal consistency is a factor used to evaluate credibility."},
+{id:43,cs:"CS5",question:"Federalism divides power between:",answers:["National and state governments","Political parties","Interest groups","Media outlets"],correct:0,hint:"Think about two levels of government under the Constitution.",explanation:"Federalism divides power between national and state governments."},
+{id:44,cs:"CS8",question:"The 10th Amendment reserves powers to:",answers:["Congress only","The president only","States or the people","Foreign governments"],correct:2,hint:"Think about powers not delegated to the federal government.",explanation:"The 10th Amendment reserves powers to the states or the people."},
+{id:45,cs:"CS10",question:"The 15th Amendment prohibited denying voting rights based on:",answers:["Age","Gender","Race","Property ownership"],correct:2,hint:"Think about Reconstruction and voting rights.",explanation:"The 15th Amendment prohibited denying voting rights based on race, color, or previous condition of servitude."},
+{id:46,cs:"CS13",question:"Impeachment is a power held by the:",answers:["Judicial branch only","Executive branch only","Legislative branch","Federal Reserve"],correct:2,hint:"Think about Congress checking officials in other branches.",explanation:"The legislative branch has impeachment powers."},
+{id:47,cs:"CS14",question:"The doctrine of incorporation applied most protections in the Bill of Rights to:",answers:["Foreign governments","State governments","Political parties","Interest groups"],correct:1,hint:"Think about the 14th Amendment due process clause.",explanation:"Incorporation applies most Bill of Rights protections to state and local governments."},
+{id:48,cs:"CS19",question:"Public demonstrations are intended to:",answers:["Influence policy decisions","Eliminate free speech","Remove amendments","Suspend elections"],correct:0,hint:"Think about citizens publicly expressing support or opposition.",explanation:"Public demonstrations are a method of influencing public policy."},
+{id:49,cs:"CS20",question:"Government regulations may provide:",answers:["Consumer protections","Elimination of competition","Guaranteed profits","Unlimited spending"],correct:0,hint:"Think about benefits of regulation.",explanation:"Regulations may provide benefits such as consumer protections and fair business practices."},
+{id:50,cs:"CS21",question:"Lower interest rates generally encourage:",answers:["Less borrowing","Economic growth","Higher unemployment","Reduced investment"],correct:1,hint:"Think about how cheaper borrowing affects spending and investment.",explanation:"Lower interest rates usually encourage borrowing, spending, investment, and economic growth."}
 ];
-
-while(questions.length < 50){
-  questions.push({...questions[questions.length % 2]});
-}
-
-let current = 0;
-let correct = 0;
-let misses = 0;
-let student = "";
-let startTime;
-
-function startGame(){
-
-  student = document.getElementById("studentName").value.trim();
-
-  if(!student){
-    alert("Enter your name.");
-    return;
-  }
-
-  startTime = new Date();
-
-  document.getElementById("startPanel").classList.add("hidden");
-  document.getElementById("gamePanel").classList.remove("hidden");
-
-  renderQuestion();
-}
-
-function renderQuestion(){
-
-  const q = questions[current];
-
-  document.getElementById("qStat").textContent =
-    `Question ${current+1} / ${questions.length}`;
-
-  document.getElementById("scoreStat").textContent =
-    `Correct: ${correct}`;
-
-  document.getElementById("missStat").textContent =
-    `Misses: ${misses}`;
-
-  const totalAttempts = correct + misses;
-
-  const acc = totalAttempts === 0
-    ? 100
-    : Math.round((correct / totalAttempts) * 100);
-
-  document.getElementById("accStat").textContent =
-    `Accuracy: ${acc}%`;
-
-  document.getElementById("bar").style.width =
-    `${(current / questions.length) * 100}%`;
-
-  document.getElementById("questionText").textContent =
-    q.question;
-
-  const answers = document.getElementById("answers");
-
-  answers.innerHTML = "";
-
-  const letters = ["A","B","C","D"];
-
-  q.answers.forEach((a,i)=>{
-
-    const btn = document.createElement("button");
-
-    btn.className = "answer";
-
-    btn.innerHTML =
-      `<strong>${letters[i]}.</strong> ${a}`;
-
-    btn.onclick = ()=>chooseAnswer(i,btn);
-
-    answers.appendChild(btn);
-
-  });
-
-  document.getElementById("feedback").className =
-    "feedback";
-}
-
-function chooseAnswer(index,btn){
-
-  const q = questions[current];
-
-  if(index === q.correct){
-
-    btn.classList.add("correct");
-
-    correct++;
-
-    const fb = document.getElementById("feedback");
-
-    fb.className = "feedback good";
-
-    fb.innerHTML =
-      `<strong>Correct.</strong> ${q.explanation}`;
-
-    setTimeout(()=>{
-      current++;
-
-      if(current >= questions.length){
-        finishGame();
-      }else{
-        renderQuestion();
-      }
-
-    },3500);
-
-  }else{
-
-    misses++;
-
-    btn.classList.add("wrong");
-
-    btn.disabled = true;
-
-    const fb = document.getElementById("feedback");
-
-    fb.className = "feedback bad";
-
-    fb.innerHTML =
-      `<strong>Not yet.</strong> ${q.hint}`;
-
-    renderQuestionStats();
-
-  }
-
-}
-
-function renderQuestionStats(){
-
-  document.getElementById("scoreStat").textContent =
-    `Correct: ${correct}`;
-
-  document.getElementById("missStat").textContent =
-    `Misses: ${misses}`;
-
-}
-
-function finishGame(){
-
-  document.getElementById("gamePanel").classList.add("hidden");
-
-  document.getElementById("finishPanel").classList.remove("hidden");
-
-  const perfect =
-    correct === questions.length && misses === 0;
-
-  document.getElementById("finishTitle").textContent =
-    perfect
-      ? "LEGENDARY MASTERY ACHIEVED"
-      : "Review Complete";
-
-  const endTime = new Date();
-
-  const runtime =
-    Math.round((endTime - startTime)/1000);
-
-  document.getElementById("summary").innerHTML =
-    `
-    <p>
-      Final Score:
-      <strong>${correct} / ${questions.length}</strong>
-    </p>
-
-    <p>
-      Missed Attempts:
-      <strong>${misses}</strong>
-    </p>
-
-    <p>
-      Runtime:
-      <strong>${runtime} seconds</strong>
-    </p>
-    `;
-
-  if(perfect){
-
-    document.getElementById("ticketArea").innerHTML =
-      `
-      <div class="ticket">
-
-        <h3>PERFECT RUN TICKET</h3>
-
-        <p><strong>Name:</strong> ${student}</p>
-
-        <p><strong>Game:</strong> Government Final Review</p>
-
-        <p><strong>Start:</strong> ${startTime.toLocaleTimeString()}</p>
-
-        <p><strong>End:</strong> ${endTime.toLocaleTimeString()}</p>
-
-        <p><strong>Runtime:</strong> ${runtime} seconds</p>
-
-      </div>
-      `;
-  }
-
-}
+let current=0,correct=0,misses=0,student="",startTime,locked=false;const $=id=>document.getElementById(id);window.addEventListener("error",e=>{const box=$("errorbox");if(box){box.style.display="block";box.textContent="Runtime error: "+e.message+"\nLine: "+e.lineno;}});function startGame(){student=$("studentName").value.trim();if(!student){$("errorbox").style.display="block";$("errorbox").textContent="Enter your name before starting.";return}startTime=new Date();$("startPanel").classList.add("hidden");$("gamePanel").classList.remove("hidden");renderQuestion()}function renderQuestion(){locked=false;const q=questions[current];$("qStat").textContent=`Question ${current+1} / ${questions.length}`;$("scoreStat").textContent=`Correct: ${correct}`;$("missStat").textContent=`Misses: ${misses}`;const attempts=correct+misses;$("accStat").textContent=`Accuracy: ${attempts===0?100:Math.round((correct/attempts)*100)}%`;$("bar").style.width=`${(current/questions.length)*100}%`;$("csTag").textContent=q.cs;$("questionText").textContent=q.question;$("feedback").className="feedback";$("feedback").textContent="";const answers=$("answers");answers.innerHTML="";["A","B","C","D"].forEach((letter,i)=>{const btn=document.createElement("button");btn.className="answer";btn.innerHTML=`<strong>${letter}.</strong> ${q.answers[i]}`;btn.onclick=()=>chooseAnswer(i,btn);answers.appendChild(btn)})}function updateStats(){$("scoreStat").textContent=`Correct: ${correct}`;$("missStat").textContent=`Misses: ${misses}`;const attempts=correct+misses;$("accStat").textContent=`Accuracy: ${attempts===0?100:Math.round((correct/attempts)*100)}%`}function chooseAnswer(index,btn){if(locked)return;const q=questions[current];if(index===q.correct){locked=true;btn.classList.add("correct");correct++;updateStats();const fb=$("feedback");fb.className="feedback good";fb.innerHTML=`<strong>Correct.</strong> ${q.explanation}`;setTimeout(()=>{current++;if(current>=questions.length)finishGame();else renderQuestion()},4200)}else{misses++;btn.classList.add("wrong");btn.disabled=true;updateStats();const fb=$("feedback");fb.className="feedback bad";fb.innerHTML=`<strong>Not yet.</strong> ${q.hint}`}}function finishGame(){const endTime=new Date();$("gamePanel").classList.add("hidden");$("finishPanel").classList.remove("hidden");const perfect=correct===questions.length&&misses===0;const runtimeSeconds=Math.round((endTime-startTime)/1000);const minutes=Math.floor(runtimeSeconds/60);const seconds=runtimeSeconds%60;const runtimeText=`${minutes} min ${seconds} sec`;$("finishTitle").textContent=perfect?"LEGENDARY MASTERY ACHIEVED":"Review Complete";$("summary").innerHTML=`<p>Final Score: <strong>${correct} / ${questions.length}</strong></p><p>Missed Attempts: <strong>${misses}</strong></p><p>Runtime: <strong>${runtimeText}</strong></p>`;if(perfect){$("ticketArea").innerHTML=`<div class="ticket"><h3>PERFECT RUN TICKET</h3><p><strong>Name:</strong> ${student}</p><p><strong>Game:</strong> Government Final Review</p><p><strong>Date:</strong> ${endTime.toLocaleDateString()}</p><p><strong>Start:</strong> ${startTime.toLocaleTimeString()}</p><p><strong>End:</strong> ${endTime.toLocaleTimeString()}</p><p><strong>Runtime:</strong> ${runtimeText}</p><p><strong>Score:</strong> 50 / 50, 0 misses</p></div>`}else{$("ticketArea").innerHTML=`<div class="feedback bad" style="display:block">No mastery ticket generated. Restart and complete a perfect run with 0 missed attempts.</div>`}}$("startBtn").addEventListener("click",startGame);$("studentName").addEventListener("keydown",e=>{if(e.key==="Enter")startGame()});
 </script>
-
 </body>
 </html>
