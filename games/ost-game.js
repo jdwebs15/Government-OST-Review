@@ -101,7 +101,7 @@ function render(){
       const redraw=()=>{
         list.replaceChildren(...picked.map(i=>node('li',p.choices[i])));
         pool.replaceChildren(...order.filter(i=>!picked.includes(i)).map(i=>{
-          const b=node('button',p.choices[i]);b.type='button';b.onclick=()=>{picked.push(i);redraw();};
+          const b=node('button',p.choices[i]);b.type='button';b.onclick=()=>{picked.push(i);redraw();checkResponse();};
           return b;
         }));
       };
@@ -112,11 +112,13 @@ function render(){
       const select=node('select');select.setAttribute('aria-label',p.prompt||q.prompt);
       const placeholder=node('option','Choose an answer');placeholder.value='';select.append(placeholder);
       order.forEach(i=>{const option=node('option',p.choices[i]);option.value=String(i);select.append(option);});
+      select.onchange=checkResponse;
       field.append(select);getters.push(()=>select.value===''?null:[Number(select.value)]);
     }else{
       const inputs=order.map((i,position)=>{
         const label=node('label');label.className='choice';
         const input=node('input');input.type=p.mode==='multi'?'checkbox':'radio';input.name='part'+j;input.value=String(i);
+        input.onchange=checkResponse;
         label.append(input,node('span',String.fromCharCode(65+position)+'. '+p.choices[i]));
         field.append(label);return input;
       });
@@ -128,13 +130,11 @@ function render(){
     }
     host.append(field);
   });
-  const button=node('button','Check Answer');
-  button.type='button';
-  host.append(button);
   function showCorrect(){
     host.querySelectorAll('button,input,select').forEach(el=>el.disabled=true);
     $('feedback').className='feedback good';
     $('feedback').textContent='Correct. '+q.explanation;
+    $('feedback').scrollIntoView({block:'nearest'});
     clearTimeout(advanceTimer);
     advanceTimer=setTimeout(()=>{
       state.idx++;
@@ -142,23 +142,22 @@ function render(){
       else{render();save();}
     },4000);
   }
-  button.onclick=()=>{
+  function checkResponse(){
     if(meta.done)return;
     const responses=getters.map(readResponse=>readResponse());
-    if(responses.some(r=>r===null)){
-      $('feedback').textContent='Complete each part before checking your answer.';
-      return;
-    }
+    if(responses.some(r=>r===null))return;
     if(responses.every((r,j)=>equal(r,q.parts[j].mode==='sequence'?q.parts[j].keys:[...q.parts[j].keys].sort((a,b)=>a-b)))){
       meta.done=true;
       showCorrect();
     }else{
       meta.missed=true;meta.missCount++;state.runMisses++;
+      render();
       $('feedback').className='feedback bad';
       $('feedback').textContent='Try again. '+q.hint;
+      $('feedback').scrollIntoView({block:'nearest'});
     }
     save();
-  };
+  }
   if(meta.done)showCorrect();
 }
 function finish(){
